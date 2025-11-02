@@ -1,8 +1,10 @@
 mod config;
 mod project;
+mod walker;
 
 pub use config::DiscoveryConfig;
 pub use project::DiscoveredProject;
+pub use walker::find_hegel_directories;
 
 // Re-export hegel-cli types we depend on
 pub use hegel::storage::State;

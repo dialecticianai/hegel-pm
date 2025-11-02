@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-02 17:25
+**Last Updated**: 2025-11-02 17:26
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 359 | 1,618 | 1,977 |
-| **Comments** | 34 | - | 34 |
-| **Blank Lines** | 65 | - | 65 |
-| **Total Lines** | 458 | 1,618 | 2,076 |
-| **Files** | 5 | 7 | 12 |
+| **Lines** | 501 | 1,619 | 2,120 |
+| **Comments** | 56 | - | 56 |
+| **Blank Lines** | 104 | - | 104 |
+| **Total Lines** | 661 | 1,619 | 2,280 |
+| **Files** | 6 | 7 | 13 |
 
-**Documentation Ratio**: 4.51 lines of docs per line of code
+**Documentation Ratio**: 3.23 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,9 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                             5             65             34            359
+Rust                             6            104             56            501
 -------------------------------------------------------------------------------
-SUM:                             5             65             34            359
+SUM:                             6            104             56            501
 -------------------------------------------------------------------------------
 ```
 
@@ -37,8 +37,9 @@ SUM:                             5             65             34            359
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
 | `discovery/config.rs` | 212 | 105 | 107 | 50.5% | ✅ |
-| `discovery/mod.rs` | 21 | 10 | 11 | 52.4% | ✅ |
+| `discovery/mod.rs` | 23 | 12 | 11 | 47.8% | ✅ |
 | `discovery/project.rs` | 221 | 98 | 123 | 55.7% | ✅ |
+| `discovery/walker.rs` | 201 | 46 | 155 | 77.1% | ✅ |
 | `lib.rs` | 1 | 1 | 0 | 0.0% | ✅ |
 | `main.rs` | 3 | 3 | 0 | 0.0% | ✅ |
 
@@ -53,7 +54,7 @@ SUM:                             5             65             34            359
 | `ARCHITECTURE.md` | 273 |
 | `CLAUDE.md` | 389 |
 | `COVERAGE_REPORT.md` | 56 |
-| `LOC_REPORT.md` | 80 |
+| `LOC_REPORT.md` | 81 |
 | `VISION.md` | 115 |
 
 ---
@@ -62,7 +63,7 @@ SUM:                             5             65             34            359
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 4.51 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 3.23 | ✅ Excellent |
 | README exists | Yes | ❌ | Missing |
 | Architecture docs | Yes | ✅ | Met |
 
