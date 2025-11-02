@@ -1,0 +1,28 @@
+# Hegel state files (local state, not committed)
+.hegel/
+
+# Hegel handoff (session continuity, not committed)
+HANDOFF.md
+
+# Rust
+target/
+Cargo.lock
+*.rs.bk
+*.pdb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Web artifacts
+dist/
+pkg/
+*.wasm
+node_modules/
