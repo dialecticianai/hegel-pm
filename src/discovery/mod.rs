@@ -1,6 +1,8 @@
 mod config;
+mod project;
 
 pub use config::DiscoveryConfig;
+pub use project::DiscoveredProject;
 
 // Re-export hegel-cli types we depend on
 pub use hegel::storage::State;
