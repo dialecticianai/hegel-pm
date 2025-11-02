@@ -1,3 +1,7 @@
+mod config;
+
+pub use config::DiscoveryConfig;
+
 // Re-export hegel-cli types we depend on
 pub use hegel::storage::State;
 pub use hegel::storage::WorkflowState;
