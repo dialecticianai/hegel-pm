@@ -1,11 +1,19 @@
+mod cache;
 mod config;
+mod discover;
+mod engine;
 mod project;
 mod state;
+mod statistics;
 mod walker;
 
+pub use cache::{load_cache, save_cache};
 pub use config::DiscoveryConfig;
+pub use discover::discover_projects;
+pub use engine::DiscoveryEngine;
 pub use project::DiscoveredProject;
 pub use state::load_state;
+pub use statistics::ProjectStatistics;
 pub use walker::find_hegel_directories;
 
 // Re-export hegel-cli types we depend on

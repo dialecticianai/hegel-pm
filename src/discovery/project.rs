@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::time::SystemTime;
 
-use super::{State, WorkflowState};
+use super::{ProjectStatistics, WorkflowState};
 
 /// A discovered Hegel project
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -22,6 +22,9 @@ pub struct DiscoveredProject {
     pub discovered_at: SystemTime,
     /// Error message if state is corrupted
     pub error: Option<String>,
+    /// Statistics (loaded lazily)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub statistics: Option<ProjectStatistics>,
 }
 
 impl DiscoveredProject {
@@ -42,7 +45,21 @@ impl DiscoveredProject {
             last_activity,
             discovered_at: SystemTime::now(),
             error,
+            statistics: None,
         }
+    }
+
+    /// Load statistics for this project (lazy loading)
+    pub fn load_statistics(&mut self) -> Result<()> {
+        // TODO: Parse hooks.jsonl and states.jsonl using hegel::metrics
+        // For now, return empty statistics
+        self.statistics = Some(ProjectStatistics::new());
+        Ok(())
+    }
+
+    /// Check if statistics are loaded
+    pub fn has_statistics(&self) -> bool {
+        self.statistics.is_some()
     }
 
     /// Calculate last activity from .hegel directory file modifications
