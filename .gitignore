@@ -4,6 +4,9 @@
 # Hegel handoff (session continuity, not committed)
 HANDOFF.md
 
+# Claude Code settings (local environment)
+.claude/
+
 # Rust
 target/
 Cargo.lock
