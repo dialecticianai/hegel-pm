@@ -56,11 +56,11 @@ Create initial test module structure that will validate project setup. Write tes
 Create Cargo.toml with hegel-cli as path dependency. Set up src directory with main.rs and lib.rs. Create discovery module stub. Import key types from hegel-cli storage and metrics modules to verify dependency works. Ensure project compiles.
 
 ### Success Criteria
-- [ ] Cargo.toml correctly depends on hegel-cli
-- [ ] Can import hegel::storage::State and hegel::metrics types
-- [ ] Project compiles without errors
-- [ ] Basic test module structure exists
-- [ ] Committed with message: feat(discovery): initialize project structure
+- [x] Cargo.toml correctly depends on hegel-cli
+- [x] Can import hegel::storage::State and hegel::metrics types
+- [x] Project compiles without errors
+- [x] Basic test module structure exists
+- [x] Committed with message: feat(discovery): initialize project structure
 
 ---
 
@@ -76,12 +76,12 @@ Test configuration creation with defaults. Test validation of root directories t
 Create DiscoveryConfig struct with root directories list, max depth, exclusions list, and cache location path. Implement validation function that checks all directories exist and are readable, max depth is positive, cache location parent is writable. Implement Default trait with sensible values: root is home Code directory, max depth ten, standard exclusions for node_modules target git vendor. Add serde derives for cache persistence.
 
 ### Success Criteria
-- [ ] DiscoveryConfig struct defined with all required fields
-- [ ] Validation catches all invalid configurations
-- [ ] Default configuration provides sensible starting values
-- [ ] Config serializes to and from JSON correctly
-- [ ] All tests pass
-- [ ] Committed with message: feat(discovery): add configuration model with validation
+- [x] DiscoveryConfig struct defined with all required fields
+- [x] Validation catches all invalid configurations
+- [x] Default configuration provides sensible starting values
+- [x] Config serializes to and from JSON correctly
+- [x] All tests pass
+- [x] Committed with message: feat(discovery): add configuration model with validation
 
 ---
 
@@ -97,13 +97,13 @@ Test project model creation with required fields. Test last activity timestamp c
 Create DiscoveredProject struct with project name, project path, hegel directory path, optional workflow state from hegel-cli State type, last activity timestamp, discovery timestamp, and optional error field for corrupted projects. Implement methods for calculating last activity from filesystem metadata. Add serde derives for caching. Implement Ord trait to sort by last activity descending.
 
 ### Success Criteria
-- [ ] DiscoveredProject struct defined with all metadata fields
-- [ ] Last activity calculation works from file timestamps
-- [ ] Projects can be sorted by recency
-- [ ] Serialization works for caching
-- [ ] Error state properly represented for corrupted projects
-- [ ] All tests pass
-- [ ] Committed with message: feat(discovery): add discovered project model
+- [x] DiscoveredProject struct defined with all metadata fields
+- [x] Last activity calculation works from file timestamps
+- [x] Projects can be sorted by recency
+- [x] Serialization works for caching
+- [x] Error state properly represented for corrupted projects
+- [x] All tests pass
+- [x] Committed with message: feat(discovery): add discovered project model
 
 ---
 
@@ -119,13 +119,13 @@ Test walking single directory with one .hegel folder found. Test walking nested 
 Create walker function that takes root directory, max depth, and exclusion list. Use walkdir crate to recursively traverse filesystem. Check depth against max depth and stop when exceeded. Filter out excluded directory names before descending. Detect .hegel directories by checking for subdirectory with that name. Collect all found .hegel parent directories. Handle errors by logging and continuing rather than failing entire scan. Return list of paths containing .hegel directories.
 
 ### Success Criteria
-- [ ] Finds all .hegel directories in test fixtures
-- [ ] Respects max depth limit
-- [ ] Skips excluded directories
-- [ ] Handles permission errors gracefully
-- [ ] Does not follow symlinks
-- [ ] All tests pass
-- [ ] Committed with message: feat(discovery): implement filesystem walking
+- [x] Finds all .hegel directories in test fixtures
+- [x] Respects max depth limit
+- [x] Skips excluded directories
+- [x] Handles permission errors gracefully
+- [x] Does not follow symlinks
+- [x] All tests pass
+- [x] Committed with message: feat(discovery): implement filesystem walking
 
 ---
 
@@ -143,13 +143,13 @@ Test parsing valid state.json file returns populated State struct. Test missing 
 Create function that takes path to .hegel directory and attempts to load state.json. Use hegel-cli's storage module functions or State deserialization. Handle file not found as valid case returning None. Handle JSON parsing errors as error result with file path context. Return Result containing optional State.
 
 ### Success Criteria
-- [ ] Successfully parses valid hegel-cli state files
-- [ ] Returns None for missing state.json without error
-- [ ] Returns descriptive error for corrupted state files
-- [ ] Reuses hegel-cli State type directly
-- [ ] hegel-cli refactored if needed for library usage
-- [ ] All tests pass
-- [ ] Committed with message: feat(discovery): integrate hegel-cli state parsing
+- [x] Successfully parses valid hegel-cli state files
+- [x] Returns None for missing state.json without error
+- [x] Returns descriptive error for corrupted state files
+- [x] Reuses hegel-cli State type directly
+- [x] hegel-cli refactored if needed for library usage
+- [x] All tests pass
+- [x] Committed with message: feat(discovery): integrate hegel-cli state parsing
 
 ---
 
@@ -165,14 +165,14 @@ Test discovery finds multiple projects and populates their state. Test discovery
 Create discover function that takes DiscoveryConfig. For each root directory, invoke filesystem walker. For each found .hegel directory, parse state using function from previous step. Calculate last activity from .hegel directory file modification times. Create DiscoveredProject struct with all metadata. Handle state parsing errors by marking project with error but including in results. Collect all discovered projects. Sort by last activity descending. Return sorted list.
 
 ### Success Criteria
-- [ ] Discovers all projects in test workspace fixtures
-- [ ] Correctly populates state for each project
-- [ ] Last activity timestamps accurate
-- [ ] Corrupted projects included with error markers
-- [ ] Results sorted by recency
-- [ ] Multiple root directories processed
-- [ ] All tests pass
-- [ ] Committed with message: feat(discovery): implement project discovery integration
+- [x] Discovers all projects in test workspace fixtures
+- [x] Correctly populates state for each project
+- [x] Last activity timestamps accurate
+- [x] Corrupted projects included with error markers
+- [x] Results sorted by recency
+- [x] Multiple root directories processed
+- [x] All tests pass
+- [x] Committed with message: feat(discovery): implement project discovery integration
 
 ---
 
@@ -190,14 +190,14 @@ Test extracting hook event counts from hooks.jsonl. Test extracting state transi
 Create ProjectStatistics struct matching data from hegel analyze output. Create function that takes path to .hegel directory and returns statistics. Use hegel-cli metrics module to parse hooks.jsonl for event counts. Use hegel-cli metrics module to parse states.jsonl for transitions. Aggregate data into ProjectStatistics. Handle missing files as zero counts. Handle malformed JSONL lines by logging warning and skipping. Return Result with statistics.
 
 ### Success Criteria
-- [ ] Statistics match hegel analyze output for same project
-- [ ] Reuses hegel-cli metrics parsing completely
-- [ ] Handles missing JSONL files gracefully
-- [ ] Skips corrupted JSONL lines with warnings
-- [ ] Returns structured data matching dashboard needs
-- [ ] hegel-cli refactored if needed for library usage
-- [ ] All tests pass
-- [ ] Committed with message: feat(discovery): add statistics extraction
+- [x] Statistics match hegel analyze output for same project
+- [x] Reuses hegel-cli metrics parsing completely
+- [x] Handles missing JSONL files gracefully
+- [x] Skips corrupted JSONL lines with warnings
+- [x] Returns structured data matching dashboard needs
+- [x] hegel-cli refactored if needed for library usage
+- [x] All tests pass
+- [x] Committed with message: feat(discovery): add statistics extraction
 
 ---
 
@@ -213,13 +213,13 @@ Test initial discovery completes quickly without loading statistics. Test statis
 Modify DiscoveredProject to have optional statistics field initially None. Create separate function to load statistics for a project on demand. Cache loaded statistics in the project struct. Modify discovery process to skip statistics extraction during scan. Add method to batch load statistics for multiple projects efficiently. Handle statistics loading errors without affecting other projects.
 
 ### Success Criteria
-- [ ] Initial discovery much faster without statistics parsing
-- [ ] Statistics loaded correctly on demand
-- [ ] Statistics cached after first load
-- [ ] Batch loading supported for efficiency
-- [ ] Errors isolated per project
-- [ ] All tests pass
-- [ ] Committed with message: feat(discovery): implement lazy statistics loading
+- [x] Initial discovery much faster without statistics parsing
+- [x] Statistics loaded correctly on demand
+- [x] Statistics cached after first load
+- [x] Batch loading supported for efficiency
+- [x] Errors isolated per project
+- [x] All tests pass
+- [x] Committed with message: feat(discovery): implement lazy statistics loading
 
 ---
 
@@ -235,14 +235,14 @@ Test saving discovered projects to cache file creates valid JSON. Test loading f
 Create cache module with save and load functions. Save discovered projects list as JSON to configured cache location using atomic write pattern. Load cache file and deserialize to project list. Handle missing cache by returning None to trigger scan. Handle corrupted cache by logging warning and returning None. Include configuration hash in cache to detect config changes. Use file locking if needed for concurrent safety.
 
 ### Success Criteria
-- [ ] Cache saves successfully to configured location
-- [ ] Cache loads correctly on subsequent runs
-- [ ] Missing cache triggers fresh scan
-- [ ] Corrupted cache handled gracefully
-- [ ] Cache invalidates when config changes
-- [ ] Concurrent access safe
-- [ ] All tests pass
-- [ ] Committed with message: feat(discovery): add cache persistence
+- [x] Cache saves successfully to configured location
+- [x] Cache loads correctly on subsequent runs
+- [x] Missing cache triggers fresh scan
+- [x] Corrupted cache handled gracefully
+- [x] Cache invalidates when config changes
+- [x] Concurrent access safe
+- [x] All tests pass
+- [x] Committed with message: feat(discovery): add cache persistence
 
 ---
 
@@ -258,14 +258,14 @@ Test API with no cache performs full scan and saves cache. Test API with valid c
 Create DiscoveryEngine struct that owns configuration and cache. Implement method to get projects that checks cache first, loads if valid, scans if not. Add force refresh parameter to bypass cache. Integrate statistics loading based on caller request. Handle all error paths with clear context. Provide clean API for dashboard to consume.
 
 ### Success Criteria
-- [ ] Single clean API for dashboard usage
-- [ ] Cache-or-scan logic works correctly
-- [ ] Force refresh option available
-- [ ] Statistics loading integrated
-- [ ] All error scenarios handled
-- [ ] API documented for consumers
-- [ ] All tests pass
-- [ ] Committed with message: feat(discovery): implement discovery orchestration
+- [x] Single clean API for dashboard usage
+- [x] Cache-or-scan logic works correctly
+- [x] Force refresh option available
+- [x] Statistics loading integrated
+- [x] All error scenarios handled
+- [x] API documented for consumers
+- [x] All tests pass
+- [x] Committed with message: feat(discovery): implement discovery orchestration
 
 ---
 

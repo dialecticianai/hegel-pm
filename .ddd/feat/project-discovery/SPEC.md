@@ -267,46 +267,46 @@ Aggregated metrics derived from `.hegel/` JSONL files.
 ## Success Criteria
 
 ### Core Functionality
-- [ ] Discovers all Hegel projects in configured root directories
-- [ ] Correctly parses workflow state from state.json using hegel-cli's State struct
-- [ ] Skips excluded directories (node_modules, target, .git, vendor)
-- [ ] Returns projects sorted by last activity timestamp
-- [ ] Handles missing state.json gracefully (marks project as newly initialized)
+- [x] Discovers all Hegel projects in configured root directories
+- [x] Correctly parses workflow state from state.json using hegel-cli's State struct
+- [x] Skips excluded directories (node_modules, target, .git, vendor)
+- [x] Returns projects sorted by last activity timestamp
+- [x] Handles missing state.json gracefully (marks project as newly initialized)
 
 ### Statistics Extraction
-- [ ] Accurately counts hook events from hooks.jsonl using hegel-cli's metrics module
-- [ ] Accurately counts state transitions from states.jsonl
-- [ ] Extracts unique file paths from file modification events
-- [ ] Calculates time spent in each workflow phase
-- [ ] Identifies distinct sessions from session IDs
+- [x] Accurately counts hook events from hooks.jsonl using hegel-cli's metrics module
+- [x] Accurately counts state transitions from states.jsonl
+- [x] Extracts unique file paths from file modification events
+- [x] Calculates time spent in each workflow phase
+- [x] Identifies distinct sessions from session IDs
 
 ### Error Handling
-- [ ] Logs but continues on permission denied for subdirectories
-- [ ] Includes projects with corrupted state.json, marks with error flag
-- [ ] Skips malformed JSONL lines, logs warnings with line numbers
-- [ ] Returns partial results when some roots are inaccessible
-- [ ] Never crashes on filesystem errors during scan
+- [x] Logs but continues on permission denied for subdirectories
+- [x] Includes projects with corrupted state.json, marks with error flag
+- [x] Skips malformed JSONL lines, logs warnings with line numbers
+- [x] Returns partial results when some roots are inaccessible
+- [x] Never crashes on filesystem errors during scan
 
 ### Performance
-- [ ] Initial scan of workspace with 10+ projects completes in under 2 seconds
-- [ ] Cached results loaded in under 10ms on dashboard launch
-- [ ] Memory usage bounded for large JSONL files (streaming parser)
-- [ ] Parallel scanning of multiple root directories
-- [ ] Early termination of deep recursion when no projects found
+- [x] Initial scan of workspace with 10+ projects completes in under 2 seconds
+- [x] Cached results loaded in under 10ms on dashboard launch
+- [x] Memory usage bounded for large JSONL files (streaming parser)
+- [ ] Parallel scanning of multiple root directories (not implemented)
+- [ ] Early termination of deep recursion when no projects found (not needed with walkdir)
 
 ### Configuration
-- [ ] Validates all configuration parameters before scanning
-- [ ] Provides clear error messages for invalid configuration
-- [ ] Supports multiple root directories simultaneously
-- [ ] Respects max depth setting (prevents infinite recursion)
-- [ ] Persists scan results to cache file for subsequent loads
+- [x] Validates all configuration parameters before scanning
+- [x] Provides clear error messages for invalid configuration
+- [x] Supports multiple root directories simultaneously
+- [x] Respects max depth setting (prevents infinite recursion)
+- [x] Persists scan results to cache file for subsequent loads
 
 ### Integration
-- [ ] Uses hegel::storage::State for all state.json parsing
-- [ ] Uses hegel::metrics for all JSONL parsing
-- [ ] Returns data structures compatible with dashboard rendering layer
-- [ ] Supports manual refresh via `hegel-pm scan` command
-- [ ] Loads from cache on dashboard launch if cache exists
+- [x] Uses hegel::storage::State for all state.json parsing
+- [x] Uses hegel::metrics for all JSONL parsing
+- [x] Returns data structures compatible with dashboard rendering layer
+- [ ] Supports manual refresh via `hegel-pm scan` command (no CLI yet - only web server stub)
+- [x] Loads from cache on dashboard launch if cache exists
 
 ---
 
