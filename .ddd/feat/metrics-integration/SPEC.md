@@ -78,25 +78,25 @@ The metrics module already exposes:
 ## Success Criteria
 
 **Functionality:**
-- [ ] Discovered projects can load metrics on demand
-- [ ] Metrics data matches `hegel analyze` terminal output exactly
-- [ ] Empty projects return zero metrics without errors
-- [ ] Invalid data handled gracefully (error or partial results)
-- [ ] Metrics serialize to JSON for web UI
+- [x] Discovered projects can load metrics on demand
+- [x] Metrics data matches `hegel analyze` terminal output exactly
+- [x] Empty projects return zero metrics without errors
+- [x] Invalid data handled gracefully (error or partial results)
+- [x] Metrics serialize to JSON for web UI
 
 **Implementation:**
-- [ ] `ProjectStatistics` replaced with type alias to `UnifiedMetrics`
-- [ ] `load_statistics()` calls `parse_unified_metrics()`
-- [ ] All hegel-cli metrics types derive `Serialize`
-- [ ] No custom data structures duplicating hegel-cli types
-- [ ] Comprehensive test coverage
+- [x] `ProjectStatistics` replaced with type alias to `UnifiedMetrics`
+- [x] `load_statistics()` calls `parse_unified_metrics()`
+- [x] All hegel-cli metrics types derive `Serialize`
+- [x] No custom data structures duplicating hegel-cli types
+- [x] Comprehensive test coverage
 
 **Performance:**
-- [ ] Loading metrics for 10 projects completes in <2 seconds
-- [ ] Metrics cached after first load (no redundant parsing)
-- [ ] Memory usage bounded (<100MB for 10 projects with metrics)
+- [x] Loading metrics for 10 projects completes in <2 seconds
+- [x] Metrics cached after first load (no redundant parsing)
+- [x] Memory usage bounded (<100MB for 10 projects with metrics)
 
 **Quality:**
-- [ ] No panics on missing or invalid files
-- [ ] Error messages include file paths for debugging
-- [ ] All existing tests still pass in both hegel-cli and hegel-pm
+- [x] No panics on missing or invalid files
+- [x] Error messages include file paths for debugging
+- [x] All existing tests still pass in both hegel-cli and hegel-pm

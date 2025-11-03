@@ -43,11 +43,11 @@ Create src/test_helpers.rs module. Extract create_test_workspace from walker tes
 Make helpers available to all test modules via cfg(test) attribute.
 
 ### Success Criteria
-- [ ] test_helpers module exists with cfg(test) attribute
-- [ ] create_test_workspace extracted and working
-- [ ] Workflow artifact helpers implemented
-- [ ] Walker tests use new shared helpers
-- [ ] All existing tests still pass
+- [x] test_helpers module exists with cfg(test) attribute
+- [x] create_test_workspace extracted and working
+- [x] Workflow artifact helpers implemented
+- [x] Walker tests use new shared helpers
+- [x] All existing tests still pass
 
 ---
 
@@ -82,10 +82,10 @@ Add Serialize and Deserialize derives to these types in hegel-cli:
 Run existing hegel-cli test suite to ensure no regressions from adding derives.
 
 ### Success Criteria
-- [ ] All metrics types derive Serialize and Deserialize
-- [ ] New serialization tests pass
-- [ ] All existing hegel-cli tests still pass
-- [ ] No behavior changes to metrics parsing logic
+- [x] All metrics types derive Serialize and Deserialize
+- [x] New serialization tests pass
+- [x] All existing hegel-cli tests still pass
+- [x] No behavior changes to metrics parsing logic
 
 ---
 
@@ -109,10 +109,10 @@ Replace ProjectStatistics struct definition with type alias to UnifiedMetrics. U
 Delete custom ProjectStatistics implementation since all logic now comes from hegel-cli.
 
 ### Success Criteria
-- [ ] ProjectStatistics is type alias not custom struct
-- [ ] All imports updated to use hegel metrics types
-- [ ] Tests pass with new type
-- [ ] No duplication of hegel-cli types
+- [x] ProjectStatistics is type alias not custom struct
+- [x] All imports updated to use hegel metrics types
+- [x] Tests pass with new type
+- [x] No duplication of hegel-cli types
 
 ---
 
@@ -139,12 +139,12 @@ Replace TODO implementation in DiscoveredProject load_statistics method with sin
 Handle errors appropriately: propagate parse errors up to caller rather than silently swallowing them.
 
 ### Success Criteria
-- [ ] load_statistics calls parse_unified_metrics
-- [ ] Result cached in project statistics field
-- [ ] Empty project returns zero metrics
-- [ ] Full workflow returns complete data
-- [ ] Errors propagated with context
-- [ ] Integration test passes
+- [x] load_statistics calls parse_unified_metrics
+- [x] Result cached in project statistics field
+- [x] Empty project returns zero metrics
+- [x] Full workflow returns complete data
+- [x] Errors propagated with context
+- [x] Integration test passes
 
 ---
 
