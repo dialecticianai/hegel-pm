@@ -20,11 +20,15 @@ Tech stack and architectural decisions for multi-project Hegel dashboard
 - **chrono** - Timestamp parsing from workflow_id (already in hegel-cli)
 - **anyhow** - Error handling (already in hegel-cli)
 
-**To Explore** (Discovery phase):
-- Web server choice: `warp`, `axum`, or `actix-web` for local HTTP server
+**Decisions Made**:
+- **Web server**: `warp` (async HTTP server, serves static files + JSON API)
+- **Build system**: Trunk (WASM bundler, generates `static/` artifacts from `index.html`)
+- **Deployment**: WASM in browser served by local warp server on `localhost:3030`
+- **API design**: Lightweight JSON responses (summary counts, not full data arrays)
+
+**Still To Explore**:
 - Sycamore routing for multi-view dashboard
-- WebSocket vs polling for live state updates
-- WASM vs native binary deployment model
+- Live state updates (deferred to future feature)
 
 ---
 
@@ -128,16 +132,42 @@ Tech stack and architectural decisions for multi-project Hegel dashboard
 - **Leptos**: Newer, less stable ecosystem
 - **React + Rust backend**: Split-language complexity
 
+### Decision 6: Lightweight API Responses
+
+**Choice**: Server returns aggregate summary counts, not full data arrays
+
+**Rationale**:
+- **Performance**: ~243 byte response vs megabytes of raw event data
+- **Client-side speed**: Instant JSON deserialization (no UI freezing)
+- **Bandwidth**: Minimal payload for local HTTP server
+- **Caching**: Small responses easy to cache in-memory
+
+**Implementation**:
+- `ProjectMetricsSummary` type with counts only (tokens, events, commands, files)
+- `ProjectStatistics` (full data) used server-side only
+- Response caching: serialized JSON stored per project
+- Async cache persistence: background worker with deduplication
+
+**Tradeoffs**:
+- Less detailed data in UI (can't show individual bash commands)
+- Future drill-down features require additional endpoints
+- **Acceptable**: Dashboard summary view prioritizes speed over detail
+
+**Alternative rejected**:
+- **Full data arrays**: Caused browser freezing on large payloads (megabytes)
+
 ---
 
 ## System Boundaries
 
 ### Internal (hegel-pm owns)
 - **Project discovery**: Recursive filesystem walking
-- **Web server**: Local HTTP server for dashboard
+- **Web server**: Local HTTP server for dashboard (warp)
 - **UI rendering**: Sycamore components (project cards, workflow graphs, metrics charts)
-- **File watching**: Monitor `.hegel/` directories for changes
-- **Configuration**: User prefs (root directory, refresh rate, UI theme)
+- **API layer**: Lightweight response types (`ProjectMetricsSummary`) for metrics endpoint
+- **Cache management**: Async cache persistence with background worker and deduplication
+- **File watching**: Monitor `.hegel/` directories for changes (future feature)
+- **Configuration**: User prefs (root directory, cache location)
 
 ### External (dependencies on hegel-cli)
 - **State parsing**: Reuse `storage::State`, `storage::WorkflowState` structs
@@ -181,15 +211,17 @@ Tech stack and architectural decisions for multi-project Hegel dashboard
 
 ## Open Questions (Discovery Phase)
 
+**Resolved**:
+- [x] **Web server choice**: `warp` selected for async HTTP + static file serving
+- [x] **Project discovery caching**: Implemented persistent cache with atomic writes
+- [x] **API optimization**: Lightweight summary responses (ProjectMetricsSummary ~243 bytes)
+- [x] **Concurrent access**: Async cache manager with mutex-free serialization
+- [x] **Component structure**: Refactored to `components/` directory (sidebar.rs, metrics_view.rs)
+
 **To Investigate**:
-- [ ] **Web server choice**: `warp` vs `axum` vs `actix-web` for local HTTP server?
-- [ ] **File watching scalability**: How many `.hegel/` dirs can we watch before hitting fd limits?
 - [ ] **JSONL parsing performance**: Large `hooks.jsonl` files (>10K events) - streaming vs full read?
-- [ ] **Sycamore best practices**: Optimal component structure for multi-project dashboard?
-- [ ] **Live update mechanism**: WebSocket vs SSE vs polling for state changes?
+- [ ] **Live update mechanism**: File watching vs manual refresh (deferred to future feature)
 - [ ] **WASM bundle optimization**: Code splitting, lazy loading for faster initial load?
-- [ ] **Project discovery caching**: Store discovered projects in local config vs re-scan on startup?
-- [ ] **Concurrent state reads**: Do we need locking if CLI is writing while PM reads?
 
 ---
 
