@@ -7,8 +7,8 @@ mod types;
 use components::{MetricsView, Sidebar};
 
 #[component]
-fn App() -> View {
-    view! {
+fn App<G: Html>(cx: Scope) -> View<G> {
+    view! { cx,
         div(class="app-container") {
             Sidebar {}
             MetricsView {}
@@ -19,5 +19,5 @@ fn App() -> View {
 #[wasm_bindgen(start)]
 pub fn main() {
     console_error_panic_hook::set_once();
-    sycamore::render(|| view! { App {} });
+    sycamore::render(|cx| view! { cx, App {} });
 }

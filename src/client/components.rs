@@ -1,18 +1,53 @@
+use gloo_net::http::Request;
 use sycamore::prelude::*;
 
+use super::types::DiscoveredProject;
+
 #[component]
-pub fn Sidebar() -> View {
-    view! {
+pub fn Sidebar<G: Html>(cx: Scope) -> View<G> {
+    let html = create_signal(cx, String::from("<p>Loading projects...</p>"));
+
+    // Fetch and render projects
+    sycamore::futures::spawn_local_scoped(cx, async move {
+        match Request::get("/api/projects").send().await {
+            Ok(resp) => {
+                if let Ok(projects) = resp.json::<Vec<DiscoveredProject>>().await {
+                    let rendered = projects.iter().map(|p| {
+                        let state = if let Some(ref s) = p.workflow_state {
+                            format!(
+                                r#"<span class="mode">{}</span> • <span class="phase">{}</span>"#,
+                                s.mode, s.current_node
+                            )
+                        } else {
+                            r#"<span class="inactive">No workflow</span>"#.to_string()
+                        };
+
+                        format!(
+                            r#"<div class="project-item"><div class="project-name">{}</div><div class="project-state">{}</div></div>"#,
+                            p.name, state
+                        )
+                    }).collect::<Vec<_>>().join("");
+
+                    html.set(rendered);
+                }
+            }
+            Err(_) => {
+                html.set(String::from("<p>Error loading projects</p>"));
+            }
+        }
+    });
+
+    view! { cx,
         div(class="sidebar") {
             h2 { "Projects" }
-            p { "Loading projects..." }
+            div(class="project-list", dangerously_set_inner_html=html.get().as_ref())
         }
     }
 }
 
 #[component]
-pub fn MetricsView() -> View {
-    view! {
+pub fn MetricsView<G: Html>(cx: Scope) -> View<G> {
+    view! { cx,
         div(class="main-content") {
             h1 { "Hegel Metrics Analysis" }
 

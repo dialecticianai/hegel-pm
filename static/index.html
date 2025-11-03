@@ -5,8 +5,8 @@
     <title>Hegel PM</title>
     
 <script type="module">
-import init, * as bindings from '/hegel-pm-2d7b26219e095e14.js';
-const wasm = await init({ module_or_path: '/hegel-pm-2d7b26219e095e14_bg.wasm' });
+import init, * as bindings from '/hegel-pm-beb921602a0dc3c4.js';
+const wasm = await init({ module_or_path: '/hegel-pm-beb921602a0dc3c4_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -22,11 +22,79 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
             background: #f5f5f5;
             color: #333;
             line-height: 1.6;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Two-panel layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: #2c3e50;
+            color: white;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .sidebar h2 {
+            padding: 20px;
+            margin: 0;
+            background: #1a252f;
+            font-size: 1.2em;
+        }
+        .project-list {
+            padding: 10px;
+        }
+        .project-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #34495e;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .project-item:hover {
+            background: #3d566e;
+        }
+        .project-item.active {
+            background: #3498db;
+        }
+        .project-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .project-state {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+        .project-state .mode {
+            color: #3498db;
+            font-weight: 500;
+        }
+        .project-item.active .project-state .mode {
+            color: #ecf0f1;
+        }
+        .project-state .phase {
+            color: #e8e8e8;
+        }
+        .project-state .inactive {
+            color: #95a5a6;
+            font-style: italic;
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
         }
         h1 {
             margin-bottom: 30px;
@@ -89,7 +157,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
             margin-left: 10px;
         }
     </style>
-<link rel="modulepreload" href="/hegel-pm-2d7b26219e095e14.js" crossorigin="anonymous" integrity="sha384-62Wcd8u3xv+jbShsFWkaTRcfGPXTQ7aP+yCcdzowbuxfNZYIFA7Ly47hg0Ab7qrL"><link rel="preload" href="/hegel-pm-2d7b26219e095e14_bg.wasm" crossorigin="anonymous" integrity="sha384-yqcCjoQgK929m/gqJTzg99ssdrdoJLCUeWD6ov1y9djG+B/+rnL8B/zBgPRF7t7d" as="fetch" type="application/wasm"></head>
+<link rel="modulepreload" href="/hegel-pm-beb921602a0dc3c4.js" crossorigin="anonymous" integrity="sha384-txIpjwNIWLMcQgru6lUU79Sx0+kVLZ/3cTmYYsv8gsumAW2fIVSOU0zsSbD6Cuhj"><link rel="preload" href="/hegel-pm-beb921602a0dc3c4_bg.wasm" crossorigin="anonymous" integrity="sha384-xzh4Cy3udzuTmrCDHi6jajYIYRYK/eoruvOaPA+9prWBzGtjq0p1VIpw9Ci/5M/D" as="fetch" type="application/wasm"></head>
 <body>
 </body>
 </html>

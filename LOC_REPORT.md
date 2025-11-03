@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-03 10:13
+**Last Updated**: 2025-11-03 10:32
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 1,213 | 2,226 | 3,439 |
-| **Comments** | 114 | - | 114 |
-| **Blank Lines** | 271 | - | 271 |
-| **Total Lines** | 1,598 | 2,226 | 3,824 |
+| **Lines** | 1,242 | 2,228 | 3,470 |
+| **Comments** | 115 | - | 115 |
+| **Blank Lines** | 276 | - | 276 |
+| **Total Lines** | 1,633 | 2,228 | 3,861 |
 | **Files** | 15 | 14 | 29 |
 
-**Documentation Ratio**: 1.84 lines of docs per line of code
+**Documentation Ratio**: 1.79 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            15            271            114           1213
+Rust                            15            276            115           1242
 Markdown                         3             27              0             63
 -------------------------------------------------------------------------------
-SUM:                            18            298            114           1276
+SUM:                            18            303            115           1305
 -------------------------------------------------------------------------------
 ```
 
@@ -37,7 +37,7 @@ SUM:                            18            298            114           1276
 
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
-| `client/components.rs` | 95 | 95 | 0 | 0.0% | ✅ |
+| `client/components.rs` | 130 | 130 | 0 | 0.0% | ✅ |
 | `client/mod.rs` | 23 | 23 | 0 | 0.0% | ✅ |
 | `client/types.rs` | 14 | 14 | 0 | 0.0% | ✅ |
 | `discovery/cache.rs` | 145 | 51 | 94 | 64.8% | ✅ |
@@ -67,7 +67,7 @@ SUM:                            18            298            114           1276
 | `CLAUDE.md` | 389 |
 | `CODE_MAP.md` | 21 |
 | `COVERAGE_REPORT.md` | 56 |
-| `LOC_REPORT.md` | 97 |
+| `LOC_REPORT.md` | 99 |
 | `README.md` | 174 |
 | `src/CODE_MAP.md` | 19 |
 | `src/discovery/CODE_MAP.md` | 40 |
@@ -80,7 +80,7 @@ SUM:                            18            298            114           1276
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.84 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.79 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 
