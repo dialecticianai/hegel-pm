@@ -51,9 +51,7 @@ impl DiscoveredProject {
 
     /// Load statistics for this project (lazy loading)
     pub fn load_statistics(&mut self) -> Result<()> {
-        // TODO: Parse hooks.jsonl and states.jsonl using hegel::metrics
-        // For now, return empty statistics
-        self.statistics = Some(ProjectStatistics::new());
+        self.statistics = Some(hegel::metrics::parse_unified_metrics(&self.hegel_dir)?);
         Ok(())
     }
 
