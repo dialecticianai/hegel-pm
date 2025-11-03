@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use hegel::storage::FileStorage;
 
-use super::{State, WorkflowState};
+use super::WorkflowState;
 
 /// Load workflow state from a .hegel directory
 pub fn load_state(hegel_dir: &PathBuf) -> Result<Option<WorkflowState>> {

@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-02 17:31
+**Last Updated**: 2025-11-03 00:52
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 1,049 | 1,621 | 2,670 |
-| **Comments** | 103 | - | 103 |
-| **Blank Lines** | 236 | - | 236 |
-| **Total Lines** | 1,388 | 1,621 | 3,009 |
-| **Files** | 11 | 7 | 18 |
+| **Lines** | 1,069 | 2,095 | 3,164 |
+| **Comments** | 109 | - | 109 |
+| **Blank Lines** | 244 | - | 244 |
+| **Total Lines** | 1,422 | 2,095 | 3,517 |
+| **Files** | 12 | 11 | 23 |
 
-**Documentation Ratio**: 1.55 lines of docs per line of code
+**Documentation Ratio**: 1.96 lines of docs per line of code
 
 ---
 
@@ -24,9 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            11            236            103           1049
+Rust                            12            244            109           1069
+Markdown                         1              5              0             26
 -------------------------------------------------------------------------------
-SUM:                            11            236            103           1049
+SUM:                            13            249            109           1095
 -------------------------------------------------------------------------------
 ```
 
@@ -44,9 +45,10 @@ SUM:                            11            236            103           1049
 | `discovery/project.rs` | 238 | 115 | 123 | 51.7% | ✅ |
 | `discovery/state.rs` | 113 | 19 | 94 | 83.2% | ✅ |
 | `discovery/statistics.rs` | 67 | 30 | 37 | 55.2% | ✅ |
-| `discovery/walker.rs` | 201 | 46 | 155 | 77.1% | ✅ |
-| `lib.rs` | 1 | 1 | 0 | 0.0% | ✅ |
+| `discovery/walker.rs` | 171 | 46 | 125 | 73.1% | ✅ |
+| `lib.rs` | 4 | 2 | 2 | 50.0% | ✅ |
 | `main.rs` | 3 | 3 | 0 | 0.0% | ✅ |
+| `test_helpers.rs` | 61 | 35 | 26 | 42.6% | ✅ |
 
 ---
 
@@ -54,12 +56,16 @@ SUM:                            11            236            103           1049
 
 | File | Lines |
 |------|-------|
+| `.ddd/feat/metrics-integration/PLAN.md` | 204 |
+| `.ddd/feat/metrics-integration/SPEC.md` | 102 |
 | `.ddd/feat/project-discovery/PLAN.md` | 372 |
 | `.ddd/feat/project-discovery/SPEC.md` | 333 |
 | `ARCHITECTURE.md` | 273 |
 | `CLAUDE.md` | 389 |
 | `COVERAGE_REPORT.md` | 56 |
-| `LOC_REPORT.md` | 83 |
+| `LOC_REPORT.md` | 87 |
+| `README.md` | 133 |
+| `src/discovery/README.md` | 31 |
 | `VISION.md` | 115 |
 
 ---
@@ -68,8 +74,8 @@ SUM:                            11            236            103           1049
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.55 | ✅ Excellent |
-| README exists | Yes | ❌ | Missing |
+| Docs/Code Ratio | ≥0.3 | 1.96 | ✅ Excellent |
+| README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 
 ---

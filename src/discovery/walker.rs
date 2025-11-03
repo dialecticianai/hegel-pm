@@ -47,39 +47,9 @@ pub fn find_hegel_directories(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_helpers::create_test_workspace;
     use std::fs;
     use tempfile::TempDir;
-
-    fn create_test_workspace() -> TempDir {
-        let temp = TempDir::new().unwrap();
-        let root = temp.path();
-
-        // Create nested project structure
-        // project1/ with .hegel
-        let project1 = root.join("project1");
-        fs::create_dir_all(&project1).unwrap();
-        fs::create_dir(project1.join(".hegel")).unwrap();
-
-        // nested/project2/ with .hegel
-        let project2 = root.join("nested").join("project2");
-        fs::create_dir_all(&project2).unwrap();
-        fs::create_dir(project2.join(".hegel")).unwrap();
-
-        // deep/nested/project3/ with .hegel
-        let project3 = root.join("deep").join("nested").join("project3");
-        fs::create_dir_all(&project3).unwrap();
-        fs::create_dir(project3.join(".hegel")).unwrap();
-
-        // excluded/node_modules/project4/ with .hegel (should be skipped)
-        let project4 = root.join("excluded").join("node_modules").join("project4");
-        fs::create_dir_all(&project4).unwrap();
-        fs::create_dir(project4.join(".hegel")).unwrap();
-
-        // no_hegel/ without .hegel
-        fs::create_dir(root.join("no_hegel")).unwrap();
-
-        temp
-    }
 
     #[test]
     fn test_find_single_project() {
