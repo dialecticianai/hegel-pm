@@ -3,7 +3,7 @@ mod discovery_mode;
 mod server_mode;
 
 use clap::Parser;
-use cli::Args;
+use cli::{Args, Command};
 use hegel_pm::discovery::{DiscoveryConfig, DiscoveryEngine};
 
 #[tokio::main]
@@ -14,12 +14,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = DiscoveryConfig::default();
     let engine = DiscoveryEngine::new(config)?;
 
-    if args.discover {
-        // Discovery mode: scan and print results
-        discovery_mode::run(&engine, args.refresh)?;
-    } else {
-        // Server mode: start web server
-        server_mode::run(&engine).await?;
+    match args.command {
+        Some(Command::Discover {
+            subcommand,
+            json,
+            no_cache,
+        }) => {
+            // New discover subcommand
+            cli::discover::run(&engine, &subcommand, json, no_cache)?;
+        }
+        None => {
+            if args.discover {
+                // Deprecated --discover flag
+                eprintln!("⚠️  Warning: --discover flag is deprecated. Use 'discover list' instead.");
+                discovery_mode::run(&engine, args.refresh)?;
+            } else {
+                // Server mode: start web server
+                server_mode::run(&engine).await?;
+            }
+        }
     }
 
     Ok(())
