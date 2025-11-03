@@ -89,6 +89,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - AST-aware: finds only actual code usage, ignores comments/strings
 - Only use grep for non-code searches (logs, markdown)
 
+**Documentation fetching**: Prefer local sources over web search
+- ✅ Use `cargo doc --open` for rustdoc (local Rust API documentation)
+- ✅ Read source from local dependencies in `~/.cargo/registry/src/`
+- ✅ Use `w3m -dump <url>` to fetch and render web pages as clean plain text
+- ✅ Optionally cache with `wget` to `.webcache/` directory for offline reference
+- ❌ DO NOT use WebFetch tool for external documentation
+- Note: Fetch directly with w3m renders better than cached files
+
 **JSONL parsing**: Follow Hegel ecosystem conventions
 - One JSON object per line (newline-delimited)
 - Timestamps in ISO 8601 format

@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-03 10:32
+**Last Updated**: 2025-11-03 11:24
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 1,242 | 2,228 | 3,470 |
+| **Lines** | 1,270 | 5,383 | 6,653 |
 | **Comments** | 115 | - | 115 |
-| **Blank Lines** | 276 | - | 276 |
-| **Total Lines** | 1,633 | 2,228 | 3,861 |
-| **Files** | 15 | 14 | 29 |
+| **Blank Lines** | 275 | - | 275 |
+| **Total Lines** | 1,660 | 5,383 | 7,043 |
+| **Files** | 15 | 21 | 36 |
 
-**Documentation Ratio**: 1.79 lines of docs per line of code
+**Documentation Ratio**: 4.24 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            15            276            115           1242
+Rust                            15            275            115           1270
 Markdown                         3             27              0             63
 -------------------------------------------------------------------------------
-SUM:                            18            303            115           1305
+SUM:                            18            302            115           1333
 -------------------------------------------------------------------------------
 ```
 
@@ -37,7 +37,7 @@ SUM:                            18            303            115           1305
 
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
-| `client/components.rs` | 130 | 130 | 0 | 0.0% | ✅ |
+| `client/components.rs` | 157 | 157 | 0 | 0.0% | ✅ |
 | `client/mod.rs` | 23 | 23 | 0 | 0.0% | ✅ |
 | `client/types.rs` | 14 | 14 | 0 | 0.0% | ✅ |
 | `discovery/cache.rs` | 145 | 51 | 94 | 64.8% | ✅ |
@@ -64,14 +64,21 @@ SUM:                            18            303            115           1305
 | `.ddd/feat/project-discovery/PLAN.md` | 372 |
 | `.ddd/feat/project-discovery/SPEC.md` | 333 |
 | `ARCHITECTURE.md` | 273 |
-| `CLAUDE.md` | 389 |
+| `CLAUDE.md` | 397 |
 | `CODE_MAP.md` | 21 |
 | `COVERAGE_REPORT.md` | 56 |
+| `learnings/.ddd/0_sycamore_foundations_assessment.md` | 335 |
+| `learnings/.ddd/1_open_questions.md` | 294 |
+| `learnings/LEARNING_SYCAMORE_COMPONENTS.md` | 733 |
+| `learnings/LEARNING_SYCAMORE_FOUNDATIONS.md` | 572 |
+| `learnings/LEARNING_SYCAMORE_PRACTICES.md` | 514 |
 | `LOC_REPORT.md` | 99 |
 | `README.md` | 174 |
+| `RESEARCH_PLAN.md` | 189 |
 | `src/CODE_MAP.md` | 19 |
 | `src/discovery/CODE_MAP.md` | 40 |
 | `src/discovery/README.md` | 31 |
+| `TESTING.md` | 510 |
 | `VISION.md` | 115 |
 
 ---
@@ -80,7 +87,7 @@ SUM:                            18            303            115           1305
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.79 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 4.24 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 

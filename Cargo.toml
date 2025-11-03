@@ -25,7 +25,7 @@ open = "5.0"
 
 # WASM-only dependencies
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-sycamore = { version = "0.8", features = ["hydrate", "suspense"] }
+sycamore = { version = "0.9", features = ["hydrate", "suspense"] }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 serde-wasm-bindgen = "0.6"
@@ -34,6 +34,10 @@ console_error_panic_hook = "0.1"
 
 [dev-dependencies]
 tempfile = "3.8"
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-test = "0.3"
+web-sys = { version = "0.3", features = ["Element", "Window", "Document", "HtmlElement"] }
 
 [[bin]]
 name = "hegel-pm"

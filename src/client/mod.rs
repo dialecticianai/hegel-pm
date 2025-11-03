@@ -1,14 +1,14 @@
 use sycamore::prelude::*;
 use wasm_bindgen::prelude::*;
 
-mod components;
+pub mod components;
 mod types;
 
 use components::{MetricsView, Sidebar};
 
 #[component]
-fn App<G: Html>(cx: Scope) -> View<G> {
-    view! { cx,
+pub fn App() -> View {
+    view! {
         div(class="app-container") {
             Sidebar {}
             MetricsView {}
@@ -19,5 +19,5 @@ fn App<G: Html>(cx: Scope) -> View<G> {
 #[wasm_bindgen(start)]
 pub fn main() {
     console_error_panic_hook::set_once();
-    sycamore::render(|cx| view! { cx, App {} });
+    sycamore::render(|| view! { App {} });
 }

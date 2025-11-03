@@ -7,6 +7,9 @@ HANDOFF.md
 # Claude Code settings (local environment)
 .claude/
 
+# Webcache (documentation cache, not committed)
+.webcache/
+
 # Rust
 target/
 Cargo.lock

@@ -4,50 +4,77 @@ use sycamore::prelude::*;
 use super::types::DiscoveredProject;
 
 #[component]
-pub fn Sidebar<G: Html>(cx: Scope) -> View<G> {
-    let html = create_signal(cx, String::from("<p>Loading projects...</p>"));
+pub fn Sidebar() -> View {
+    let projects = create_signal(Vec::<DiscoveredProject>::new());
+    let loading = create_signal(true);
+    let error = create_signal(false);
 
-    // Fetch and render projects
-    sycamore::futures::spawn_local_scoped(cx, async move {
+    // Fetch projects
+    sycamore::futures::spawn_local(async move {
         match Request::get("/api/projects").send().await {
             Ok(resp) => {
-                if let Ok(projects) = resp.json::<Vec<DiscoveredProject>>().await {
-                    let rendered = projects.iter().map(|p| {
-                        let state = if let Some(ref s) = p.workflow_state {
-                            format!(
-                                r#"<span class="mode">{}</span> • <span class="phase">{}</span>"#,
-                                s.mode, s.current_node
-                            )
-                        } else {
-                            r#"<span class="inactive">No workflow</span>"#.to_string()
-                        };
-
-                        format!(
-                            r#"<div class="project-item"><div class="project-name">{}</div><div class="project-state">{}</div></div>"#,
-                            p.name, state
-                        )
-                    }).collect::<Vec<_>>().join("");
-
-                    html.set(rendered);
+                if let Ok(projs) = resp.json::<Vec<DiscoveredProject>>().await {
+                    projects.set(projs);
+                    loading.set(false);
+                } else {
+                    error.set(true);
+                    loading.set(false);
                 }
             }
             Err(_) => {
-                html.set(String::from("<p>Error loading projects</p>"));
+                error.set(true);
+                loading.set(false);
             }
         }
     });
 
-    view! { cx,
+    view! {
         div(class="sidebar") {
             h2 { "Projects" }
-            div(class="project-list", dangerously_set_inner_html=html.get().as_ref())
+            div(class="project-list") {
+                (if loading.get() {
+                    view! { p { "Loading projects..." } }
+                } else if error.get() {
+                    view! { p { "Error loading projects" } }
+                } else {
+                    view! {
+                        Keyed(
+                            list=projects,
+                            key=|p| p.name.clone(),
+                            view=|p| {
+                                let name = p.name.clone();
+                                let state_view = if let Some(s) = p.workflow_state.clone() {
+                                    let mode = s.mode;
+                                    let phase = s.current_node;
+                                    view! {
+                                        span(class="mode") { (mode) }
+                                        " • "
+                                        span(class="phase") { (phase) }
+                                    }
+                                } else {
+                                    view! { span(class="inactive") { "No workflow" } }
+                                };
+
+                                view! {
+                                    div(class="project-item") {
+                                        div(class="project-name") { (name) }
+                                        div(class="project-state") {
+                                            (state_view)
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    }
+                })
+            }
         }
     }
 }
 
 #[component]
-pub fn MetricsView<G: Html>(cx: Scope) -> View<G> {
-    view! { cx,
+pub fn MetricsView() -> View {
+    view! {
         div(class="main-content") {
             h1 { "Hegel Metrics Analysis" }
 
