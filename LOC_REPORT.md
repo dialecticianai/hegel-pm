@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-03 01:16
+**Last Updated**: 2025-11-03 01:42
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 1,103 | 2,184 | 3,287 |
+| **Lines** | 1,144 | 2,185 | 3,329 |
 | **Comments** | 105 | - | 105 |
-| **Blank Lines** | 253 | - | 253 |
-| **Total Lines** | 1,461 | 2,184 | 3,645 |
+| **Blank Lines** | 255 | - | 255 |
+| **Total Lines** | 1,504 | 2,185 | 3,689 |
 | **Files** | 13 | 14 | 27 |
 
-**Documentation Ratio**: 1.98 lines of docs per line of code
+**Documentation Ratio**: 1.91 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            13            253            105           1103
+Rust                            13            255            105           1144
 Markdown                         3             27              0             63
 -------------------------------------------------------------------------------
-SUM:                            16            280            105           1166
+SUM:                            16            282            105           1207
 -------------------------------------------------------------------------------
 ```
 
@@ -37,7 +37,7 @@ SUM:                            16            280            105           1166
 
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
-| `client/mod.rs` | 50 | 50 | 0 | 0.0% | ✅ |
+| `client/mod.rs` | 92 | 92 | 0 | 0.0% | ✅ |
 | `discovery/cache.rs` | 145 | 51 | 94 | 64.8% | ✅ |
 | `discovery/config.rs` | 212 | 105 | 107 | 50.5% | ✅ |
 | `discovery/discover.rs` | 200 | 52 | 148 | 74.0% | ✅ |
@@ -47,7 +47,7 @@ SUM:                            16            280            105           1166
 | `discovery/state.rs` | 113 | 19 | 94 | 83.2% | ✅ |
 | `discovery/statistics.rs` | 30 | 3 | 27 | 90.0% | ✅ |
 | `discovery/walker.rs` | 171 | 46 | 125 | 73.1% | ✅ |
-| `lib.rs` | 8 | 2 | 6 | 75.0% | ✅ |
+| `lib.rs` | 9 | 3 | 6 | 66.7% | ✅ |
 | `main.rs` | 27 | 27 | 0 | 0.0% | ✅ |
 | `test_helpers.rs` | 61 | 35 | 26 | 42.6% | ✅ |
 
@@ -65,7 +65,7 @@ SUM:                            16            280            105           1166
 | `CLAUDE.md` | 389 |
 | `CODE_MAP.md` | 21 |
 | `COVERAGE_REPORT.md` | 56 |
-| `LOC_REPORT.md` | 96 |
+| `LOC_REPORT.md` | 97 |
 | `README.md` | 133 |
 | `src/CODE_MAP.md` | 19 |
 | `src/discovery/CODE_MAP.md` | 40 |
@@ -78,7 +78,7 @@ SUM:                            16            280            105           1166
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.98 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.91 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 

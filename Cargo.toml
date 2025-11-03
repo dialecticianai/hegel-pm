@@ -8,23 +8,21 @@ license = "SSPL-1.0"
 repository = "https://github.com/dialecticianai/hegel-pm"
 
 [dependencies]
-# Hegel CLI dependency (storage, metrics, state parsing)
-hegel = { path = "../hegel-cli" }
-
 # Core utilities
 anyhow = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
-# Filesystem operations
+# Native-only dependencies
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+hegel = { path = "../hegel-cli" }
 walkdir = "2.5"
 dirs = "5.0"
-
-# Web framework (server)
 warp = "0.3"
 tokio = { version = "1.0", features = ["full"] }
 
-# Web framework (client - WASM)
+# WASM-only dependencies
+[target.'cfg(target_arch = "wasm32")'.dependencies]
 sycamore = { version = "0.9", features = ["hydrate"] }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
@@ -38,6 +36,11 @@ tempfile = "3.8"
 [[bin]]
 name = "hegel-pm-server"
 path = "src/main.rs"
+required-features = ["server"]
+
+[features]
+default = []
+server = []
 
 [lib]
 crate-type = ["cdylib", "rlib"]
