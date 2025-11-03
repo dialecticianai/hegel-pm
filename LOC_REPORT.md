@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-03 15:34
+**Last Updated**: 2025-11-03 15:36
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 2,169 | 6,455 | 8,624 |
-| **Comments** | 188 | - | 188 |
-| **Blank Lines** | 399 | - | 399 |
-| **Total Lines** | 2,756 | 6,455 | 9,211 |
+| **Lines** | 2,375 | 6,455 | 8,830 |
+| **Comments** | 194 | - | 194 |
+| **Blank Lines** | 434 | - | 434 |
+| **Total Lines** | 3,003 | 6,455 | 9,458 |
 | **Files** | 27 | 23 | 50 |
 
-**Documentation Ratio**: 2.98 lines of docs per line of code
+**Documentation Ratio**: 2.72 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            27            399            188           2169
+Rust                            27            434            194           2375
 Markdown                         4             18              0             83
 -------------------------------------------------------------------------------
-SUM:                            31            417            188           2252
+SUM:                            31            452            194           2458
 -------------------------------------------------------------------------------
 ```
 
@@ -42,7 +42,7 @@ SUM:                            31            417            188           2252
 | `cli/discover/format.rs` | 128 | 52 | 76 | 59.4% | ✅ |
 | `cli/discover/list.rs` | 214 | 123 | 91 | 42.5% | ✅ |
 | `cli/discover/mod.rs` | 97 | 68 | 29 | 29.9% | ✅ |
-| `cli/discover/show.rs` | 14 | 14 | 0 | 0.0% | ✅ |
+| `cli/discover/show.rs` | 261 | 168 | 93 | 35.6% | ✅ |
 | `client/components/metrics_view.rs` | 179 | 179 | 0 | 0.0% | ✅ |
 | `client/components/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `client/components/sidebar.rs` | 78 | 78 | 0 | 0.0% | ✅ |
@@ -101,7 +101,7 @@ SUM:                            31            417            188           2252
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 2.98 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.72 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 
