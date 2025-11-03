@@ -33,16 +33,14 @@ pub struct TokenMetrics {
     pub total_output_tokens: u64,
     pub total_cache_creation_tokens: u64,
     pub total_cache_read_tokens: u64,
+    pub assistant_turns: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HookMetrics {
     pub total_events: usize,
-    pub tool_use_count: usize,
-    pub bash_count: usize,
-    pub write_count: usize,
-    pub edit_count: usize,
-    pub top_bash_commands: Vec<(String, usize)>,
+    pub bash_commands: Vec<BashCommand>,
+    pub file_modifications: Vec<FileModification>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -71,12 +69,14 @@ pub struct PhaseMetrics {
 pub struct BashCommand {
     pub command: String,
     pub timestamp: Option<String>,
+    pub stdout: String,
+    pub stderr: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FileModification {
     pub file_path: String,
-    pub operation: String,
+    pub tool: String,
     pub timestamp: Option<String>,
 }
 

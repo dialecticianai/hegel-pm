@@ -165,7 +165,7 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                         div(class="metric-label") { "Bash commands" }
                         div(class="metric-value") {
                             (move || metrics.with(|m| {
-                                m.as_ref().map(|s| s.hook_metrics.bash_count.to_string()).unwrap_or_else(|| "-".to_string())
+                                m.as_ref().map(|s| s.hook_metrics.bash_commands.len().to_string()).unwrap_or_else(|| "-".to_string())
                             }))
                         }
                     }
@@ -173,7 +173,7 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                         div(class="metric-label") { "File modifications" }
                         div(class="metric-value") {
                             (move || metrics.with(|m| {
-                                m.as_ref().map(|s| (s.hook_metrics.write_count + s.hook_metrics.edit_count).to_string()).unwrap_or_else(|| "-".to_string())
+                                m.as_ref().map(|s| s.hook_metrics.file_modifications.len().to_string()).unwrap_or_else(|| "-".to_string())
                             }))
                         }
                     }
