@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-03 15:36
+**Last Updated**: 2025-11-03 15:38
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 2,375 | 6,455 | 8,830 |
-| **Comments** | 194 | - | 194 |
-| **Blank Lines** | 434 | - | 434 |
-| **Total Lines** | 3,003 | 6,455 | 9,458 |
+| **Lines** | 2,711 | 6,455 | 9,166 |
+| **Comments** | 202 | - | 202 |
+| **Blank Lines** | 479 | - | 479 |
+| **Total Lines** | 3,392 | 6,455 | 9,847 |
 | **Files** | 27 | 23 | 50 |
 
-**Documentation Ratio**: 2.72 lines of docs per line of code
+**Documentation Ratio**: 2.38 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            27            434            194           2375
+Rust                            27            479            202           2711
 Markdown                         4             18              0             83
 -------------------------------------------------------------------------------
-SUM:                            31            452            194           2458
+SUM:                            31            497            202           2794
 -------------------------------------------------------------------------------
 ```
 
@@ -38,7 +38,7 @@ SUM:                            31            452            194           2458
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
 | `cli.rs` | 164 | 61 | 103 | 62.8% | ✅ |
-| `cli/discover/all.rs` | 15 | 15 | 0 | 0.0% | ✅ |
+| `cli/discover/all.rs` | 404 | 278 | 126 | 31.2% | ⚠️ Large |
 | `cli/discover/format.rs` | 128 | 52 | 76 | 59.4% | ✅ |
 | `cli/discover/list.rs` | 214 | 123 | 91 | 42.5% | ✅ |
 | `cli/discover/mod.rs` | 97 | 68 | 29 | 29.9% | ✅ |
@@ -64,6 +64,8 @@ SUM:                            31            452            194           2458
 | `main.rs` | 39 | 39 | 0 | 0.0% | ✅ |
 | `server_mode.rs` | 195 | 195 | 0 | 0.0% | ✅ |
 | `test_helpers.rs` | 61 | 35 | 26 | 42.6% | ✅ |
+
+**⚠️ Warning:** 1 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -101,7 +103,7 @@ SUM:                            31            452            194           2458
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 2.72 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.38 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 
