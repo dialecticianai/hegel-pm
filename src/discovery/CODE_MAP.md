@@ -6,34 +6,17 @@ Auto-discovery and state management for Hegel projects across the filesystem.
 
 ```
 discovery/
-├── mod.rs          Module exports and public API surface
-│
-├── engine.rs       DiscoveryEngine orchestration (caching, background refresh)
-│   ├── new()                       # Create engine with config
-│   └── get_projects()              # Fetch with cache-or-scan logic
-│
-├── config.rs       DiscoveryConfig (search roots, exclusions, cache path)
-│   ├── default()                   # ~/Code, depth 10, standard exclusions
-│   └── new()                       # Custom configuration
-│
-├── walker.rs       Filesystem traversal to locate .hegel/ directories
-│   └── walk_directories()          # Returns Vec<PathBuf> of project roots
-│
-├── discover.rs     Core discovery logic (scan → load state → construct projects)
-│   └── discover_projects()         # Orchestrates walker + state + project
-│
-├── project.rs      DiscoveredProject model (workflow state, lazy metrics)
-│   ├── load_statistics()           # On-demand hegel-cli metrics loading
-│   └── Serializable via serde
-│
-├── state.rs        Workflow state extraction from .hegel/state.json
-│   └── load_workflow_state()       # Uses hegel-cli FileStorage
-│
-├── statistics.rs   Type alias to hegel::metrics::UnifiedMetrics
-│
-└── cache.rs        Persistent cache with atomic writes and expiration
-    ├── load()                      # Read from cache file
-    └── save()                      # Atomic write via temp + rename
+├── mod.rs              Module exports and public API surface
+├── engine.rs           DiscoveryEngine orchestration (caching, background refresh)
+├── config.rs           DiscoveryConfig (search roots, exclusions, cache path, validation)
+├── walker.rs           Filesystem traversal to locate .hegel/ directories
+├── discover.rs         Core discovery logic (scan → load state → construct projects)
+├── project.rs          DiscoveredProject model (workflow state, lazy metrics loading)
+├── state.rs            Workflow state extraction from .hegel/state.json via hegel-cli FileStorage
+├── statistics.rs       Type alias to hegel::metrics::UnifiedMetrics
+├── api_types.rs        Lightweight API response types (ProjectMetricsSummary for /api endpoints)
+├── cache_manager.rs    Async cache persistence with deduplication and background worker
+└── cache.rs            Persistent cache with atomic writes and expiration
 ```
 
 ## Key Patterns
