@@ -2,18 +2,18 @@
 
 Core application modules for Hegel project discovery and visualization.
 
-## Entry Points
+## Structure
 
-### **lib.rs**
-Library root exposing discovery module for integration.
-
-### **main.rs**
-Binary entry point (placeholder for future web server).
-
-## Core Modules
-
-### **discovery/**
-Project discovery engine and data models. See discovery/CODE_MAP.md.
-
-### **test_helpers.rs**
-Shared test utilities for creating test workspaces and project fixtures.
+```
+src/
+├── lib.rs              Library root exposing discovery module
+├── main.rs             Binary entry point with web server (warp + API routes)
+│
+├── discovery/          Project discovery engine and data models
+│   └── See discovery/CODE_MAP.md
+│
+├── client/             Sycamore WASM web UI for dashboard
+│   └── See client/CODE_MAP.md
+│
+└── test_helpers.rs     Shared test utilities (workspaces, fixtures)
+```

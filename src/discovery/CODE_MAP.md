@@ -2,39 +2,42 @@
 
 Auto-discovery and state management for Hegel projects across the filesystem.
 
-## Module Root
+## Structure
 
-### **mod.rs**
-Module exports and public API surface for discovery engine.
+```
+discovery/
+├── mod.rs          Module exports and public API surface
+│
+├── engine.rs       DiscoveryEngine orchestration (caching, background refresh)
+│   ├── new()                       # Create engine with config
+│   └── get_projects()              # Fetch with cache-or-scan logic
+│
+├── config.rs       DiscoveryConfig (search roots, exclusions, cache path)
+│   ├── default()                   # ~/Code, depth 10, standard exclusions
+│   └── new()                       # Custom configuration
+│
+├── walker.rs       Filesystem traversal to locate .hegel/ directories
+│   └── walk_directories()          # Returns Vec<PathBuf> of project roots
+│
+├── discover.rs     Core discovery logic (scan → load state → construct projects)
+│   └── discover_projects()         # Orchestrates walker + state + project
+│
+├── project.rs      DiscoveredProject model (workflow state, lazy metrics)
+│   ├── load_statistics()           # On-demand hegel-cli metrics loading
+│   └── Serializable via serde
+│
+├── state.rs        Workflow state extraction from .hegel/state.json
+│   └── load_workflow_state()       # Uses hegel-cli FileStorage
+│
+├── statistics.rs   Type alias to hegel::metrics::UnifiedMetrics
+│
+└── cache.rs        Persistent cache with atomic writes and expiration
+    ├── load()                      # Read from cache file
+    └── save()                      # Atomic write via temp + rename
+```
 
-## Configuration
+## Key Patterns
 
-### **config.rs**
-Discovery configuration with search roots, exclusions, and cache settings.
-
-## Discovery Engine
-
-### **engine.rs**
-Orchestrates project discovery with caching and background refresh.
-
-### **walker.rs**
-Filesystem walker to locate `.hegel/` directories across search roots.
-
-### **discover.rs**
-Core discovery logic: scans directories, loads state, constructs project objects.
-
-## Data Models
-
-### **project.rs**
-DiscoveredProject model with workflow state, statistics, and metadata. Implements lazy-loading for metrics via `load_statistics()`.
-
-### **state.rs**
-Loads workflow state from `.hegel/state.json` using hegel-cli's FileStorage.
-
-### **statistics.rs**
-Type alias to hegel-cli's UnifiedMetrics for comprehensive workflow analytics.
-
-## Caching
-
-### **cache.rs**
-Persistent cache for discovered projects with atomic writes and expiration.
+**Abstraction boundary**: All .hegel data access via hegel-cli library (never direct file reads)
+**Lazy loading**: Metrics loaded on-demand to keep discovery fast
+**Cache invalidation**: Configurable TTL with atomic updates
