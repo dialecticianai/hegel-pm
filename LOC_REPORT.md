@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-03 13:11
+**Last Updated**: 2025-11-03 13:29
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 1,480 | 5,449 | 6,929 |
+| **Lines** | 1,496 | 5,495 | 6,991 |
 | **Comments** | 130 | - | 130 |
-| **Blank Lines** | 302 | - | 302 |
-| **Total Lines** | 1,912 | 5,449 | 7,361 |
+| **Blank Lines** | 304 | - | 304 |
+| **Total Lines** | 1,930 | 5,495 | 7,425 |
 | **Files** | 20 | 21 | 41 |
 
-**Documentation Ratio**: 3.68 lines of docs per line of code
+**Documentation Ratio**: 3.67 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            20            302            130           1480
+Rust                            20            304            130           1496
 Markdown                         4             22              0            126
 -------------------------------------------------------------------------------
-SUM:                            24            324            130           1606
+SUM:                            24            326            130           1622
 -------------------------------------------------------------------------------
 ```
 
@@ -47,7 +47,7 @@ SUM:                            24            324            130           1606
 | `discovery/cache.rs` | 145 | 51 | 94 | 64.8% | ✅ |
 | `discovery/config.rs` | 212 | 105 | 107 | 50.5% | ✅ |
 | `discovery/discover.rs` | 200 | 52 | 148 | 74.0% | ✅ |
-| `discovery/engine.rs` | 175 | 46 | 129 | 73.7% | ✅ |
+| `discovery/engine.rs` | 182 | 53 | 129 | 70.9% | ✅ |
 | `discovery/mod.rs` | 33 | 22 | 11 | 33.3% | ✅ |
 | `discovery/project.rs` | 236 | 113 | 123 | 52.1% | ✅ |
 | `discovery/state.rs` | 113 | 19 | 94 | 83.2% | ✅ |
@@ -55,7 +55,7 @@ SUM:                            24            324            130           1606
 | `discovery/walker.rs` | 171 | 46 | 125 | 73.1% | ✅ |
 | `lib.rs` | 9 | 3 | 6 | 66.7% | ✅ |
 | `main.rs` | 26 | 26 | 0 | 0.0% | ✅ |
-| `server_mode.rs` | 81 | 81 | 0 | 0.0% | ✅ |
+| `server_mode.rs` | 92 | 92 | 0 | 0.0% | ✅ |
 | `test_helpers.rs` | 61 | 35 | 26 | 42.6% | ✅ |
 
 ---
@@ -69,7 +69,7 @@ SUM:                            24            324            130           1606
 | `.ddd/feat/project-discovery/PLAN.md` | 372 |
 | `.ddd/feat/project-discovery/SPEC.md` | 333 |
 | `ARCHITECTURE.md` | 273 |
-| `CLAUDE.md` | 397 |
+| `CLAUDE.md` | 423 |
 | `COVERAGE_REPORT.md` | 56 |
 | `learnings/.ddd/0_sycamore_foundations_assessment.md` | 335 |
 | `learnings/.ddd/1_open_questions.md` | 294 |
@@ -77,7 +77,7 @@ SUM:                            24            324            130           1606
 | `learnings/LEARNING_SYCAMORE_FOUNDATIONS.md` | 572 |
 | `learnings/LEARNING_SYCAMORE_PRACTICES.md` | 530 |
 | `LOC_REPORT.md` | 111 |
-| `README.md` | 175 |
+| `README.md` | 195 |
 | `RESEARCH_PLAN.md` | 189 |
 | `src/client/CODE_MAP.md` | 52 |
 | `src/CODE_MAP.md` | 22 |
@@ -92,7 +92,7 @@ SUM:                            24            324            130           1606
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 3.68 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 3.67 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 

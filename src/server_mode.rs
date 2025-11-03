@@ -6,6 +6,7 @@ use warp::Filter;
 /// Start web server with project discovery API and static file serving
 pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
     println!("🚀 Starting hegel-pm web server...");
+    println!("📍 Cache location: {}", engine.config().cache_location.display());
 
     // Discover projects
     let projects = engine.get_projects(false)?;
@@ -30,15 +31,21 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
     // API endpoint for project metrics
     let api_metrics = warp::path!("api" / "projects" / String / "metrics")
         .map(move |name: String| {
+            use std::time::Instant;
+            let start = Instant::now();
+
             let mut projects = projects_for_metrics.lock().unwrap();
 
             // Find project by name and load statistics
             if let Some(project) = projects.iter_mut().find(|p| p.name == name) {
                 if !project.has_statistics() {
+                    let load_start = Instant::now();
+                    println!("⏳ Loading statistics for project: {}", name);
                     let _ = project.load_statistics();
+                    println!("✅ Statistics loaded in {:?}", load_start.elapsed());
                 }
 
-                match &project.statistics {
+                let response = match &project.statistics {
                     Some(stats) => warp::reply::with_status(
                         warp::reply::json(stats),
                         warp::http::StatusCode::OK
@@ -47,8 +54,12 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
                         warp::reply::json(&serde_json::json!({"error": "Failed to load statistics"})),
                         warp::http::StatusCode::INTERNAL_SERVER_ERROR
                     )
-                }
+                };
+
+                println!("📊 Metrics request for '{}' completed in {:?}", name, start.elapsed());
+                response
             } else {
+                println!("❌ Project not found: {}", name);
                 warp::reply::with_status(
                     warp::reply::json(&serde_json::json!({"error": "Project not found"})),
                     warp::http::StatusCode::NOT_FOUND

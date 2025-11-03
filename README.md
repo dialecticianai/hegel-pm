@@ -97,6 +97,26 @@ let config = DiscoveryConfig::new(
 
 ## Development
 
+### Scripts
+
+**Server Management:**
+```bash
+./scripts/restart-server.sh    # Kill old server, rebuild, restart with logs
+```
+
+This script:
+1. Stops any running hegel-pm server
+2. Rebuilds with `cargo build --release --features server`
+3. Starts fresh server with full logging (cache status, request timing)
+
+Use this after:
+- Backend changes (server_mode.rs, discovery/)
+- Client type updates (src/client/types.rs)
+- When you need to see server logs
+- When server behavior seems off
+
+**Note:** Frontend (WASM) changes require `trunk build` separately.
+
 ### Testing
 
 ```bash

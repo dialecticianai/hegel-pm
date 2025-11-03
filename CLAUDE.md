@@ -10,6 +10,32 @@
 
 ---
 
+# Development Scripts
+
+**Available scripts in `scripts/` directory:**
+
+## Server Management
+
+```bash
+./scripts/restart-server.sh    # Kill old server, rebuild, start fresh
+```
+
+**What it does:**
+1. Stops any running hegel-pm server process
+2. Rebuilds with `cargo build --release --features server`
+3. Starts server with `cargo run --bin hegel-pm --features server --release`
+4. Shows server logs including cache status and request timing
+
+**When to use:**
+- After making backend changes (server_mode.rs, discovery/, etc.)
+- After updating client types (src/client/types.rs)
+- To see fresh server logs with timing information
+- When server is behaving unexpectedly
+
+**Note:** Frontend changes (WASM) require `trunk build` separately.
+
+---
+
 # Hegel Ecosystem Integration
 
 **hegel-pm reads Hegel state directories** (`.hegel/`) from managed projects:

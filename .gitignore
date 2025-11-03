@@ -4,6 +4,9 @@
 # Hegel handoff (session continuity, not committed)
 HANDOFF.md
 
+# Server logs (local development, not committed)
+logs/
+
 # Claude Code settings (local environment)
 .claude/
 
