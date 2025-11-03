@@ -1,20 +1,10 @@
+mod cli;
+mod discovery_mode;
+mod server_mode;
+
 use clap::Parser;
+use cli::Args;
 use hegel_pm::discovery::{DiscoveryConfig, DiscoveryEngine};
-use warp::Filter;
-
-/// Hegel Project Manager - Multi-project workflow orchestration
-#[derive(Parser, Debug)]
-#[command(name = "hegel-pm")]
-#[command(about = "Project manager for Hegel projects with web UI", long_about = None)]
-struct Args {
-    /// Run discovery scan and print results (don't start server)
-    #[arg(long)]
-    discover: bool,
-
-    /// Force refresh cache during discovery
-    #[arg(long)]
-    refresh: bool,
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -26,56 +16,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     if args.discover {
         // Discovery mode: scan and print results
-        println!("🔍 Scanning for Hegel projects...");
-        let projects = engine.get_projects(args.refresh)?;
-        println!("📁 Discovered {} projects:\n", projects.len());
-
-        for project in &projects {
-            println!("  • {} ({})", project.name, project.project_path.display());
-            if let Some(state) = &project.workflow_state {
-                println!("    Mode: {} | Phase: {}", state.mode, state.current_node);
-            } else {
-                println!("    No active workflow");
-            }
-        }
-
-        return Ok(());
-    }
-
-    // Default mode: start web server
-    println!("🚀 Starting hegel-pm web server...");
-
-    // Discover projects
-    let projects = engine.get_projects(false)?;
-    println!("📁 Discovered {} projects", projects.len());
-
-    // Clone projects for API endpoint
-    let projects_clone = projects.clone();
-
-    // API endpoint for projects
-    let api_projects = warp::path!("api" / "projects")
-        .map(move || warp::reply::json(&projects_clone));
-
-    // Serve static files (HTML, WASM, JS)
-    let static_files = warp::fs::dir("./static");
-
-    // Combine routes
-    let routes = api_projects.or(static_files);
-
-    let url = "http://localhost:3030";
-    println!("🌐 Server running at {}", url);
-    println!("📝 Build WASM with: trunk build --release");
-
-    // Open browser
-    if let Err(e) = open::that(url) {
-        eprintln!("⚠️  Failed to open browser: {}", e);
+        discovery_mode::run(&engine, args.refresh)?;
     } else {
-        println!("🌍 Opening browser...");
+        // Server mode: start web server
+        server_mode::run(&engine).await?;
     }
-
-    warp::serve(routes)
-        .run(([127, 0, 0, 1], 3030))
-        .await;
 
     Ok(())
 }

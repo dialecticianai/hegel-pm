@@ -7,7 +7,10 @@ Core application modules for Hegel project discovery and visualization.
 ```
 src/
 ├── lib.rs              Library root exposing discovery module
-├── main.rs             Binary entry point with web server (warp + API routes)
+├── main.rs             Binary entry point (mode dispatch)
+├── cli.rs              CLI args (--discover, --refresh)
+├── discovery_mode.rs   Scan and print project list
+├── server_mode.rs      Warp HTTP server + auto-open browser
 │
 ├── discovery/          Project discovery engine and data models
 │   └── See discovery/CODE_MAP.md
