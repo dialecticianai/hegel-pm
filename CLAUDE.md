@@ -17,22 +17,22 @@
 ## Server Management
 
 ```bash
-./scripts/restart-server.sh    # Kill old server, rebuild, start fresh
+./scripts/restart-server.sh              # Backend only (fast)
+./scripts/restart-server.sh --frontend   # Backend + frontend (full rebuild)
 ```
 
 **What it does:**
 1. Stops any running hegel-pm server process
-2. Rebuilds with `cargo build --release --features server`
-3. Starts server with `cargo run --bin hegel-pm --features server --release`
-4. Shows server logs including cache status and request timing
+2. Rebuilds backend with `cargo build --release --features server`
+3. Optionally rebuilds frontend with `trunk build --release` (if `--frontend` flag)
+4. Starts server with `cargo run --bin hegel-pm --features server --release`
+5. Shows server logs including cache status and request timing
 
 **When to use:**
-- After making backend changes (server_mode.rs, discovery/, etc.)
-- After updating client types (src/client/types.rs)
+- **Backend only**: After changes to server_mode.rs, discovery/, CLI, etc.
+- **With --frontend**: After client UI changes (src/client/, types, components)
 - To see fresh server logs with timing information
-- When server is behaving unexpectedly
-
-**Note:** Frontend changes (WASM) require `trunk build` separately.
+- When server is behaving unexpectedly or UI has stale WASM
 
 ---
 
