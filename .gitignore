@@ -35,3 +35,8 @@ dist/
 pkg/
 *.wasm
 node_modules/
+
+# Trunk build artifacts (static/ contains generated files)
+static/*.js
+static/*.wasm
+static/index.html
