@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-03 13:29
+**Last Updated**: 2025-11-03 14:03
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 1,496 | 5,495 | 6,991 |
-| **Comments** | 130 | - | 130 |
-| **Blank Lines** | 304 | - | 304 |
-| **Total Lines** | 1,930 | 5,495 | 7,425 |
-| **Files** | 20 | 21 | 41 |
+| **Lines** | 1,650 | 5,495 | 7,145 |
+| **Comments** | 154 | - | 154 |
+| **Blank Lines** | 322 | - | 322 |
+| **Total Lines** | 2,126 | 5,495 | 7,621 |
+| **Files** | 22 | 21 | 43 |
 
-**Documentation Ratio**: 3.67 lines of docs per line of code
+**Documentation Ratio**: 3.33 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            20            304            130           1496
+Rust                            22            322            154           1650
 Markdown                         4             22              0            126
 -------------------------------------------------------------------------------
-SUM:                            24            326            130           1622
+SUM:                            26            344            154           1776
 -------------------------------------------------------------------------------
 ```
 
@@ -38,24 +38,26 @@ SUM:                            24            326            130           1622
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
 | `cli.rs` | 15 | 15 | 0 | 0.0% | ✅ |
-| `client/components/metrics_view.rs` | 184 | 184 | 0 | 0.0% | ✅ |
+| `client/components/metrics_view.rs` | 179 | 179 | 0 | 0.0% | ✅ |
 | `client/components/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `client/components/sidebar.rs` | 78 | 78 | 0 | 0.0% | ✅ |
 | `client/mod.rs` | 26 | 26 | 0 | 0.0% | ✅ |
-| `client/types.rs` | 92 | 92 | 0 | 0.0% | ✅ |
+| `client/types.rs` | 86 | 86 | 0 | 0.0% | ✅ |
 | `discovery_mode.rs` | 20 | 20 | 0 | 0.0% | ✅ |
+| `discovery/api_types.rs` | 32 | 32 | 0 | 0.0% | ✅ |
+| `discovery/cache_manager.rs` | 68 | 68 | 0 | 0.0% | ✅ |
 | `discovery/cache.rs` | 145 | 51 | 94 | 64.8% | ✅ |
 | `discovery/config.rs` | 212 | 105 | 107 | 50.5% | ✅ |
 | `discovery/discover.rs` | 200 | 52 | 148 | 74.0% | ✅ |
 | `discovery/engine.rs` | 182 | 53 | 129 | 70.9% | ✅ |
-| `discovery/mod.rs` | 33 | 22 | 11 | 33.3% | ✅ |
+| `discovery/mod.rs` | 37 | 26 | 11 | 29.7% | ✅ |
 | `discovery/project.rs` | 236 | 113 | 123 | 52.1% | ✅ |
 | `discovery/state.rs` | 113 | 19 | 94 | 83.2% | ✅ |
 | `discovery/statistics.rs` | 30 | 3 | 27 | 90.0% | ✅ |
 | `discovery/walker.rs` | 171 | 46 | 125 | 73.1% | ✅ |
 | `lib.rs` | 9 | 3 | 6 | 66.7% | ✅ |
 | `main.rs` | 26 | 26 | 0 | 0.0% | ✅ |
-| `server_mode.rs` | 92 | 92 | 0 | 0.0% | ✅ |
+| `server_mode.rs` | 195 | 195 | 0 | 0.0% | ✅ |
 | `test_helpers.rs` | 61 | 35 | 26 | 42.6% | ✅ |
 
 ---
@@ -92,7 +94,7 @@ SUM:                            24            326            130           1622
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 3.67 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 3.33 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 
