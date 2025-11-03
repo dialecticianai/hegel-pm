@@ -20,10 +20,24 @@ serde_json = "1.0"
 walkdir = "2.5"
 dirs = "5.0"
 
-# Web framework
-sycamore = "0.9"
+# Web framework (server)
 warp = "0.3"
 tokio = { version = "1.0", features = ["full"] }
 
+# Web framework (client - WASM)
+sycamore = { version = "0.9", features = ["hydrate"] }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+serde-wasm-bindgen = "0.6"
+gloo-net = "0.5"
+console_error_panic_hook = "0.1"
+
 [dev-dependencies]
 tempfile = "3.8"
+
+[[bin]]
+name = "hegel-pm-server"
+path = "src/main.rs"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
