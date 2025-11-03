@@ -1,5 +1,5 @@
 use super::format::{abbreviate_path, format_duration_ms, format_size, format_timestamp};
-use super::{validate_sort_column, VALID_SORT_COLUMNS};
+use super::validate_sort_column;
 use hegel_pm::discovery::DiscoveryEngine;
 use serde::Serialize;
 use std::error::Error;
@@ -278,6 +278,7 @@ fn output_human(
 
 #[cfg(test)]
 mod tests {
+    use super::super::VALID_SORT_COLUMNS;
     use super::*;
     use hegel_pm::discovery::DiscoveryConfig;
     use std::fs;

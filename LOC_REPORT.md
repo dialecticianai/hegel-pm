@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-03 15:38
+**Last Updated**: 2025-11-03 15:40
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 2,711 | 6,455 | 9,166 |
+| **Lines** | 2,712 | 6,457 | 9,169 |
 | **Comments** | 202 | - | 202 |
 | **Blank Lines** | 479 | - | 479 |
-| **Total Lines** | 3,392 | 6,455 | 9,847 |
+| **Total Lines** | 3,393 | 6,457 | 9,850 |
 | **Files** | 27 | 23 | 50 |
 
 **Documentation Ratio**: 2.38 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            27            479            202           2711
+Rust                            27            479            202           2712
 Markdown                         4             18              0             83
 -------------------------------------------------------------------------------
-SUM:                            31            497            202           2794
+SUM:                            31            497            202           2795
 -------------------------------------------------------------------------------
 ```
 
@@ -38,7 +38,7 @@ SUM:                            31            497            202           2794
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
 | `cli.rs` | 164 | 61 | 103 | 62.8% | ✅ |
-| `cli/discover/all.rs` | 404 | 278 | 126 | 31.2% | ⚠️ Large |
+| `cli/discover/all.rs` | 405 | 278 | 127 | 31.4% | ⚠️ Large |
 | `cli/discover/format.rs` | 128 | 52 | 76 | 59.4% | ✅ |
 | `cli/discover/list.rs` | 214 | 123 | 91 | 42.5% | ✅ |
 | `cli/discover/mod.rs` | 97 | 68 | 29 | 29.9% | ✅ |
@@ -87,7 +87,7 @@ SUM:                            31            497            202           2794
 | `learnings/LEARNING_SYCAMORE_COMPONENTS.md` | 733 |
 | `learnings/LEARNING_SYCAMORE_FOUNDATIONS.md` | 572 |
 | `learnings/LEARNING_SYCAMORE_PRACTICES.md` | 530 |
-| `LOC_REPORT.md` | 120 |
+| `LOC_REPORT.md` | 122 |
 | `README.md` | 213 |
 | `RESEARCH_PLAN.md` | 189 |
 | `src/client/CODE_MAP.md` | 22 |
