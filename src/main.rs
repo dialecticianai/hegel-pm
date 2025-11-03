@@ -1,5 +1,6 @@
 use clap::Parser;
 use hegel_pm::discovery::{DiscoveryConfig, DiscoveryEngine};
+use warp::Filter;
 
 /// Hegel Project Manager - Multi-project workflow orchestration
 #[derive(Parser, Debug)]
@@ -48,8 +49,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let projects = engine.get_projects(false)?;
     println!("📁 Discovered {} projects", projects.len());
 
+    // Clone projects for API endpoint
+    let projects_clone = projects.clone();
+
+    // API endpoint for projects
+    let api_projects = warp::path!("api" / "projects")
+        .map(move || warp::reply::json(&projects_clone));
+
     // Serve static files (HTML, WASM, JS)
     let static_files = warp::fs::dir("./static");
+
+    // Combine routes
+    let routes = api_projects.or(static_files);
 
     let url = "http://localhost:3030";
     println!("🌐 Server running at {}", url);
@@ -62,7 +73,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("🌍 Opening browser...");
     }
 
-    warp::serve(static_files)
+    warp::serve(routes)
         .run(([127, 0, 0, 1], 3030))
         .await;
 
