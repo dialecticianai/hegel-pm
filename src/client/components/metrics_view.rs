@@ -27,17 +27,41 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
 
             sycamore::futures::spawn_local(async move {
                 let url = format!("/api/projects/{}/metrics", name);
+                web_sys::console::log_1(&format!("Fetching metrics from: {}", url).into());
+
                 match Request::get(&url).send().await {
                     Ok(resp) => {
-                        if let Ok(stats) = resp.json::<ProjectStatistics>().await {
-                            metrics_clone.set(Some(stats));
-                            loading_clone.set(false);
-                        } else {
-                            error_clone.set(true);
-                            loading_clone.set(false);
+                        let status = resp.status();
+                        web_sys::console::log_1(&format!("Response status: {}", status).into());
+
+                        // Get raw text to see what we're receiving
+                        match resp.text().await {
+                            Ok(text) => {
+                                web_sys::console::log_1(&format!("Response body: {}", text).into());
+
+                                // Try to deserialize
+                                match serde_json::from_str::<ProjectStatistics>(&text) {
+                                    Ok(stats) => {
+                                        web_sys::console::log_1(&"Successfully deserialized metrics".into());
+                                        metrics_clone.set(Some(stats));
+                                        loading_clone.set(false);
+                                    }
+                                    Err(e) => {
+                                        web_sys::console::error_1(&format!("Deserialization error: {:?}", e).into());
+                                        error_clone.set(true);
+                                        loading_clone.set(false);
+                                    }
+                                }
+                            }
+                            Err(e) => {
+                                web_sys::console::error_1(&format!("Failed to get response text: {:?}", e).into());
+                                error_clone.set(true);
+                                loading_clone.set(false);
+                            }
                         }
                     }
-                    Err(_) => {
+                    Err(e) => {
+                        web_sys::console::error_1(&format!("Request failed: {:?}", e).into());
                         error_clone.set(true);
                         loading_clone.set(false);
                     }
@@ -75,18 +99,6 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
             }
 
             // Metrics sections (always present, content updates reactively)
-            div(class="metrics-section") {
-                h3 { "Session" }
-                p {
-                    "ID: "
-                    (move || metrics.with(|m| {
-                        m.as_ref()
-                            .and_then(|s| s.session_id.clone())
-                            .unwrap_or_else(|| "N/A".to_string())
-                    }))
-                }
-            }
-
             div(class="metrics-section") {
                 h3 { "Token Usage" }
                 div(class="metric-grid") {
