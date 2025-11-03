@@ -75,12 +75,7 @@ fn output_json(projects: &[DiscoveredProject], cache_used: bool) -> Result<(), B
     Ok(())
 }
 
-fn output_human(projects: &[DiscoveredProject], cache_used: bool) -> Result<(), Box<dyn Error>> {
-    // Show cache status if used
-    if cache_used && !projects.is_empty() {
-        println!("✅ Loaded {} projects from cache\n", projects.len());
-    }
-
+fn output_human(projects: &[DiscoveredProject], _cache_used: bool) -> Result<(), Box<dyn Error>> {
     if projects.is_empty() {
         println!("No Hegel projects found");
         return Ok(());

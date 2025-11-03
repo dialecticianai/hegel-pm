@@ -173,13 +173,8 @@ fn output_human(
     rows: &[ProjectRow],
     sort_by: &str,
     total_load_time: Option<u64>,
-    cache_used: bool,
+    _cache_used: bool,
 ) -> Result<(), Box<dyn Error>> {
-    // Show cache status if used
-    if cache_used && !rows.is_empty() {
-        println!("✅ Loaded {} projects from cache\n", rows.len());
-    }
-
     if rows.is_empty() {
         println!("No Hegel projects found");
         return Ok(());
