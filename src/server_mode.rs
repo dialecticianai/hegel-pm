@@ -1,5 +1,6 @@
 use hegel_pm::discovery::DiscoveryEngine;
 use std::error::Error;
+use std::sync::{Arc, Mutex};
 use warp::Filter;
 
 /// Start web server with project discovery API and static file serving
@@ -10,18 +11,56 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
     let projects = engine.get_projects(false)?;
     println!("📁 Discovered {} projects", projects.len());
 
-    // Clone projects for API endpoint
-    let projects_clone = projects.clone();
+    // Wrap projects in Arc<Mutex> for shared mutable access
+    let projects_arc = Arc::new(Mutex::new(projects));
 
-    // API endpoint for projects
+    // Clone for project list endpoint
+    let projects_clone = projects_arc.clone();
+
+    // API endpoint for projects list
     let api_projects = warp::path!("api" / "projects")
-        .map(move || warp::reply::json(&projects_clone));
+        .map(move || {
+            let projects = projects_clone.lock().unwrap();
+            warp::reply::json(&*projects)
+        });
+
+    // Clone for metrics endpoint
+    let projects_for_metrics = projects_arc.clone();
+
+    // API endpoint for project metrics
+    let api_metrics = warp::path!("api" / "projects" / String / "metrics")
+        .map(move |name: String| {
+            let mut projects = projects_for_metrics.lock().unwrap();
+
+            // Find project by name and load statistics
+            if let Some(project) = projects.iter_mut().find(|p| p.name == name) {
+                if !project.has_statistics() {
+                    let _ = project.load_statistics();
+                }
+
+                match &project.statistics {
+                    Some(stats) => warp::reply::with_status(
+                        warp::reply::json(stats),
+                        warp::http::StatusCode::OK
+                    ),
+                    None => warp::reply::with_status(
+                        warp::reply::json(&serde_json::json!({"error": "Failed to load statistics"})),
+                        warp::http::StatusCode::INTERNAL_SERVER_ERROR
+                    )
+                }
+            } else {
+                warp::reply::with_status(
+                    warp::reply::json(&serde_json::json!({"error": "Project not found"})),
+                    warp::http::StatusCode::NOT_FOUND
+                )
+            }
+        });
 
     // Serve static files (HTML, WASM, JS)
     let static_files = warp::fs::dir("./static");
 
     // Combine routes
-    let routes = api_projects.or(static_files);
+    let routes = api_projects.or(api_metrics).or(static_files);
 
     let url = "http://localhost:3030";
     println!("🌐 Server running at {}", url);

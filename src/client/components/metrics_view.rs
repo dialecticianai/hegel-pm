@@ -1,4 +1,7 @@
+use gloo_net::http::Request;
 use sycamore::prelude::*;
+
+use crate::client::types::ProjectStatistics;
 
 #[derive(Props)]
 pub struct MetricsViewProps {
@@ -8,6 +11,41 @@ pub struct MetricsViewProps {
 #[component]
 pub fn MetricsView(props: MetricsViewProps) -> View {
     let selected_project = props.selected_project;
+    let metrics = create_signal(None::<ProjectStatistics>);
+    let loading = create_signal(false);
+    let error = create_signal(false);
+
+    // Fetch metrics when selected project changes
+    create_effect(move || {
+        if let Some(name) = selected_project.with(|s| s.clone()) {
+            loading.set(true);
+            error.set(false);
+
+            let metrics_clone = metrics.clone();
+            let loading_clone = loading.clone();
+            let error_clone = error.clone();
+
+            sycamore::futures::spawn_local(async move {
+                let url = format!("/api/projects/{}/metrics", name);
+                match Request::get(&url).send().await {
+                    Ok(resp) => {
+                        if let Ok(stats) = resp.json::<ProjectStatistics>().await {
+                            metrics_clone.set(Some(stats));
+                            loading_clone.set(false);
+                        } else {
+                            error_clone.set(true);
+                            loading_clone.set(false);
+                        }
+                    }
+                    Err(_) => {
+                        error_clone.set(true);
+                        loading_clone.set(false);
+                    }
+                }
+            });
+        }
+    });
+
     view! {
         div(class="main-content") {
             h1 {
@@ -21,9 +59,32 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                 }))
             }
 
+            // Status message (always present, content changes)
+            p(class="status") {
+                (move || {
+                    if loading.get() {
+                        "Loading metrics..."
+                    } else if error.get() {
+                        "Error loading metrics"
+                    } else if metrics.with(|m| m.is_none()) {
+                        "Select a project to view metrics"
+                    } else {
+                        ""
+                    }
+                })
+            }
+
+            // Metrics sections (always present, content updates reactively)
             div(class="metrics-section") {
                 h3 { "Session" }
-                p { "ID: 88f74756-ad2c-4789-b0c0-f370e0419d3a" }
+                p {
+                    "ID: "
+                    (move || metrics.with(|m| {
+                        m.as_ref()
+                            .and_then(|s| s.session_id.clone())
+                            .unwrap_or_else(|| "N/A".to_string())
+                    }))
+                }
             }
 
             div(class="metrics-section") {
@@ -31,27 +92,48 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                 div(class="metric-grid") {
                     div(class="metric-item") {
                         div(class="metric-label") { "Input tokens" }
-                        div(class="metric-value") { "77,521" }
+                        div(class="metric-value") {
+                            (move || metrics.with(|m| {
+                                m.as_ref().map(|s| s.token_metrics.total_input_tokens.to_string()).unwrap_or_else(|| "-".to_string())
+                            }))
+                        }
                     }
                     div(class="metric-item") {
                         div(class="metric-label") { "Output tokens" }
-                        div(class="metric-value") { "87,556" }
+                        div(class="metric-value") {
+                            (move || metrics.with(|m| {
+                                m.as_ref().map(|s| s.token_metrics.total_output_tokens.to_string()).unwrap_or_else(|| "-".to_string())
+                            }))
+                        }
                     }
                     div(class="metric-item") {
                         div(class="metric-label") { "Cache creation" }
-                        div(class="metric-value") { "2,344,565" }
+                        div(class="metric-value") {
+                            (move || metrics.with(|m| {
+                                m.as_ref().map(|s| s.token_metrics.total_cache_creation_tokens.to_string()).unwrap_or_else(|| "-".to_string())
+                            }))
+                        }
                     }
                     div(class="metric-item") {
                         div(class="metric-label") { "Cache reads" }
-                        div(class="metric-value") { "101,224,969" }
+                        div(class="metric-value") {
+                            (move || metrics.with(|m| {
+                                m.as_ref().map(|s| s.token_metrics.total_cache_read_tokens.to_string()).unwrap_or_else(|| "-".to_string())
+                            }))
+                        }
                     }
                     div(class="metric-item") {
-                        div(class="metric-label") { "Assistant turns" }
-                        div(class="metric-value") { "1,121" }
-                    }
-                    div(class="metric-item") {
-                        div(class="metric-label") { "Total" }
-                        div(class="metric-value") { "103,734,611" }
+                        div(class="metric-label") { "Total tokens" }
+                        div(class="metric-value") {
+                            (move || metrics.with(|m| {
+                                m.as_ref().map(|s| {
+                                    (s.token_metrics.total_input_tokens +
+                                     s.token_metrics.total_output_tokens +
+                                     s.token_metrics.total_cache_creation_tokens +
+                                     s.token_metrics.total_cache_read_tokens).to_string()
+                                }).unwrap_or_else(|| "-".to_string())
+                            }))
+                        }
                     }
                 }
             }
@@ -61,38 +143,28 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                 div(class="metric-grid") {
                     div(class="metric-item") {
                         div(class="metric-label") { "Total events" }
-                        div(class="metric-value") { "307" }
+                        div(class="metric-value") {
+                            (move || metrics.with(|m| {
+                                m.as_ref().map(|s| s.hook_metrics.total_events.to_string()).unwrap_or_else(|| "-".to_string())
+                            }))
+                        }
                     }
                     div(class="metric-item") {
                         div(class="metric-label") { "Bash commands" }
-                        div(class="metric-value") { "58" }
+                        div(class="metric-value") {
+                            (move || metrics.with(|m| {
+                                m.as_ref().map(|s| s.hook_metrics.bash_count.to_string()).unwrap_or_else(|| "-".to_string())
+                            }))
+                        }
                     }
                     div(class="metric-item") {
                         div(class="metric-label") { "File modifications" }
-                        div(class="metric-value") { "31" }
+                        div(class="metric-value") {
+                            (move || metrics.with(|m| {
+                                m.as_ref().map(|s| (s.hook_metrics.write_count + s.hook_metrics.edit_count).to_string()).unwrap_or_else(|| "-".to_string())
+                            }))
+                        }
                     }
-                }
-            }
-
-            div(class="metrics-section") {
-                h3 { "Top Bash Commands" }
-                ul(class="top-list") {
-                    li { span(class="command-text") { "cargo test 2>&1 | grep \"test result:\" | tail -2" } span(class="command-count") { "2x" } }
-                    li { span(class="command-text") { "git status" } span(class="command-count") { "2x" } }
-                    li { span(class="command-text") { "cargo test --quiet" } span(class="command-count") { "2x" } }
-                    li { span(class="command-text") { "hegel guides" } span(class="command-count") { "2x" } }
-                }
-            }
-
-            div(class="metrics-section") {
-                h3 { "Workflow Transitions" }
-                div(class="metric-item") {
-                    div(class="metric-label") { "Total transitions" }
-                    div(class="metric-value") { "379" }
-                }
-                div(class="metric-item") {
-                    div(class="metric-label") { "Mode" }
-                    div(class="metric-value") { "execution" }
                 }
             }
         }
