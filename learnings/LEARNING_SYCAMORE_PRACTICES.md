@@ -500,6 +500,22 @@ create_effect(move || {
 - Q: Best practices for testing async workflows (suspense, resources)?
 - Q: Integration testing strategy (multi-component interactions)?
 
+**Component Composition & List Rendering**:
+- Q: How to use Indexed/Keyed with component props that need to be captured in closures?
+  - **Problem**: `view=|p| { ... }` causes E0716 when trying to capture props.field
+  - **Solution**: Use `move` closure and copy prop into local variable:
+  ```rust
+  Indexed(
+      list=items,
+      view=move |item| {  // ← move keyword critical!
+          let prop_copy = props.some_signal;  // ← copy prop into closure
+          view! { div { (item.name) } }
+      }
+  )
+  ```
+  - **Why**: Closure needs to own captured values, can't borrow from props
+  - **Note**: Signals are Copy, so this is cheap (just copying a handle)
+
 ---
 
 ## Sources

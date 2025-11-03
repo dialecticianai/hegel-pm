@@ -22,10 +22,10 @@ Project manager for Hegel projects with web UI. Auto-discovers projects, visuali
 - Serves Sycamore WASM UI bundle
 - JSON API endpoint for project discovery data
 
-**Web UI** (`ui/` - Sycamore + WASM)
+**Web UI** (Sycamore + WASM in `src/client/`)
 - Reactive WASM-based dashboard
 - Real-time project list display
-- Built with Trunk bundler
+- Built with Trunk bundler (outputs to `static/`)
 
 **Dependencies**
 - `hegel-cli` (path dependency) - All .hegel data access via library API
@@ -55,8 +55,8 @@ cargo build --release --bin hegel-pm --features server
 
 **WASM UI development:**
 ```bash
-cd ui && trunk serve  # Hot reload at localhost:8080
-cd ui && trunk build --release  # Production build to static/
+trunk serve  # Hot reload at localhost:8080
+trunk build --release  # Production build to static/
 ```
 
 ### Discovery API (Library Usage)
@@ -123,7 +123,8 @@ hegel-pm/
 │   │   └── README.md      # Module documentation
 │   ├── lib.rs
 │   └── main.rs
-├── ui/                # Sycamore WASM frontend
+├── index.html         # Trunk build template (WASM entry point)
+├── static/            # Built WASM output (served by web server)
 ├── .ddd/
 │   └── feat/
 │       └── project-discovery/

@@ -1,82 +1,25 @@
-use gloo_net::http::Request;
 use sycamore::prelude::*;
 
-use super::types::DiscoveredProject;
-
-#[component]
-pub fn Sidebar() -> View {
-    let projects = create_signal(Vec::<DiscoveredProject>::new());
-    let loading = create_signal(true);
-    let error = create_signal(false);
-
-    // Fetch projects
-    sycamore::futures::spawn_local(async move {
-        match Request::get("/api/projects").send().await {
-            Ok(resp) => {
-                if let Ok(projs) = resp.json::<Vec<DiscoveredProject>>().await {
-                    projects.set(projs);
-                    loading.set(false);
-                } else {
-                    error.set(true);
-                    loading.set(false);
-                }
-            }
-            Err(_) => {
-                error.set(true);
-                loading.set(false);
-            }
-        }
-    });
-
-    view! {
-        div(class="sidebar") {
-            h2 { "Projects" }
-            div(class="project-list") {
-                (if loading.get() {
-                    view! { p { "Loading projects..." } }
-                } else if error.get() {
-                    view! { p { "Error loading projects" } }
-                } else {
-                    view! {
-                        Keyed(
-                            list=projects,
-                            key=|p| p.name.clone(),
-                            view=|p| {
-                                let name = p.name.clone();
-                                let state_view = if let Some(s) = p.workflow_state.clone() {
-                                    let mode = s.mode;
-                                    let phase = s.current_node;
-                                    view! {
-                                        span(class="mode") { (mode) }
-                                        " • "
-                                        span(class="phase") { (phase) }
-                                    }
-                                } else {
-                                    view! { span(class="inactive") { "No workflow" } }
-                                };
-
-                                view! {
-                                    div(class="project-item") {
-                                        div(class="project-name") { (name) }
-                                        div(class="project-state") {
-                                            (state_view)
-                                        }
-                                    }
-                                }
-                            }
-                        )
-                    }
-                })
-            }
-        }
-    }
+#[derive(Props)]
+pub struct MetricsViewProps {
+    pub selected_project: ReadSignal<Option<String>>,
 }
 
 #[component]
-pub fn MetricsView() -> View {
+pub fn MetricsView(props: MetricsViewProps) -> View {
+    let selected_project = props.selected_project;
     view! {
         div(class="main-content") {
-            h1 { "Hegel Metrics Analysis" }
+            h1 {
+                "Hegel Metrics Analysis"
+                (selected_project.with(|sel| {
+                    if let Some(name) = sel {
+                        format!(" - {}", name)
+                    } else {
+                        String::new()
+                    }
+                }))
+            }
 
             div(class="metrics-section") {
                 h3 { "Session" }

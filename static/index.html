@@ -5,8 +5,8 @@
     <title>Hegel PM</title>
     
 <script type="module">
-import init, * as bindings from '/hegel-pm-b4a85e83fca6b93.js';
-const wasm = await init({ module_or_path: '/hegel-pm-b4a85e83fca6b93_bg.wasm' });
+import init, * as bindings from '/hegel-pm-6fcba597b8c3a65d.js';
+const wasm = await init({ module_or_path: '/hegel-pm-6fcba597b8c3a65d_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -61,7 +61,8 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
             background: #3d566e;
         }
         .project-item.active {
-            background: #3498db;
+            background: white;
+            color: #2c3e50;
         }
         .project-name {
             font-weight: 600;
@@ -76,7 +77,10 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
             font-weight: 500;
         }
         .project-item.active .project-state .mode {
-            color: #ecf0f1;
+            color: #3498db;
+        }
+        .project-item.active .project-state .phase {
+            color: #2c3e50;
         }
         .project-state .phase {
             color: #e8e8e8;
@@ -157,7 +161,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
             margin-left: 10px;
         }
     </style>
-<link rel="modulepreload" href="/hegel-pm-b4a85e83fca6b93.js" crossorigin="anonymous" integrity="sha384-SLQdrpbSt3VWZjfNgLitICvwzHxvuLkhwrUvB+lrAAH3CuncdkgEk/Z+2YhAyTDO"><link rel="preload" href="/hegel-pm-b4a85e83fca6b93_bg.wasm" crossorigin="anonymous" integrity="sha384-olh38zs9E/CSyCRPUyL7WqY31/zKxGajZ8oWo9qzUzmKVR5q1JTD9inC2qZgngsr" as="fetch" type="application/wasm"></head>
+<link rel="modulepreload" href="/hegel-pm-6fcba597b8c3a65d.js" crossorigin="anonymous" integrity="sha384-YtVzg5knmFfsnnh5HUy0SWKnvrTKVqA9jw3jqONJBm3PBom3m73iSsV/6frvE3CM"><link rel="preload" href="/hegel-pm-6fcba597b8c3a65d_bg.wasm" crossorigin="anonymous" integrity="sha384-22XQ0SdptkC+jVEQ2pK15po758GDIr4TAIwQjbT8I07aGiOwqPzNg1FWDV8RSq/u" as="fetch" type="application/wasm"></head>
 <body>
 </body>
 </html>
