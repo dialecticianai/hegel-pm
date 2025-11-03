@@ -13,34 +13,19 @@ pub struct WorkflowState {
     pub mode: String,
 }
 
-// Client-side types for project-level metrics (mirrors hegel::metrics::UnifiedMetrics)
-// Note: Aggregates data across ALL workflows (archived + live), not just current session
-// session_id only represents the current/active session, not the aggregated historical data
+// Lightweight API response for metrics - contains only summary data, not raw events
+// This matches src/discovery/api_types.rs::ProjectMetricsSummary
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectStatistics {
-    pub hook_metrics: HookMetrics,
-    pub token_metrics: TokenMetrics,
-    pub state_transitions: Vec<StateTransitionEvent>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub session_id: Option<String>, // Current session only (not displayed in UI)
-    pub phase_metrics: Vec<PhaseMetrics>,
-    pub git_commits: Vec<GitCommit>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TokenMetrics {
     pub total_input_tokens: u64,
     pub total_output_tokens: u64,
     pub total_cache_creation_tokens: u64,
     pub total_cache_read_tokens: u64,
-    pub assistant_turns: u64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HookMetrics {
     pub total_events: usize,
-    pub bash_commands: Vec<BashCommand>,
-    pub file_modifications: Vec<FileModification>,
+    pub bash_command_count: usize,
+    pub file_modification_count: usize,
+    pub git_commit_count: usize,
+    pub phase_count: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -63,6 +48,15 @@ pub struct PhaseMetrics {
     pub bash_commands: Vec<BashCommand>,
     pub file_modifications: Vec<FileModification>,
     pub git_commits: Vec<GitCommit>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TokenMetrics {
+    pub total_input_tokens: u64,
+    pub total_output_tokens: u64,
+    pub total_cache_creation_tokens: u64,
+    pub total_cache_read_tokens: u64,
+    pub assistant_turns: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -34,27 +34,22 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                         let status = resp.status();
                         web_sys::console::log_1(&format!("Response status: {}", status).into());
 
-                        // Get raw text to see what we're receiving
-                        match resp.text().await {
-                            Ok(text) => {
-                                web_sys::console::log_1(&format!("Response body: {}", text).into());
+                        if status != 200 {
+                            web_sys::console::error_1(&format!("HTTP error: {}", status).into());
+                            error_clone.set(true);
+                            loading_clone.set(false);
+                            return;
+                        }
 
-                                // Try to deserialize
-                                match serde_json::from_str::<ProjectStatistics>(&text) {
-                                    Ok(stats) => {
-                                        web_sys::console::log_1(&"Successfully deserialized metrics".into());
-                                        metrics_clone.set(Some(stats));
-                                        loading_clone.set(false);
-                                    }
-                                    Err(e) => {
-                                        web_sys::console::error_1(&format!("Deserialization error: {:?}", e).into());
-                                        error_clone.set(true);
-                                        loading_clone.set(false);
-                                    }
-                                }
+                        // Get JSON response
+                        match resp.json::<ProjectStatistics>().await {
+                            Ok(stats) => {
+                                web_sys::console::log_1(&"Successfully loaded metrics (cached JSON)".into());
+                                metrics_clone.set(Some(stats));
+                                loading_clone.set(false);
                             }
                             Err(e) => {
-                                web_sys::console::error_1(&format!("Failed to get response text: {:?}", e).into());
+                                web_sys::console::error_1(&format!("JSON deserialization error: {:?}", e).into());
                                 error_clone.set(true);
                                 loading_clone.set(false);
                             }
@@ -106,7 +101,7 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                         div(class="metric-label") { "Input tokens" }
                         div(class="metric-value") {
                             (move || metrics.with(|m| {
-                                m.as_ref().map(|s| s.token_metrics.total_input_tokens.to_string()).unwrap_or_else(|| "-".to_string())
+                                m.as_ref().map(|s| s.total_input_tokens.to_string()).unwrap_or_else(|| "-".to_string())
                             }))
                         }
                     }
@@ -114,7 +109,7 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                         div(class="metric-label") { "Output tokens" }
                         div(class="metric-value") {
                             (move || metrics.with(|m| {
-                                m.as_ref().map(|s| s.token_metrics.total_output_tokens.to_string()).unwrap_or_else(|| "-".to_string())
+                                m.as_ref().map(|s| s.total_output_tokens.to_string()).unwrap_or_else(|| "-".to_string())
                             }))
                         }
                     }
@@ -122,7 +117,7 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                         div(class="metric-label") { "Cache creation" }
                         div(class="metric-value") {
                             (move || metrics.with(|m| {
-                                m.as_ref().map(|s| s.token_metrics.total_cache_creation_tokens.to_string()).unwrap_or_else(|| "-".to_string())
+                                m.as_ref().map(|s| s.total_cache_creation_tokens.to_string()).unwrap_or_else(|| "-".to_string())
                             }))
                         }
                     }
@@ -130,7 +125,7 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                         div(class="metric-label") { "Cache reads" }
                         div(class="metric-value") {
                             (move || metrics.with(|m| {
-                                m.as_ref().map(|s| s.token_metrics.total_cache_read_tokens.to_string()).unwrap_or_else(|| "-".to_string())
+                                m.as_ref().map(|s| s.total_cache_read_tokens.to_string()).unwrap_or_else(|| "-".to_string())
                             }))
                         }
                     }
@@ -139,10 +134,10 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                         div(class="metric-value") {
                             (move || metrics.with(|m| {
                                 m.as_ref().map(|s| {
-                                    (s.token_metrics.total_input_tokens +
-                                     s.token_metrics.total_output_tokens +
-                                     s.token_metrics.total_cache_creation_tokens +
-                                     s.token_metrics.total_cache_read_tokens).to_string()
+                                    (s.total_input_tokens +
+                                     s.total_output_tokens +
+                                     s.total_cache_creation_tokens +
+                                     s.total_cache_read_tokens).to_string()
                                 }).unwrap_or_else(|| "-".to_string())
                             }))
                         }
@@ -157,7 +152,7 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                         div(class="metric-label") { "Total events" }
                         div(class="metric-value") {
                             (move || metrics.with(|m| {
-                                m.as_ref().map(|s| s.hook_metrics.total_events.to_string()).unwrap_or_else(|| "-".to_string())
+                                m.as_ref().map(|s| s.total_events.to_string()).unwrap_or_else(|| "-".to_string())
                             }))
                         }
                     }
@@ -165,7 +160,7 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                         div(class="metric-label") { "Bash commands" }
                         div(class="metric-value") {
                             (move || metrics.with(|m| {
-                                m.as_ref().map(|s| s.hook_metrics.bash_commands.len().to_string()).unwrap_or_else(|| "-".to_string())
+                                m.as_ref().map(|s| s.bash_command_count.to_string()).unwrap_or_else(|| "-".to_string())
                             }))
                         }
                     }
@@ -173,7 +168,7 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                         div(class="metric-label") { "File modifications" }
                         div(class="metric-value") {
                             (move || metrics.with(|m| {
-                                m.as_ref().map(|s| s.hook_metrics.file_modifications.len().to_string()).unwrap_or_else(|| "-".to_string())
+                                m.as_ref().map(|s| s.file_modification_count.to_string()).unwrap_or_else(|| "-".to_string())
                             }))
                         }
                     }
