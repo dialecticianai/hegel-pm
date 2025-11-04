@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct DiscoveredProject {
     pub name: String,
-    pub project_path: String,
     pub workflow_state: Option<WorkflowState>,
 }
 

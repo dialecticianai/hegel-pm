@@ -17,14 +17,22 @@ pub fn Sidebar(props: SidebarProps) -> View {
     sycamore::futures::spawn_local(async move {
         match Request::get("/api/projects").send().await {
             Ok(resp) => {
-                if let Ok(projs) = resp.json::<Vec<DiscoveredProject>>().await {
-                    if let Some(first) = projs.first() {
-                        selected_clone.set(Some(first.name.clone()));
+                let status = resp.status();
+                match resp.json::<Vec<DiscoveredProject>>().await {
+                    Ok(projs) => {
+                        if let Some(first) = projs.first() {
+                            selected_clone.set(Some(first.name.clone()));
+                        }
+                        projects.set(projs);
                     }
-                    projects.set(projs);
+                    Err(e) => {
+                        web_sys::console::error_1(&format!("Failed to parse /api/projects response (status {}): {:?}", status, e).into());
+                    }
                 }
             }
-            Err(_) => {}
+            Err(e) => {
+                web_sys::console::error_1(&format!("Failed to fetch /api/projects: {:?}", e).into());
+            }
         }
     });
 

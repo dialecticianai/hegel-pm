@@ -28,6 +28,9 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
     // API endpoint for projects list
     let api_projects = warp::path!("api" / "projects")
         .map(move || {
+            use std::time::Instant;
+            let start = Instant::now();
+
             let projects = projects_clone.lock().unwrap();
             // Convert to lightweight ProjectListItem (only name + workflow_state)
             let list_items: Vec<ProjectListItem> = projects
@@ -37,6 +40,8 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
                     workflow_state: p.workflow_state.clone(),
                 })
                 .collect();
+
+            println!("📋 Projects list request completed in {:?} ({} projects)", start.elapsed(), list_items.len());
             warp::reply::json(&list_items)
         });
 
