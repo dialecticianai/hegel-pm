@@ -5,7 +5,7 @@
 **Key Context**:
 - Language: Rust (edition 2021)
 - Framework: Sycamore (reactive web framework)
-- Test runner: `cargo test`
+- Test runner: `./scripts/test.sh` (or `cargo test --features server`)
 - Ecosystem role: Manages multiple Hegel projects (cli, mirror, etc.)
 
 ---
@@ -13,6 +13,25 @@
 # Development Scripts
 
 **Available scripts in `scripts/` directory:**
+
+## Build & Test (Preferred)
+
+```bash
+./scripts/test.sh                      # Build + test everything (default)
+./scripts/test.sh --exclude frontend   # Backend only (skip WASM)
+./scripts/test.sh --exclude backend    # Frontend only (skip cargo)
+```
+
+**What it does:**
+1. Builds frontend with `trunk build --release` (unless excluded)
+2. Builds backend with `cargo build --release --features server` (unless excluded)
+3. Runs `cargo test --features server` (if backend not excluded)
+
+**When to use:**
+- **Default workflow**: Quick iteration during development
+- Verifying changes without starting the server
+- CI/CD pipelines
+- When you just need to know if tests pass
 
 ## Server Management
 
@@ -29,10 +48,10 @@
 5. Shows server logs including cache status and request timing
 
 **When to use:**
-- **Backend only**: After changes to server_mode.rs, discovery/, CLI, etc.
-- **With --frontend**: After client UI changes (src/client/, types, components)
+- **When you need to view changes**: After edits requiring browser verification
 - To see fresh server logs with timing information
 - When server is behaving unexpectedly or UI has stale WASM
+- For debugging with live log output
 
 ---
 

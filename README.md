@@ -124,6 +124,18 @@ let config = DiscoveryConfig::new(
 
 ### Scripts
 
+**Build & Test (Preferred):**
+```bash
+./scripts/test.sh                      # Build + test everything (default)
+./scripts/test.sh --exclude frontend   # Backend only (skip WASM)
+./scripts/test.sh --exclude backend    # Frontend only (skip cargo)
+```
+
+Use this for:
+- Quick iteration during development
+- Verifying changes without starting the server
+- CI/CD pipelines
+
 **Server Management:**
 ```bash
 ./scripts/restart-server.sh              # Backend only (fast)
@@ -132,24 +144,22 @@ let config = DiscoveryConfig::new(
 
 This script:
 1. Stops any running hegel-pm server
-2. Rebuilds backend with `cargo build --release --features server`
-3. Optionally rebuilds frontend with `trunk build --release` (if `--frontend` flag)
-4. Starts fresh server with full logging (cache status, request timing)
+2. Rebuilds backend/frontend (optional)
+3. Starts fresh server with full logging (cache status, request timing)
 
-Use this after:
-- **Backend only**: Changes to server_mode.rs, discovery/, CLI, etc.
-- **With --frontend**: Client UI changes (src/client/, types, components)
-- When you need to see server logs
-- When server is behaving unexpectedly or UI has stale WASM
+Use this when:
+- You need to see server logs with timing information
+- Server is behaving unexpectedly or UI has stale WASM
+- After changes that require viewing in browser
 
-### Testing
-
+**Manual Commands:**
 ```bash
-cargo test          # Run all tests
-cargo test discovery  # Run discovery module tests only
+cargo test                  # Run all tests
+cargo test discovery        # Run discovery module tests only
+cargo test --features server  # Run with server feature enabled
 ```
 
-Coverage: 33.96% (will improve with UI implementation)
+Coverage: 31.64% (target: ≥80%, enforced by pre-commit hook)
 
 ### Project Structure
 
