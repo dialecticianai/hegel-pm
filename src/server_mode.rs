@@ -1,4 +1,4 @@
-use hegel_pm::discovery::{CacheManager, DiscoveryEngine, ProjectMetricsSummary};
+use hegel_pm::discovery::{CacheManager, DiscoveryEngine, ProjectListItem, ProjectMetricsSummary};
 use std::collections::HashMap;
 use std::error::Error;
 use std::sync::{Arc, Mutex};
@@ -29,7 +29,15 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
     let api_projects = warp::path!("api" / "projects")
         .map(move || {
             let projects = projects_clone.lock().unwrap();
-            warp::reply::json(&*projects)
+            // Convert to lightweight ProjectListItem (only name + workflow_state)
+            let list_items: Vec<ProjectListItem> = projects
+                .iter()
+                .map(|p| ProjectListItem {
+                    name: p.name.clone(),
+                    workflow_state: p.workflow_state.clone(),
+                })
+                .collect();
+            warp::reply::json(&list_items)
         });
 
     // Clone for metrics endpoint
@@ -78,7 +86,7 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
                 if let Some(dir) = hegel_dir {
                     let load_start = Instant::now();
                     println!("⏳ Loading statistics for project: {}", name);
-                    match hegel::metrics::parse_unified_metrics(&dir, false) {
+                    match hegel::metrics::parse_unified_metrics(&dir, true) {
                         Ok(stats) => {
                             println!("✅ Statistics loaded in {:?}", load_start.elapsed());
                             Some(stats)

@@ -21,6 +21,7 @@ pub struct ProjectStatistics {
     pub total_output_tokens: u64,
     pub total_cache_creation_tokens: u64,
     pub total_cache_read_tokens: u64,
+    pub total_all_tokens: u64,
     pub total_events: usize,
     pub bash_command_count: usize,
     pub file_modification_count: usize,

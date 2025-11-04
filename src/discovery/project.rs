@@ -53,7 +53,7 @@ impl DiscoveredProject {
     pub fn load_statistics(&mut self) -> Result<()> {
         self.statistics = Some(hegel::metrics::parse_unified_metrics(
             &self.hegel_dir,
-            false,
+            true,
         )?);
         Ok(())
     }

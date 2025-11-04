@@ -133,12 +133,7 @@ pub fn MetricsView(props: MetricsViewProps) -> View {
                         div(class="metric-label") { "Total tokens" }
                         div(class="metric-value") {
                             (move || metrics.with(|m| {
-                                m.as_ref().map(|s| {
-                                    (s.total_input_tokens +
-                                     s.total_output_tokens +
-                                     s.total_cache_creation_tokens +
-                                     s.total_cache_read_tokens).to_string()
-                                }).unwrap_or_else(|| "-".to_string())
+                                m.as_ref().map(|s| s.total_all_tokens.to_string()).unwrap_or_else(|| "-".to_string())
                             }))
                         }
                     }
