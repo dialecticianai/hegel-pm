@@ -151,6 +151,15 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - Check existing scripts before writing new ones
 - Reusable infrastructure compounds value
 
+**Oneoff migration scripts**: For large-scale automated transformations (Perl preferred)
+- Location: `scripts/oneoffs/YYYYMMDD-description.pl`
+- Pattern: Dry-run mode (`--dry-run` flag) to preview changes before applying
+- Use cases: Code migrations (logging, imports, renames), JSON fixes (via jq), bulk refactoring
+- Examples: `20251104-migrate-to-tracing.pl` (regex), hegel-cli's archive fix (jq)
+- Benefits: Auditable, repeatable, testable transformations vs error-prone manual edits
+- Workflow: 1) Write script with dry-run, 2) Test dry-run, 3) Apply, 4) Commit script + changes
+- Reference: See existing oneoff scripts for patterns (classification rules, backups, summaries)
+
 ---
 
 # Using Hegel for Workflow Orchestration
@@ -256,15 +265,6 @@ hegel reflect <file.md> --out-dir <dir> # Custom output location
 
 Reviews saved to `.ddd/<filename>.review.N` (JSONL format). Read with `cat .ddd/SPEC.review.1 | jq -r '.comment'`.
 
-### Command Guardrails
-
-```bash
-hegel git <args>        # Git with safety checks and audit logging
-hegel docker <args>     # Docker with safety checks and audit logging
-```
-
-Configuration: `.hegel/guardrails.yaml` (see example below). All invocations logged to `.hegel/command_log.jsonl`.
-
 ### Metrics
 
 ```bash
@@ -308,7 +308,6 @@ hegel status            # Check active workflow
 
 ```bash
 hegel astq -p 'pattern' src/        # AST-aware code search (NOT grep)
-hegel git add . && hegel git commit # Safe git ops in workflows
 hegel top                           # Monitor metrics
 ```
 
@@ -338,40 +337,12 @@ cat .ddd/SPEC.review.1 | jq -r '.comment'  # Read feedback
 ├── metamode.json       # Meta-mode declaration
 ├── config.toml         # User configuration
 ├── hooks.jsonl         # Claude Code events (tool usage, file mods, timestamps)
-├── states.jsonl        # Workflow transitions (from/to, mode, workflow_id)
-├── command_log.jsonl   # Wrapped command invocations (success/failure, blocks)
-└── guardrails.yaml     # Command safety rules (patterns, reasons)
+└── states.jsonl        # Workflow transitions (from/to, mode, workflow_id)
 ```
 
 **JSONL format:** One JSON object per line (newline-delimited)
 **Atomicity:** `state.json` uses atomic writes (write temp, rename)
 **Correlation:** `workflow_id` (ISO 8601 timestamp) links hooks/states/transcripts
-
----
-
-## Example Guardrails Configuration
-
-`.hegel/guardrails.yaml`:
-
-```yaml
-git:
-  blocked:
-    - pattern: "reset --hard"
-      reason: "Destructive: permanently discards uncommitted changes"
-    - pattern: "clean -fd"
-      reason: "Destructive: removes untracked files/directories"
-    - pattern: "commit.*--no-verify"
-      reason: "Bypasses pre-commit hooks"
-    - pattern: "push.*--force"
-      reason: "Force push can overwrite remote history"
-
-docker:
-  blocked:
-    - pattern: "rm -f"
-      reason: "Force remove containers blocked"
-    - pattern: "system prune -a"
-      reason: "Destructive: removes all unused containers, networks, images"
-```
 
 ---
 
@@ -382,7 +353,6 @@ docker:
 | "No workflow loaded" | `hegel start <workflow>` |
 | "Cannot start workflow while one is active" | `hegel abort` then `hegel start <workflow>` |
 | "Stayed at current node" (unexpected) | Check `hegel status`, verify not at terminal node, use `hegel restart` |
-| "⛔ Command blocked by guardrails" | Review reason, edit `.hegel/guardrails.yaml`, or find alternative |
 
 ---
 
@@ -391,14 +361,12 @@ docker:
 **DO:**
 - ✅ Check `hegel status` at session start
 - ✅ Use `hegel astq` for code search (NOT grep/rg - AST-aware)
-- ✅ Use `hegel git` for git operations in structured workflows
 - ✅ Preview `astq` transformations before applying
 - ✅ Read review files after `hegel reflect`
 - ✅ Defer to `hegel <command> --help` for detailed syntax
 
 **DON'T:**
 - ❌ Start workflow if user hasn't requested structure
-- ❌ Skip guardrails with raw `git` commands
 - ❌ Use `astq --apply` without previewing
 - ❌ Ignore workflow prompts (contain phase-specific guidance)
 - ❌ Reset workflow without user confirmation
@@ -421,9 +389,7 @@ hegel meta
 hegel start <discovery|execution|research|minimal>
 hegel next|restart|abort|repeat|status|reset
 
-# Commands
-hegel git <args>
-hegel docker <args>
+# Commands (none for hegel-pm yet)
 
 # Code
 hegel astq [options] [path]     # See: hegel astq --help
