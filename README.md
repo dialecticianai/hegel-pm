@@ -21,9 +21,10 @@ Project manager for Hegel projects with web UI. Auto-discovers projects, visuali
 - Warp-based HTTP server on `localhost:3030`
 - Serves Sycamore WASM UI bundle (built by trunk to `static/`)
 - JSON API endpoints:
-  - `/api/projects` - List of discovered projects with workflow states
-  - `/api/projects/{name}/metrics` - Lightweight metrics summary (~243 bytes)
+  - `/api/projects` - Lightweight project list (name + workflow_state only)
+  - `/api/projects/{name}/metrics` - Metrics summary with pre-computed aggregates
 - Response caching and async cache persistence for optimal performance
+- Archive-aware metrics: includes archived workflows + live data
 
 **Web UI** (Sycamore + WASM in `src/client/`)
 - Reactive WASM-based dashboard
@@ -43,10 +44,18 @@ Project manager for Hegel projects with web UI. Auto-discovers projects, visuali
 # Start web server and open browser (default)
 hegel-pm
 
-# Run discovery scan only (prints project list)
-hegel-pm --discover
+# Discovery commands (new subcommand structure)
+hegel-pm discover list              # List all projects
+hegel-pm discover show <name>       # Show single project details
+hegel-pm discover all               # Full table with metrics
 
-# Force cache refresh
+# Run hegel commands across all projects (xargs-style)
+hegel-pm hegel status               # Run 'hegel status' on each project
+hegel-pm hegel analyze              # Run 'hegel analyze' on each project
+hegel-pm hegel analyze --fix-archives --dry-run  # Dry-run archive fix
+
+# Legacy flags (deprecated, use 'discover list' instead)
+hegel-pm --discover
 hegel-pm --discover --refresh
 ```
 
@@ -194,7 +203,10 @@ All errors include context with file paths for debugging:
 
 - **Initial scan**: <2 seconds for typical workspace (10-20 projects)
 - **Cache load**: <10ms
-- **Metrics API response**: ~140 microseconds (cached), ~243 bytes payload
+- **Metrics API response**: Fast (leverages pre-computed archive totals)
+  - Project list: Minimal payload (name + workflow_state only, ~60-80% reduction)
+  - Metrics: Pre-computed aggregates (total_all_tokens computed on backend)
+- **Archive-aware**: Includes full project history (archived + live workflows)
 - **Memory**: Bounded (lazy loading via hegel-cli library)
 - **Parallel scanning**: Multiple root directories scanned independently
 - **Async cache persistence**: Non-blocking saves with automatic deduplication
@@ -204,9 +216,12 @@ All errors include context with file paths for debugging:
 hegel-pm depends on hegel-cli as a library for all .hegel data access:
 - `hegel::storage::FileStorage` - State data extraction
 - `hegel::storage::{State, WorkflowState}` - Type definitions
-- `hegel::metrics::UnifiedMetrics` - Complete metrics aggregation
+- `hegel::metrics::parse_unified_metrics` - Archive-aware metrics aggregation
+  - Merges archived workflows with live data
+  - Uses pre-computed totals from archive files
+  - Includes git metrics backfilled via `hegel analyze --fix-archives`
 
-**Abstraction boundary**: hegel-pm never directly reads .hegel files. All data access goes through hegel-cli's library API. The underlying storage format (JSON, JSONL, SQLite, etc.) is completely opaque to hegel-pm.
+**Abstraction boundary**: hegel-pm never directly reads .hegel files. All data access goes through hegel-cli's library API. The underlying storage format (JSON, JSONL, archives, SQLite, etc.) is completely opaque to hegel-pm.
 
 ## License
 

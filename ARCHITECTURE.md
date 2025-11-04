@@ -137,16 +137,23 @@ Tech stack and architectural decisions for multi-project Hegel dashboard
 **Choice**: Server returns aggregate summary counts, not full data arrays
 
 **Rationale**:
-- **Performance**: ~243 byte response vs megabytes of raw event data
+- **Performance**: Minimal response sizes for fast transmission
 - **Client-side speed**: Instant JSON deserialization (no UI freezing)
 - **Bandwidth**: Minimal payload for local HTTP server
 - **Caching**: Small responses easy to cache in-memory
 
 **Implementation**:
-- `ProjectMetricsSummary` type with counts only (tokens, events, commands, files)
-- `ProjectStatistics` (full data) used server-side only
+- `ProjectListItem` type for `/api/projects` (name + workflow_state only, ~60-80% reduction)
+- `ProjectMetricsSummary` type with pre-computed aggregates:
+  - Counts only (tokens, events, commands, files, phases)
+  - `total_all_tokens` computed on backend (eliminates frontend arithmetic)
+- `ProjectStatistics` (full UnifiedMetrics) used server-side only
 - Response caching: serialized JSON stored per project
 - Async cache persistence: background worker with deduplication
+- Archive-aware: `parse_unified_metrics(..., include_archives=true)`
+  - Merges archived workflows with live data
+  - Uses pre-computed totals from archives
+  - Fast O(1) access vs re-parsing all JSONL logs
 
 **Tradeoffs**:
 - Less detailed data in UI (can't show individual bash commands)
@@ -214,14 +221,20 @@ Tech stack and architectural decisions for multi-project Hegel dashboard
 **Resolved**:
 - [x] **Web server choice**: `warp` selected for async HTTP + static file serving
 - [x] **Project discovery caching**: Implemented persistent cache with atomic writes
-- [x] **API optimization**: Lightweight summary responses (ProjectMetricsSummary ~243 bytes)
+- [x] **API optimization**:
+  - Lightweight `ProjectListItem` for project list (~60-80% reduction)
+  - `ProjectMetricsSummary` with pre-computed aggregates (total_all_tokens)
+  - Archive-aware metrics (include_archives=true, uses pre-computed totals)
 - [x] **Concurrent access**: Async cache manager with mutex-free serialization
 - [x] **Component structure**: Refactored to `components/` directory (sidebar.rs, metrics_view.rs)
+- [x] **Multi-project commands**: `hegel-pm hegel` xargs-style passthrough for running hegel commands across all projects
 
 **To Investigate**:
-- [ ] **JSONL parsing performance**: Large `hooks.jsonl` files (>10K events) - streaming vs full read?
 - [ ] **Live update mechanism**: File watching vs manual refresh (deferred to future feature)
 - [ ] **WASM bundle optimization**: Code splitting, lazy loading for faster initial load?
+
+**No Longer Relevant**:
+- ~~**JSONL parsing performance**~~: Solved via archive system (pre-computed totals, no re-parsing)
 
 ---
 
