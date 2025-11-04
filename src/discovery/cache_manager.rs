@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use tokio::sync::mpsc;
 use tokio::time::{sleep, Duration};
+use tracing::{error, info, warn};
 
 use super::{save_cache, DiscoveredProject};
 
@@ -28,7 +29,7 @@ impl CacheManager {
         // Send is cheap (just puts in queue), doesn't block
         // Worker will deduplicate if save already pending
         if let Err(e) = self.tx.send(projects) {
-            eprintln!("⚠️  Failed to queue cache save: {}", e);
+            error!("⚠️  Failed to queue cache save: {}", e);
         }
     }
 }
@@ -57,9 +58,9 @@ async fn cache_worker(
                 if let Some(projects) = pending.take() {
                     // Write cache in background (releases mutex)
                     if let Err(e) = save_cache(&projects, &cache_location) {
-                        eprintln!("⚠️  Cache save failed: {}", e);
+                        warn!("⚠️  Cache save failed: {}", e);
                     } else {
-                        println!("💾 Cache saved ({} projects)", projects.len());
+                        info!("💾 Cache saved ({} projects)", projects.len());
                     }
                 }
             }

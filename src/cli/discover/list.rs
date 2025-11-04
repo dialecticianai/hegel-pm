@@ -2,6 +2,7 @@ use super::format::{abbreviate_path, format_size, format_timestamp, format_times
 use hegel_pm::discovery::{DiscoveredProject, DiscoveryEngine};
 use serde::Serialize;
 use std::error::Error;
+use tracing::info;
 
 /// Run the list command
 pub fn run(engine: &DiscoveryEngine, json: bool, no_cache: bool) -> Result<(), Box<dyn Error>> {
@@ -71,13 +72,13 @@ fn output_json(projects: &[DiscoveredProject], cache_used: bool) -> Result<(), B
         cache_used,
     };
 
-    println!("{}", serde_json::to_string_pretty(&output)?);
+    info!("{}", serde_json::to_string_pretty(&output)?);
     Ok(())
 }
 
 fn output_human(projects: &[DiscoveredProject], _cache_used: bool) -> Result<(), Box<dyn Error>> {
     if projects.is_empty() {
-        println!("No Hegel projects found");
+        info!("No Hegel projects found");
         return Ok(());
     }
 
@@ -101,7 +102,7 @@ fn output_human(projects: &[DiscoveredProject], _cache_used: bool) -> Result<(),
         let path = abbreviate_path(&project.project_path);
         let timestamp = format_timestamp(project.last_activity);
 
-        println!(
+        info!(
             "{:<name_width$}  {:<path_width$}  {:>8}  {}",
             project.name,
             path,
@@ -112,7 +113,7 @@ fn output_human(projects: &[DiscoveredProject], _cache_used: bool) -> Result<(),
         );
     }
 
-    println!("\n{} projects found", projects.len());
+    info!("\n{} projects found", projects.len());
     Ok(())
 }
 

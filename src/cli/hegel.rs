@@ -1,6 +1,7 @@
 use hegel_pm::discovery::DiscoveryEngine;
 use std::error::Error;
 use std::process::Command;
+use tracing::{error, info};
 
 /// Commands that should not be run across all projects
 const DISALLOWED_COMMANDS: &[&str] = &[
@@ -30,11 +31,11 @@ pub fn run(engine: &DiscoveryEngine, args: &[String]) -> Result<(), Box<dyn Erro
     let projects = engine.get_projects(false)?;
 
     if projects.is_empty() {
-        println!("No Hegel projects found");
+        info!("No Hegel projects found");
         return Ok(());
     }
 
-    println!(
+    info!(
         "Running 'hegel {}' across {} project(s)...\n",
         args.join(" "),
         projects.len()
@@ -44,8 +45,8 @@ pub fn run(engine: &DiscoveryEngine, args: &[String]) -> Result<(), Box<dyn Erro
     let mut failure_count = 0;
 
     for project in &projects {
-        println!("=== {} ===", project.name);
-        println!("Path: {}", project.project_path.display());
+        info!("=== {} ===", project.name);
+        info!("Path: {}", project.project_path.display());
 
         // Run hegel command with --state-dir pointing to this project's .hegel directory
         let mut cmd = Command::new("hegel");
@@ -68,23 +69,23 @@ pub fn run(engine: &DiscoveryEngine, args: &[String]) -> Result<(), Box<dyn Erro
 
                 if output.status.success() {
                     success_count += 1;
-                    println!("✓ Success\n");
+                    info!("✓ Success\n");
                 } else {
                     failure_count += 1;
-                    println!("✗ Failed with exit code: {:?}\n", output.status.code());
+                    info!("✗ Failed with exit code: {:?}\n", output.status.code());
                 }
             }
             Err(e) => {
                 failure_count += 1;
-                eprintln!("✗ Failed to execute command: {}\n", e);
+                error!("✗ Failed to execute command: {}\n", e);
             }
         }
     }
 
-    println!("=== Summary ===");
-    println!("Total projects: {}", projects.len());
-    println!("Succeeded: {}", success_count);
-    println!("Failed: {}", failure_count);
+    info!("=== Summary ===");
+    info!("Total projects: {}", projects.len());
+    info!("Succeeded: {}", success_count);
+    info!("Failed: {}", failure_count);
 
     if failure_count > 0 {
         Err(format!("{} project(s) failed", failure_count).into())

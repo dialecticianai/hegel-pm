@@ -3,15 +3,16 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::sync::{Arc, Mutex};
 use warp::Filter;
+use tracing::{debug, error, info};
 
 /// Start web server with project discovery API and static file serving
 pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
-    println!("🚀 Starting hegel-pm web server...");
-    println!("📍 Cache location: {}", engine.config().cache_location.display());
+    info!("🚀 Starting hegel-pm web server...");
+    info!("📍 Cache location: {}", engine.config().cache_location.display());
 
     // Discover projects
     let projects = engine.get_projects(false)?;
-    println!("📁 Discovered {} projects", projects.len());
+    info!("📁 Discovered {} projects", projects.len());
 
     // Create cache manager for async, non-blocking saves
     let cache_manager = CacheManager::new(engine.config().cache_location.clone());
@@ -41,7 +42,7 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
                 })
                 .collect();
 
-            println!("📋 Projects list request completed in {:?} ({} projects)", start.elapsed(), list_items.len());
+            debug!("📋 Projects list request completed in {:?} ({} projects)", start.elapsed(), list_items.len());
             warp::reply::json(&list_items)
         });
 
@@ -62,7 +63,7 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
             {
                 let cache = resp_cache.lock().unwrap();
                 if let Some(cached_json) = cache.get(&name) {
-                    println!("💨 Serving cached response for '{}' in {:?}", name, start.elapsed());
+                    debug!("💨 Serving cached response for '{}' in {:?}", name, start.elapsed());
                     return warp::http::Response::builder()
                         .status(warp::http::StatusCode::OK)
                         .header("Content-Type", "application/json")
@@ -90,14 +91,14 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
             let loaded_stats = if needs_loading {
                 if let Some(dir) = hegel_dir {
                     let load_start = Instant::now();
-                    println!("⏳ Loading statistics for project: {}", name);
+                    debug!("⏳ Loading statistics for project: {}", name);
                     match hegel::metrics::parse_unified_metrics(&dir, true) {
                         Ok(stats) => {
-                            println!("✅ Statistics loaded in {:?}", load_start.elapsed());
+                            info!("✅ Statistics loaded in {:?}", load_start.elapsed());
                             Some(stats)
                         }
                         Err(e) => {
-                            eprintln!("❌ Failed to load statistics for '{}': {}", name, e);
+                            error!("❌ Failed to load statistics for '{}': {}", name, e);
                             None
                         }
                     }
@@ -138,7 +139,7 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
                         Ok(json_bytes) => {
                             // Cache the serialized response
                             resp_cache.lock().unwrap().insert(name.clone(), json_bytes.clone());
-                            println!("📦 Cached JSON response for '{}' ({} bytes)", name, json_bytes.len());
+                            debug!("📦 Cached JSON response for '{}' ({} bytes)", name, json_bytes.len());
 
                             warp::http::Response::builder()
                                 .status(warp::http::StatusCode::OK)
@@ -147,7 +148,7 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
                                 .unwrap()
                         }
                         Err(e) => {
-                            eprintln!("❌ JSON serialization failed: {}", e);
+                            error!("❌ JSON serialization failed: {}", e);
                             warp::http::Response::builder()
                                 .status(warp::http::StatusCode::INTERNAL_SERVER_ERROR)
                                 .header("Content-Type", "application/json")
@@ -162,7 +163,7 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
                     .body(serde_json::to_vec(&serde_json::json!({"error": "Failed to load statistics"})).unwrap())
                     .unwrap(),
                 None => {
-                    println!("❌ Project not found: {}", name);
+                    info!("❌ Project not found: {}", name);
                     warp::http::Response::builder()
                         .status(warp::http::StatusCode::NOT_FOUND)
                         .header("Content-Type", "application/json")
@@ -171,13 +172,13 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
                 }
             };
 
-            println!("📊 Metrics request for '{}' completed in {:?}", name, start.elapsed());
+            debug!("📊 Metrics request for '{}' completed in {:?}", name, start.elapsed());
 
             // Queue cache save if statistics were loaded (non-blocking)
             if needs_caching {
                 let projects = projects_for_metrics.lock().unwrap();
                 cache_mgr.queue_save(projects.clone());
-                println!("📤 Queued cache save for '{}'", name);
+                info!("📤 Queued cache save for '{}'", name);
             }
 
             response
@@ -190,14 +191,14 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
     let routes = api_projects.or(api_metrics).or(static_files);
 
     let url = "http://localhost:3030";
-    println!("🌐 Server running at {}", url);
-    println!("📝 Build WASM with: trunk build --release");
+    info!("🌐 Server running at {}", url);
+    info!("📝 Build WASM with: trunk build --release");
 
     // Open browser
     if let Err(e) = open::that(url) {
-        eprintln!("⚠️  Failed to open browser: {}", e);
+        error!("⚠️  Failed to open browser: {}", e);
     } else {
-        println!("🌍 Opening browser...");
+        info!("🌍 Opening browser...");
     }
 
     warp::serve(routes)

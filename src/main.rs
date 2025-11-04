@@ -5,9 +5,23 @@ mod server_mode;
 use clap::Parser;
 use cli::{Args, Command};
 use hegel_pm::discovery::{DiscoveryConfig, DiscoveryEngine};
+use tracing::{Level, warn};
+use tracing_subscriber::{fmt, EnvFilter};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Initialize tracing subscriber with env filter
+    // Default to INFO level, can be overridden with RUST_LOG env var
+    // Examples:
+    //   RUST_LOG=debug hegel-pm
+    //   RUST_LOG=hegel_pm::server_mode=trace hegel-pm
+    fmt()
+        .with_env_filter(
+            EnvFilter::from_default_env()
+                .add_directive(Level::INFO.into())
+        )
+        .init();
+
     let args = Args::parse();
 
     // Initialize discovery engine with default config
@@ -30,7 +44,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         None => {
             if args.discover {
                 // Deprecated --discover flag
-                eprintln!("⚠️  Warning: --discover flag is deprecated. Use 'discover list' instead.");
+                warn!("⚠️  Warning: --discover flag is deprecated. Use 'discover list' instead.");
                 discovery_mode::run(&engine, args.refresh)?;
             } else {
                 // Server mode: start web server

@@ -1,5 +1,6 @@
 use anyhow::Result;
 use std::path::PathBuf;
+use tracing::info;
 use walkdir::WalkDir;
 
 /// Find all .hegel directories in the given root, respecting exclusions and max depth
@@ -27,7 +28,7 @@ pub fn find_hegel_directories(
             Ok(e) => e,
             Err(err) => {
                 // Log error but continue scanning
-                eprintln!("Warning: skipping entry: {}", err);
+                info!("Warning: skipping entry: {}", err);
                 continue;
             }
         };

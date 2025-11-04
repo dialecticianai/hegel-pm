@@ -1,4 +1,5 @@
 use anyhow::Result;
+use tracing::info;
 
 use super::{discover_projects, load_cache, save_cache, DiscoveredProject, DiscoveryConfig};
 
@@ -18,19 +19,19 @@ impl DiscoveryEngine {
     pub fn get_projects(&self, force_refresh: bool) -> Result<Vec<DiscoveredProject>> {
         if force_refresh {
             // Force refresh bypasses cache
-            println!("🔄 Force refresh requested, scanning...");
+            info!("🔄 Force refresh requested, scanning...");
             return self.scan_and_cache();
         }
 
         // Try to load from cache
         match load_cache(&self.config.cache_location)? {
             Some(projects) => {
-                println!("✅ Loaded {} projects from cache", projects.len());
+                info!("✅ Loaded {} projects from cache", projects.len());
                 Ok(projects)
             }
             None => {
                 // No cache, perform scan
-                println!("❌ No cache found, performing full scan...");
+                info!("❌ No cache found, performing full scan...");
                 self.scan_and_cache()
             }
         }
@@ -39,9 +40,9 @@ impl DiscoveryEngine {
     /// Scan for projects and update cache
     pub fn scan_and_cache(&self) -> Result<Vec<DiscoveredProject>> {
         let projects = discover_projects(&self.config)?;
-        println!("💾 Saving {} projects to cache", projects.len());
+        info!("💾 Saving {} projects to cache", projects.len());
         save_cache(&projects, &self.config.cache_location)?;
-        println!("✅ Cache saved to {}", self.config.cache_location.display());
+        info!("✅ Cache saved to {}", self.config.cache_location.display());
         Ok(projects)
     }
 

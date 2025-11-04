@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-04 14:51
+**Last Updated**: 2025-11-04 15:00
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 2,901 | 6,543 | 9,444 |
-| **Comments** | 214 | - | 214 |
-| **Blank Lines** | 508 | - | 508 |
-| **Total Lines** | 3,623 | 6,543 | 10,166 |
+| **Lines** | 2,918 | 6,543 | 9,461 |
+| **Comments** | 219 | - | 219 |
+| **Blank Lines** | 509 | - | 509 |
+| **Total Lines** | 3,646 | 6,543 | 10,189 |
 | **Files** | 28 | 25 | 53 |
 
-**Documentation Ratio**: 2.26 lines of docs per line of code
+**Documentation Ratio**: 2.24 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            28            508            214           2901
+Rust                            28            509            219           2918
 Markdown                         6             28              0            128
 -------------------------------------------------------------------------------
-SUM:                            34            536            214           3029
+SUM:                            34            537            219           3046
 -------------------------------------------------------------------------------
 ```
 
@@ -38,32 +38,32 @@ SUM:                            34            536            214           3029
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
 | `cli.rs` | 211 | 69 | 142 | 67.3% | ✅ |
-| `cli/discover/all.rs` | 400 | 273 | 127 | 31.8% | ⚠️ Large |
+| `cli/discover/all.rs` | 401 | 274 | 127 | 31.7% | ⚠️ Large |
 | `cli/discover/format.rs` | 128 | 52 | 76 | 59.4% | ✅ |
-| `cli/discover/list.rs` | 209 | 118 | 91 | 43.5% | ✅ |
+| `cli/discover/list.rs` | 210 | 119 | 91 | 43.3% | ✅ |
 | `cli/discover/mod.rs` | 97 | 68 | 29 | 29.9% | ✅ |
-| `cli/discover/show.rs` | 261 | 168 | 93 | 35.6% | ✅ |
-| `cli/hegel.rs` | 156 | 95 | 61 | 39.1% | ✅ |
+| `cli/discover/show.rs` | 262 | 169 | 93 | 35.5% | ✅ |
+| `cli/hegel.rs` | 157 | 96 | 61 | 38.9% | ✅ |
 | `client/components/metrics_view.rs` | 174 | 174 | 0 | 0.0% | ✅ |
 | `client/components/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `client/components/sidebar.rs` | 86 | 86 | 0 | 0.0% | ✅ |
 | `client/mod.rs` | 26 | 26 | 0 | 0.0% | ✅ |
 | `client/types.rs` | 86 | 86 | 0 | 0.0% | ✅ |
-| `discovery_mode.rs` | 20 | 20 | 0 | 0.0% | ✅ |
+| `discovery_mode.rs` | 21 | 21 | 0 | 0.0% | ✅ |
 | `discovery/api_types.rs` | 46 | 46 | 0 | 0.0% | ✅ |
-| `discovery/cache_manager.rs` | 68 | 68 | 0 | 0.0% | ✅ |
+| `discovery/cache_manager.rs` | 69 | 69 | 0 | 0.0% | ✅ |
 | `discovery/cache.rs` | 145 | 51 | 94 | 64.8% | ✅ |
 | `discovery/config.rs` | 212 | 105 | 107 | 50.5% | ✅ |
 | `discovery/discover.rs` | 200 | 52 | 148 | 74.0% | ✅ |
-| `discovery/engine.rs` | 182 | 53 | 129 | 70.9% | ✅ |
+| `discovery/engine.rs` | 183 | 54 | 129 | 70.5% | ✅ |
 | `discovery/mod.rs` | 37 | 26 | 11 | 29.7% | ✅ |
 | `discovery/project.rs` | 239 | 116 | 123 | 51.5% | ✅ |
 | `discovery/state.rs` | 113 | 19 | 94 | 83.2% | ✅ |
 | `discovery/statistics.rs` | 30 | 3 | 27 | 90.0% | ✅ |
-| `discovery/walker.rs` | 171 | 46 | 125 | 73.1% | ✅ |
+| `discovery/walker.rs` | 172 | 47 | 125 | 72.7% | ✅ |
 | `lib.rs` | 9 | 3 | 6 | 66.7% | ✅ |
-| `main.rs` | 43 | 43 | 0 | 0.0% | ✅ |
-| `server_mode.rs` | 208 | 208 | 0 | 0.0% | ⚠️ Large |
+| `main.rs` | 57 | 57 | 0 | 0.0% | ✅ |
+| `server_mode.rs` | 209 | 209 | 0 | 0.0% | ⚠️ Large |
 | `test_helpers.rs` | 61 | 35 | 26 | 42.6% | ✅ |
 
 **⚠️ Warning:** 2 file(s) over 200 impl lines - consider splitting for maintainability
@@ -106,7 +106,7 @@ SUM:                            34            536            214           3029
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 2.26 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.24 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 
