@@ -51,7 +51,10 @@ impl DiscoveredProject {
 
     /// Load statistics for this project (lazy loading)
     pub fn load_statistics(&mut self) -> Result<()> {
-        self.statistics = Some(hegel::metrics::parse_unified_metrics(&self.hegel_dir)?);
+        self.statistics = Some(hegel::metrics::parse_unified_metrics(
+            &self.hegel_dir,
+            false,
+        )?);
         Ok(())
     }
 

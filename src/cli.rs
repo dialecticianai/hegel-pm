@@ -1,4 +1,5 @@
 pub mod discover;
+pub mod hegel;
 
 use clap::{Parser, Subcommand};
 
@@ -33,6 +34,13 @@ pub enum Command {
         /// Force fresh filesystem scan, bypass cache
         #[arg(long, global = true)]
         no_cache: bool,
+    },
+
+    /// Run a hegel command across all discovered projects
+    Hegel {
+        /// Arguments to pass to hegel command
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
     },
 }
 
@@ -160,5 +168,44 @@ mod tests {
         let args = Args::parse_from(["hegel-pm", "--discover", "--refresh"]);
         assert!(args.discover);
         assert!(args.refresh);
+    }
+
+    #[test]
+    fn test_hegel_command() {
+        let args = Args::parse_from(["hegel-pm", "hegel", "status"]);
+        match args.command {
+            Some(Command::Hegel { args }) => {
+                assert_eq!(args, vec!["status"]);
+            }
+            _ => panic!("Expected Hegel command"),
+        }
+    }
+
+    #[test]
+    fn test_hegel_command_with_multiple_args() {
+        let args = Args::parse_from([
+            "hegel-pm",
+            "hegel",
+            "analyze",
+            "--fix-archives",
+            "--dry-run",
+        ]);
+        match args.command {
+            Some(Command::Hegel { args }) => {
+                assert_eq!(args, vec!["analyze", "--fix-archives", "--dry-run"]);
+            }
+            _ => panic!("Expected Hegel command"),
+        }
+    }
+
+    #[test]
+    fn test_hegel_command_with_flags() {
+        let args = Args::parse_from(["hegel-pm", "hegel", "analyze", "--fix-archives", "--json"]);
+        match args.command {
+            Some(Command::Hegel { args }) => {
+                assert_eq!(args, vec!["analyze", "--fix-archives", "--json"]);
+            }
+            _ => panic!("Expected Hegel command"),
+        }
     }
 }

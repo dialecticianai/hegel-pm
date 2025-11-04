@@ -23,6 +23,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             // New discover subcommand
             cli::discover::run(&engine, &subcommand, json, no_cache)?;
         }
+        Some(Command::Hegel { args: hegel_args }) => {
+            // Run hegel command across all projects
+            cli::hegel::run(&engine, &hegel_args)?;
+        }
         None => {
             if args.discover {
                 // Deprecated --discover flag

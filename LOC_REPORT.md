@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-03 15:48
+**Last Updated**: 2025-11-04 14:30
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 2,706 | 6,511 | 9,217 |
-| **Comments** | 200 | - | 200 |
-| **Blank Lines** | 477 | - | 477 |
-| **Total Lines** | 3,383 | 6,511 | 9,894 |
-| **Files** | 27 | 25 | 52 |
+| **Lines** | 2,877 | 6,514 | 9,391 |
+| **Comments** | 212 | - | 212 |
+| **Blank Lines** | 504 | - | 504 |
+| **Total Lines** | 3,593 | 6,514 | 10,107 |
+| **Files** | 28 | 25 | 53 |
 
-**Documentation Ratio**: 2.41 lines of docs per line of code
+**Documentation Ratio**: 2.26 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            27            477            200           2706
-Markdown                         6             28              0            127
+Rust                            28            504            212           2877
+Markdown                         6             28              0            128
 -------------------------------------------------------------------------------
-SUM:                            33            505            200           2833
+SUM:                            34            532            212           3005
 -------------------------------------------------------------------------------
 ```
 
@@ -37,12 +37,13 @@ SUM:                            33            505            200           2833
 
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
-| `cli.rs` | 164 | 61 | 103 | 62.8% | ✅ |
+| `cli.rs` | 211 | 69 | 142 | 67.3% | ✅ |
 | `cli/discover/all.rs` | 400 | 273 | 127 | 31.8% | ⚠️ Large |
 | `cli/discover/format.rs` | 128 | 52 | 76 | 59.4% | ✅ |
 | `cli/discover/list.rs` | 209 | 118 | 91 | 43.5% | ✅ |
 | `cli/discover/mod.rs` | 97 | 68 | 29 | 29.9% | ✅ |
 | `cli/discover/show.rs` | 261 | 168 | 93 | 35.6% | ✅ |
+| `cli/hegel.rs` | 156 | 95 | 61 | 39.1% | ✅ |
 | `client/components/metrics_view.rs` | 179 | 179 | 0 | 0.0% | ✅ |
 | `client/components/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `client/components/sidebar.rs` | 78 | 78 | 0 | 0.0% | ✅ |
@@ -56,12 +57,12 @@ SUM:                            33            505            200           2833
 | `discovery/discover.rs` | 200 | 52 | 148 | 74.0% | ✅ |
 | `discovery/engine.rs` | 182 | 53 | 129 | 70.9% | ✅ |
 | `discovery/mod.rs` | 37 | 26 | 11 | 29.7% | ✅ |
-| `discovery/project.rs` | 236 | 113 | 123 | 52.1% | ✅ |
+| `discovery/project.rs` | 239 | 116 | 123 | 51.5% | ✅ |
 | `discovery/state.rs` | 113 | 19 | 94 | 83.2% | ✅ |
 | `discovery/statistics.rs` | 30 | 3 | 27 | 90.0% | ✅ |
 | `discovery/walker.rs` | 171 | 46 | 125 | 73.1% | ✅ |
 | `lib.rs` | 9 | 3 | 6 | 66.7% | ✅ |
-| `main.rs` | 39 | 39 | 0 | 0.0% | ✅ |
+| `main.rs` | 43 | 43 | 0 | 0.0% | ✅ |
 | `server_mode.rs` | 195 | 195 | 0 | 0.0% | ✅ |
 | `test_helpers.rs` | 61 | 35 | 26 | 42.6% | ✅ |
 
@@ -87,10 +88,10 @@ SUM:                            33            505            200           2833
 | `learnings/LEARNING_SYCAMORE_COMPONENTS.md` | 733 |
 | `learnings/LEARNING_SYCAMORE_FOUNDATIONS.md` | 572 |
 | `learnings/LEARNING_SYCAMORE_PRACTICES.md` | 530 |
-| `LOC_REPORT.md` | 122 |
+| `LOC_REPORT.md` | 124 |
 | `README.md` | 213 |
 | `RESEARCH_PLAN.md` | 189 |
-| `src/cli/CODE_MAP.md` | 22 |
+| `src/cli/CODE_MAP.md` | 23 |
 | `src/cli/discover/README.md` | 29 |
 | `src/client/CODE_MAP.md` | 22 |
 | `src/CODE_MAP.md` | 25 |
@@ -105,7 +106,7 @@ SUM:                            33            505            200           2833
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 2.41 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.26 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 

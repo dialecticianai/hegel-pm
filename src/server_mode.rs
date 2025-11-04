@@ -78,7 +78,7 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
                 if let Some(dir) = hegel_dir {
                     let load_start = Instant::now();
                     println!("⏳ Loading statistics for project: {}", name);
-                    match hegel::metrics::parse_unified_metrics(&dir) {
+                    match hegel::metrics::parse_unified_metrics(&dir, false) {
                         Ok(stats) => {
                             println!("✅ Statistics loaded in {:?}", load_start.elapsed());
                             Some(stats)
