@@ -116,9 +116,15 @@
 
 **Commit footer** (always include):
 ```
-🤖 Generated with Claude Code
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
+
+**Commit frequency**: Wait for user to initiate commits/pushes
+- Don't commit aggressively after every change (wastes tokens)
+- Let work accumulate into logical units
+- User will say "let's commit" or "push this" when ready
+- Exception: End of session wrap-up
 
 **Pre-commit hooks** (auto-installed):
 - `rustfmt` on all staged `.rs` files (auto-stages formatted output)
