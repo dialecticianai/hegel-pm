@@ -15,16 +15,29 @@ Project manager for Hegel projects with web UI. Auto-discovers projects, visuali
 - Filesystem-based project discovery
 - Workflow state and metrics extraction via hegel-cli library
 - Cache persistence for fast subsequent loads
-- See `src/discovery/README.md` for detailed documentation
+- See `src/discovery/CODE_MAP.md` for detailed documentation
+
+**Data Layer** (`src/data_layer/`)
+- Message-passing worker pool for async I/O operations
+- Lock-free response caching with DashMap (pre-serialized JSON)
+- Parallel cache misses via tokio::spawn
+- Zero blocking I/O in HTTP handlers
+- See `src/data_layer/CODE_MAP.md` for architecture details
+
+**HTTP Backends** (`src/http/`)
+- Pluggable backend architecture (warp or axum)
+- Compile-time selection via feature flags
+- Both backends delegate to data layer worker pool
+- See `src/http/CODE_MAP.md` for backend implementations
 
 **Web Server** (`src/main.rs` with `server` feature)
-- Warp-based HTTP server on `localhost:3030`
+- HTTP server on `localhost:3030` with swappable backend
+- Default: warp-backend (can switch to axum-backend via features)
 - Serves Sycamore WASM UI bundle (built by trunk to `static/`)
 - JSON API endpoints:
   - `/api/projects` - Lightweight project list (name + workflow_state only)
   - `/api/projects/{name}/metrics` - ProjectInfo with summary + workflow detail breakdowns
   - `/api/all-projects` - Aggregate metrics across all discovered projects
-- Response caching and async cache persistence for optimal performance
 - Archive-aware metrics: includes archived workflows + live data
 
 **Web UI** (Sycamore + WASM in `src/client/`)
@@ -35,8 +48,11 @@ Project manager for Hegel projects with web UI. Auto-discovers projects, visuali
 
 **Dependencies**
 - `hegel-cli` (path dependency) - All .hegel data access via library API
-- `warp` - Async web server framework
+- `warp` (optional, default) - Async web server backend
+- `axum` (optional) - Alternative async web server backend
 - `sycamore` - Reactive web UI framework (WASM-compiled)
+- `tokio` - Async runtime for worker pool and message passing
+- `dashmap` - Lock-free concurrent HashMap for response caching
 
 ## Usage
 
@@ -63,8 +79,12 @@ hegel-pm --discover --refresh
 
 **Build from source:**
 ```bash
+# Default build (warp backend)
 cargo build --release --bin hegel-pm --features server
 ./target/release/hegel-pm
+
+# With axum backend
+cargo build --release --bin hegel-pm --no-default-features --features server,axum-backend
 ```
 
 **WASM UI development:**
@@ -169,24 +189,26 @@ Coverage: 31.64% (target: ≥80%, enforced by pre-commit hook)
 hegel-pm/
 ├── src/
 │   ├── discovery/     # Project discovery engine
-│   │   ├── config.rs      # Configuration with validation
-│   │   ├── walker.rs      # Filesystem traversal
-│   │   ├── state.rs       # State extraction (delegates to hegel-cli)
-│   │   ├── project.rs     # DiscoveredProject model
-│   │   ├── statistics.rs  # Type alias to hegel::metrics::UnifiedMetrics
-│   │   ├── cache.rs       # Cache persistence
-│   │   ├── discover.rs    # Project discovery integration
-│   │   ├── engine.rs      # DiscoveryEngine orchestration
-│   │   └── README.md      # Module documentation
+│   │   └── CODE_MAP.md    # Module structure documentation
+│   ├── data_layer/    # Worker pool and caching
+│   │   └── CODE_MAP.md    # Data layer architecture
+│   ├── http/          # HTTP backend abstraction
+│   │   ├── warp_backend.rs   # Warp implementation
+│   │   ├── axum_backend.rs   # Axum implementation
+│   │   └── CODE_MAP.md       # Backend documentation
+│   ├── client/        # Sycamore WASM UI
+│   ├── cli/           # CLI commands
 │   ├── lib.rs
-│   └── main.rs
+│   ├── main.rs
+│   └── CODE_MAP.md    # Source structure overview
 ├── index.html         # Trunk build template (WASM entry point)
 ├── static/            # Built WASM output (served by web server)
 ├── .ddd/
 │   └── feat/
-│       └── project-discovery/
+│       └── swappable_backend/
 │           ├── SPEC.md    # Feature specification
-│           └── PLAN.md    # Implementation plan
+│           ├── PLAN.md    # Implementation plan
+│           └── HANDOFF.md # Implementation handoff
 └── README.md
 ```
 
@@ -213,14 +235,16 @@ All errors include context with file paths for debugging:
 ## Performance
 
 - **Initial scan**: <2 seconds for typical workspace (10-20 projects)
-- **Cache load**: <10ms
+- **Worker pool**: Parallel I/O with configurable worker count (default: num_cpus * 2)
+- **Response caching**: Lock-free reads via DashMap, pre-serialized JSON
+- **Cache hits**: <1ms (zero deserialization, direct byte serving)
+- **Cache misses**: Parallel loading via tokio::spawn
 - **Metrics API response**: Fast (leverages pre-computed archive totals)
   - Project list: Minimal payload (name + workflow_state only, ~60-80% reduction)
   - Metrics: Pre-computed aggregates (total_all_tokens computed on backend)
 - **Archive-aware**: Includes full project history (archived + live workflows)
 - **Memory**: Bounded (lazy loading via hegel-cli library)
-- **Parallel scanning**: Multiple root directories scanned independently
-- **Async cache persistence**: Non-blocking saves with automatic deduplication
+- **HTTP backends**: Both warp and axum delegate to same optimized data layer
 
 ## Integration with hegel-cli
 

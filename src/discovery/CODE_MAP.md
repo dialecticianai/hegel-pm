@@ -15,7 +15,6 @@ discovery/
 ├── state.rs            Workflow state extraction from .hegel/state.json via hegel-cli FileStorage
 ├── statistics.rs       Type alias to hegel::metrics::UnifiedMetrics
 ├── api_types.rs        Lightweight API response types (ProjectMetricsSummary for /api endpoints)
-├── cache_manager.rs    Async cache persistence with deduplication and background worker
 └── cache.rs            Persistent cache with atomic writes and expiration
 ```
 

@@ -21,9 +21,10 @@ Tech stack and architectural decisions for multi-project Hegel dashboard
 - **anyhow** - Error handling (already in hegel-cli)
 
 **Decisions Made**:
-- **Web server**: `warp` (async HTTP server, serves static files + JSON API)
+- **HTTP backend**: Swappable architecture (warp or axum via feature flags)
+- **Data layer**: Message-passing worker pool with lock-free caching (DashMap)
 - **Build system**: Trunk (WASM bundler, generates `static/` artifacts from `index.html`)
-- **Deployment**: WASM in browser served by local warp server on `localhost:3030`
+- **Deployment**: WASM in browser served by local HTTP server on `localhost:3030`
 - **API design**: Lightweight JSON responses (summary counts, not full data arrays)
 
 **Still To Explore**:
@@ -164,16 +165,51 @@ Tech stack and architectural decisions for multi-project Hegel dashboard
 **Alternative rejected**:
 - **Full data arrays**: Caused browser freezing on large payloads (megabytes)
 
+### Decision 7: Swappable HTTP Backend Architecture
+
+**Choice**: Abstract HTTP layer with trait-based backend selection (warp or axum)
+
+**Rationale**:
+- **Flexibility**: Different backends for different deployment scenarios
+- **Compile-time selection**: Zero runtime overhead, single backend per build
+- **Future-proofing**: Easy to add new backends (hyper, actix-web) without changing data layer
+- **Performance isolation**: HTTP layer separate from data layer (worker pool)
+
+**Implementation**:
+- `HttpBackend` trait with `run()` method
+- Feature flags: `warp-backend` (default), `axum-backend`
+- Compile-time mutual exclusion (build error if both enabled)
+- Both backends delegate I/O to `data_layer::WorkerPool` via message passing
+- `ServerConfig` struct for backend-agnostic configuration
+
+**Data Layer Design**:
+- Message-passing worker pool (tokio mpsc channels)
+- Pre-serialized JSON caching (DashMap for lock-free reads)
+- Parallel cache misses (tokio::spawn for concurrent loading)
+- Zero blocking I/O in HTTP handlers (all requests → DataRequest messages)
+
+**Tradeoffs**:
+- Additional abstraction layer vs direct warp usage
+- Slightly more complex build configuration (feature flags)
+- **Acceptable**: Flexibility and testability outweigh minimal complexity
+
+**Alternatives considered**:
+- **Warp only**: Simpler but locked into single framework
+- **Runtime selection**: Higher complexity, runtime overhead
+- **Separate binaries**: Build complexity, code duplication
+
 ---
 
 ## System Boundaries
 
 ### Internal (hegel-pm owns)
 - **Project discovery**: Recursive filesystem walking
-- **Web server**: Local HTTP server for dashboard (warp)
+- **Data layer**: Worker pool with message passing, lock-free response caching
+- **HTTP backends**: Swappable warp/axum implementations (trait-based abstraction)
+- **Web server**: Local HTTP server for dashboard (pluggable backend)
 - **UI rendering**: Sycamore components (project cards, workflow graphs, metrics charts)
 - **API layer**: Lightweight response types (`ProjectMetricsSummary`) for metrics endpoint
-- **Cache management**: Async cache persistence with background worker and deduplication
+- **Cache management**: Pre-serialized JSON cache (DashMap), parallel cache misses
 - **File watching**: Monitor `.hegel/` directories for changes (future feature)
 - **Configuration**: User prefs (root directory, cache location)
 
@@ -220,13 +256,16 @@ Tech stack and architectural decisions for multi-project Hegel dashboard
 ## Open Questions (Discovery Phase)
 
 **Resolved**:
-- [x] **Web server choice**: `warp` selected for async HTTP + static file serving
+- [x] **Web server choice**: Swappable backend (warp default, axum available)
+- [x] **Data layer architecture**: Message-passing worker pool with lock-free caching
+- [x] **HTTP abstraction**: Trait-based backend selection with compile-time mutual exclusion
 - [x] **Project discovery caching**: Implemented persistent cache with atomic writes
 - [x] **API optimization**:
   - Lightweight `ProjectListItem` for project list (~60-80% reduction)
   - `ProjectMetricsSummary` with pre-computed aggregates (total_all_tokens)
   - Archive-aware metrics (include_archives=true, uses pre-computed totals)
-- [x] **Concurrent access**: Async cache manager with mutex-free serialization
+  - Pre-serialized JSON cache (DashMap) for zero-copy serving
+- [x] **Concurrent access**: Lock-free reads, parallel cache misses
 - [x] **Component structure**: Refactored to `components/` directory (sidebar.rs, metrics_view.rs)
 - [x] **Multi-project commands**: `hegel-pm hegel` xargs-style passthrough for running hegel commands across all projects
 
