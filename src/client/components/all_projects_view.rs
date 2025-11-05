@@ -1,6 +1,6 @@
+use crate::client::types::AllProjectsAggregate;
 use gloo_net::http::Request;
 use sycamore::prelude::*;
-use crate::client::types::AllProjectsAggregate;
 
 #[component]
 pub fn AllProjectsView() -> View {
@@ -26,7 +26,9 @@ pub fn AllProjectsView() -> View {
                             loading.set(false);
                         }
                         Err(e) => {
-                            web_sys::console::error_1(&format!("JSON parse failed: {:?}", e).into());
+                            web_sys::console::error_1(
+                                &format!("JSON parse failed: {:?}", e).into(),
+                            );
                             error.set(true);
                             loading.set(false);
                         }

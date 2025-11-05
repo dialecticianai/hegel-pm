@@ -1,6 +1,6 @@
+use crate::client::types::{PhaseSummary, ProjectInfo, WorkflowSummary};
 use gloo_net::http::Request;
 use sycamore::prelude::*;
-use crate::client::types::{ProjectInfo, WorkflowSummary, PhaseSummary};
 
 #[derive(Props)]
 pub struct WorkflowDetailViewProps {
@@ -34,7 +34,9 @@ pub fn WorkflowDetailView(props: WorkflowDetailViewProps) -> View {
                     match Request::get(&url).send().await {
                         Ok(resp) => {
                             if resp.status() != 200 {
-                                web_sys::console::error_1(&format!("HTTP error: {}", resp.status()).into());
+                                web_sys::console::error_1(
+                                    &format!("HTTP error: {}", resp.status()).into(),
+                                );
                                 error.set(true);
                                 loading.set(false);
                                 return;
@@ -42,12 +44,16 @@ pub fn WorkflowDetailView(props: WorkflowDetailViewProps) -> View {
 
                             match resp.json::<ProjectInfo>().await {
                                 Ok(info) => {
-                                    web_sys::console::log_1(&"Successfully loaded project info".into());
+                                    web_sys::console::log_1(
+                                        &"Successfully loaded project info".into(),
+                                    );
                                     project_info.set(Some(info));
                                     loading.set(false);
                                 }
                                 Err(e) => {
-                                    web_sys::console::error_1(&format!("JSON parse failed: {:?}", e).into());
+                                    web_sys::console::error_1(
+                                        &format!("JSON parse failed: {:?}", e).into(),
+                                    );
                                     error.set(true);
                                     loading.set(false);
                                 }

@@ -1,5 +1,5 @@
 mod cache;
-mod messages;
+pub mod messages;
 mod worker;
 
 pub use cache::{CacheKey, ResponseCache};

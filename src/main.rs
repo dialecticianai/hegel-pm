@@ -1,13 +1,23 @@
+#[cfg(not(target_arch = "wasm32"))]
 mod cli;
+#[cfg(not(target_arch = "wasm32"))]
 mod discovery_mode;
+#[cfg(not(target_arch = "wasm32"))]
 mod server_mode;
 
+// The binary is only compiled for native targets, not WASM
+#[cfg(not(target_arch = "wasm32"))]
 use clap::Parser;
+#[cfg(not(target_arch = "wasm32"))]
 use cli::{Args, Command};
+#[cfg(not(target_arch = "wasm32"))]
 use hegel_pm::discovery::{DiscoveryConfig, DiscoveryEngine};
-use tracing::{Level, warn};
+#[cfg(not(target_arch = "wasm32"))]
+use tracing::{warn, Level};
+#[cfg(not(target_arch = "wasm32"))]
 use tracing_subscriber::{fmt, EnvFilter};
 
+#[cfg(not(target_arch = "wasm32"))]
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialize tracing subscriber with env filter
@@ -16,10 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //   RUST_LOG=debug hegel-pm
     //   RUST_LOG=hegel_pm::server_mode=trace hegel-pm
     fmt()
-        .with_env_filter(
-            EnvFilter::from_default_env()
-                .add_directive(Level::INFO.into())
-        )
+        .with_env_filter(EnvFilter::from_default_env().add_directive(Level::INFO.into()))
         .init();
 
     let args = Args::parse();
@@ -54,4 +61,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
+}
+
+// Dummy main for WASM builds (binary is never actually used for WASM)
+#[cfg(target_arch = "wasm32")]
+fn main() {
+    panic!("This binary is not meant to be compiled for WASM");
 }

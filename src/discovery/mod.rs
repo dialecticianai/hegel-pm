@@ -1,6 +1,5 @@
 mod api_types;
 mod cache;
-mod cache_manager;
 mod config;
 mod discover;
 mod engine;
@@ -11,7 +10,6 @@ mod walker;
 
 pub use api_types::{ProjectListItem, ProjectMetricsSummary};
 pub use cache::{load_cache, save_cache};
-pub use cache_manager::CacheManager;
 pub use config::DiscoveryConfig;
 pub use discover::discover_projects;
 pub use engine::DiscoveryEngine;

@@ -29,12 +29,20 @@ pub fn Sidebar(props: SidebarProps) -> View {
                         projects.set(projs);
                     }
                     Err(e) => {
-                        web_sys::console::error_1(&format!("Failed to parse /api/projects response (status {}): {:?}", status, e).into());
+                        web_sys::console::error_1(
+                            &format!(
+                                "Failed to parse /api/projects response (status {}): {:?}",
+                                status, e
+                            )
+                            .into(),
+                        );
                     }
                 }
             }
             Err(e) => {
-                web_sys::console::error_1(&format!("Failed to fetch /api/projects: {:?}", e).into());
+                web_sys::console::error_1(
+                    &format!("Failed to fetch /api/projects: {:?}", e).into(),
+                );
             }
         }
     });

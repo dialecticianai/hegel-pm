@@ -19,7 +19,6 @@ clap = { version = "4.5", features = ["derive"] }
 hegel = { path = "../hegel-cli" }
 walkdir = "2.5"
 dirs = "5.0"
-warp = "0.3"
 tokio = { version = "1.0", features = ["full"] }
 open = "5.0"
 chrono = "0.4"
@@ -27,6 +26,15 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 dashmap = "6.0"
 num_cpus = "1.16"
+
+# HTTP backend dependencies (feature-gated)
+warp = { version = "0.3", optional = true }
+axum = { version = "0.7", optional = true }
+tower = { version = "0.4", optional = true }
+tower-http = { version = "0.5", features = ["fs"], optional = true }
+
+# Async trait support for HttpBackend
+async-trait = "0.1"
 
 # WASM-only dependencies
 [target.'cfg(target_arch = "wasm32")'.dependencies]
@@ -51,8 +59,10 @@ path = "src/main.rs"
 required-features = ["server"]
 
 [features]
-default = []
+default = ["server", "warp-backend"]
 server = []
+warp-backend = ["warp"]
+axum-backend = ["axum", "tower", "tower-http"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]

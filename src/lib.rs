@@ -7,6 +7,9 @@ pub mod api_types;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod data_layer;
 
+#[cfg(not(target_arch = "wasm32"))]
+pub mod http;
+
 #[cfg(test)]
 mod test_helpers;
 
