@@ -1,4 +1,7 @@
-use hegel_pm::api_types::{AggregateMetrics, AllProjectsAggregate};
+use hegel_pm::api_types::{
+    build_workflow_summaries, AggregateMetrics, AllProjectsAggregate, ProjectInfo,
+    ProjectWorkflowDetail,
+};
 use hegel_pm::discovery::{CacheManager, DiscoveryEngine, ProjectListItem, ProjectMetricsSummary};
 use std::collections::HashMap;
 use std::error::Error;
@@ -123,20 +126,35 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
                 false
             };
 
-            // Step 4: Get stats (brief lock, clone data)
-            let stats_result = {
+            // Step 4: Get stats and workflow state (brief lock, clone data)
+            let project_data = {
                 let projects = projects_for_metrics.lock().unwrap();
                 projects.iter()
                     .find(|p| p.name == name)
-                    .map(|project| project.statistics.clone())
+                    .map(|project| (project.statistics.clone(), project.workflow_state.clone()))
             }; // Mutex released BEFORE serialization
 
             // Step 5: Build response (no mutex, serialize to JSON once and cache)
-            let response = match stats_result {
-                Some(Some(stats)) => {
-                    // Convert to lightweight summary (only counts, no raw data)
+            let response = match project_data {
+                Some((Some(stats), workflow_state)) => {
+                    // Build ProjectMetricsSummary
                     let summary = ProjectMetricsSummary::from(&stats);
-                    match serde_json::to_vec(&summary) {
+
+                    // Build workflow detail from UnifiedMetrics
+                    let workflows = build_workflow_summaries(&stats);
+                    let detail = ProjectWorkflowDetail {
+                        current_workflow_state: workflow_state,
+                        workflows,
+                    };
+
+                    // Build ProjectInfo
+                    let project_info = ProjectInfo {
+                        project_name: name.clone(),
+                        summary,
+                        detail,
+                    };
+
+                    match serde_json::to_vec(&project_info) {
                         Ok(json_bytes) => {
                             // Cache the serialized response
                             resp_cache.lock().unwrap().insert(name.clone(), json_bytes.clone());
@@ -158,7 +176,7 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
                         }
                     }
                 }
-                Some(None) => warp::http::Response::builder()
+                Some((None, _)) => warp::http::Response::builder()
                     .status(warp::http::StatusCode::INTERNAL_SERVER_ERROR)
                     .header("Content-Type", "application/json")
                     .body(serde_json::to_vec(&serde_json::json!({"error": "Failed to load statistics"})).unwrap())
