@@ -1,5 +1,12 @@
 use serde::{Deserialize, Serialize};
 
+// Navigation state for view routing
+#[derive(Clone, Copy, PartialEq)]
+pub enum View {
+    AllProjects,
+    ProjectDetail,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct DiscoveredProject {
     pub name: String,

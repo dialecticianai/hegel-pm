@@ -1,10 +1,11 @@
 use gloo_net::http::Request;
 use sycamore::prelude::*;
 
-use crate::client::types::DiscoveredProject;
+use crate::client::types::{DiscoveredProject, View as ViewEnum};
 
 #[derive(Props)]
 pub struct SidebarProps {
+    pub current_view: Signal<ViewEnum>,
     pub selected_project: Signal<Option<String>>,
 }
 
@@ -14,6 +15,7 @@ pub fn Sidebar(props: SidebarProps) -> View {
 
     // Fetch projects and populate
     let selected_clone = props.selected_project;
+    let view_clone = props.current_view;
     sycamore::futures::spawn_local(async move {
         match Request::get("/api/projects").send().await {
             Ok(resp) => {
@@ -22,6 +24,7 @@ pub fn Sidebar(props: SidebarProps) -> View {
                     Ok(projs) => {
                         if let Some(first) = projs.first() {
                             selected_clone.set(Some(first.name.clone()));
+                            view_clone.set(ViewEnum::ProjectDetail);
                         }
                         projects.set(projs);
                     }
@@ -39,6 +42,20 @@ pub fn Sidebar(props: SidebarProps) -> View {
     view! {
         div(class="sidebar") {
             h2 { "Projects" }
+
+            // All Projects link
+            div(
+                class="nav-item all-projects",
+                on:click=move |_| {
+                    props.current_view.set(ViewEnum::AllProjects);
+                    props.selected_project.set(None);
+                }
+            ) {
+                "All Projects"
+            }
+
+            hr {}
+
             div(class="project-list") {
                 Indexed(
                     list=projects,
@@ -47,6 +64,7 @@ pub fn Sidebar(props: SidebarProps) -> View {
                         let name_for_click = name.clone();
                         let name_for_class = name.clone();
                         let sel_proj = props.selected_project;
+                        let current_view = props.current_view;
 
                         let mode_text = p.workflow_state.as_ref().map(|s| s.mode.clone());
                         let phase_text = p.workflow_state.as_ref().map(|s| s.current_node.clone());
@@ -61,6 +79,7 @@ pub fn Sidebar(props: SidebarProps) -> View {
                                     }
                                 },
                                 on:click=move |_| {
+                                    current_view.set(ViewEnum::ProjectDetail);
                                     sel_proj.set(Some(name_for_click.clone()));
                                 }
                             ) {

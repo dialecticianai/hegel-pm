@@ -4,17 +4,31 @@ use wasm_bindgen::prelude::*;
 pub mod components;
 mod types;
 
-use components::{MetricsView, Sidebar};
+use components::{AllProjectsView, Sidebar, WorkflowDetailView};
+use types::View as ViewEnum;
 
 #[component]
 pub fn App() -> View {
-    // Shared state: selected project name
+    // Shared state: current view and selected project
+    let current_view = create_signal(ViewEnum::AllProjects);
     let selected_project = create_signal(None::<String>);
 
     view! {
         div(class="app-container") {
-            Sidebar(selected_project=selected_project)
-            MetricsView(selected_project=*selected_project)
+            Sidebar(current_view=current_view, selected_project=selected_project)
+
+            div(class="main-content") {
+                (move || {
+                    match current_view.get() {
+                        ViewEnum::AllProjects => view! {
+                            AllProjectsView()
+                        },
+                        ViewEnum::ProjectDetail => view! {
+                            WorkflowDetailView(selected_project=*selected_project)
+                        },
+                    }
+                })
+            }
         }
     }
 }
