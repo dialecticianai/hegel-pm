@@ -1,6 +1,5 @@
 use gloo_net::http::Request;
 use sycamore::prelude::*;
-use sycamore::reactive::batch;
 use crate::client::types::AllProjectsAggregate;
 
 #[component]
@@ -16,35 +15,27 @@ pub fn AllProjectsView() -> View {
                 Ok(resp) => {
                     if resp.status() != 200 {
                         web_sys::console::error_1(&format!("HTTP error: {}", resp.status()).into());
-                        batch(|| {
-                            error.set(true);
-                            loading.set(false);
-                        });
+                        error.set(true);
+                        loading.set(false);
                         return;
                     }
 
                     match resp.json::<AllProjectsAggregate>().await {
                         Ok(data) => {
-                            batch(|| {
-                                aggregate_data.set(Some(data));
-                                loading.set(false);
-                            });
+                            aggregate_data.set(Some(data));
+                            loading.set(false);
                         }
                         Err(e) => {
                             web_sys::console::error_1(&format!("JSON parse failed: {:?}", e).into());
-                            batch(|| {
-                                error.set(true);
-                                loading.set(false);
-                            });
+                            error.set(true);
+                            loading.set(false);
                         }
                     }
                 }
                 Err(e) => {
                     web_sys::console::error_1(&format!("Request failed: {:?}", e).into());
-                    batch(|| {
-                        error.set(true);
-                        loading.set(false);
-                    });
+                    error.set(true);
+                    loading.set(false);
                 }
             }
         });

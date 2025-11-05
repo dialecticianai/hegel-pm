@@ -1,6 +1,5 @@
 use gloo_net::http::Request;
 use sycamore::prelude::*;
-use sycamore::reactive::batch;
 use crate::client::types::{ProjectInfo, WorkflowSummary, PhaseSummary};
 
 #[derive(Props)]
@@ -35,10 +34,8 @@ pub fn WorkflowDetailView(props: WorkflowDetailViewProps) -> View {
                     Ok(resp) => {
                         if resp.status() != 200 {
                             web_sys::console::error_1(&format!("HTTP error: {}", resp.status()).into());
-                            batch(|| {
-                                error.set(true);
-                                loading.set(false);
-                            });
+                            error.set(true);
+                            loading.set(false);
                             return;
                         }
 
@@ -55,28 +52,22 @@ pub fn WorkflowDetailView(props: WorkflowDetailViewProps) -> View {
                                     .map(|w| vec![true; w.phases.len()])
                                     .collect();
 
-                                batch(|| {
-                                    workflows_collapsed.set(wf_collapsed);
-                                    phases_collapsed.set(phase_counts);
-                                    project_info.set(Some(info));
-                                    loading.set(false);
-                                });
+                                workflows_collapsed.set(wf_collapsed);
+                                phases_collapsed.set(phase_counts);
+                                project_info.set(Some(info));
+                                loading.set(false);
                             }
                             Err(e) => {
                                 web_sys::console::error_1(&format!("JSON parse failed: {:?}", e).into());
-                                batch(|| {
-                                    error.set(true);
-                                    loading.set(false);
-                                });
+                                error.set(true);
+                                loading.set(false);
                             }
                         }
                     }
                     Err(e) => {
                         web_sys::console::error_1(&format!("Request failed: {:?}", e).into());
-                        batch(|| {
-                            error.set(true);
-                            loading.set(false);
-                        });
+                        error.set(true);
+                        loading.set(false);
                     }
                 }
             });
@@ -85,12 +76,10 @@ pub fn WorkflowDetailView(props: WorkflowDetailViewProps) -> View {
 
     // Expand all workflows and phases
     let expand_all = move || {
-        batch(|| {
-            workflows_collapsed.update(|v| v.iter_mut().for_each(|c| *c = false));
-            phases_collapsed.update(|v| {
-                v.iter_mut().for_each(|workflow_phases| {
-                    workflow_phases.iter_mut().for_each(|c| *c = false);
-                });
+        workflows_collapsed.update(|v| v.iter_mut().for_each(|c| *c = false));
+        phases_collapsed.update(|v| {
+            v.iter_mut().for_each(|workflow_phases| {
+                workflow_phases.iter_mut().for_each(|c| *c = false);
             });
         });
     };
