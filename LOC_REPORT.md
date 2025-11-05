@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-04 20:18
+**Last Updated**: 2025-11-04 20:19
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 3,401 | 7,375 | 10,776 |
-| **Comments** | 248 | - | 248 |
-| **Blank Lines** | 585 | - | 585 |
-| **Total Lines** | 4,234 | 7,375 | 11,609 |
+| **Lines** | 3,460 | 7,375 | 10,835 |
+| **Comments** | 249 | - | 249 |
+| **Blank Lines** | 593 | - | 593 |
+| **Total Lines** | 4,302 | 7,375 | 11,677 |
 | **Files** | 29 | 27 | 56 |
 
-**Documentation Ratio**: 2.17 lines of docs per line of code
+**Documentation Ratio**: 2.13 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            29            585            248           3401
+Rust                            29            593            249           3460
 Markdown                         6             28              0            128
 -------------------------------------------------------------------------------
-SUM:                            35            613            248           3529
+SUM:                            35            621            249           3588
 -------------------------------------------------------------------------------
 ```
 
@@ -49,7 +49,7 @@ SUM:                            35            613            248           3529
 | `client/components/mod.rs` | 5 | 5 | 0 | 0.0% | ✅ |
 | `client/components/sidebar.rs` | 86 | 86 | 0 | 0.0% | ✅ |
 | `client/mod.rs` | 26 | 26 | 0 | 0.0% | ✅ |
-| `client/types.rs` | 86 | 86 | 0 | 0.0% | ✅ |
+| `client/types.rs` | 154 | 154 | 0 | 0.0% | ✅ |
 | `discovery_mode.rs` | 21 | 21 | 0 | 0.0% | ✅ |
 | `discovery/api_types.rs` | 46 | 46 | 0 | 0.0% | ✅ |
 | `discovery/cache_manager.rs` | 69 | 69 | 0 | 0.0% | ✅ |
@@ -109,7 +109,7 @@ SUM:                            35            613            248           3529
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 2.17 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.13 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 
