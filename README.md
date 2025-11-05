@@ -4,8 +4,8 @@ Project manager for Hegel projects with web UI. Auto-discovers projects, visuali
 
 ## Status
 
-**Current**: Sycamore WASM UI working end-to-end with live project display and metrics integration
-**Next**: Enhanced UI features (visualizations, graphs, filtering)
+**Current**: Multi-view UI with all-projects dashboard and per-project workflow detail (collapsible workflows/phases)
+**Next**: Enhanced UI features (graphs/trends, search/filtering)
 
 ## Architecture
 
@@ -22,13 +22,15 @@ Project manager for Hegel projects with web UI. Auto-discovers projects, visuali
 - Serves Sycamore WASM UI bundle (built by trunk to `static/`)
 - JSON API endpoints:
   - `/api/projects` - Lightweight project list (name + workflow_state only)
-  - `/api/projects/{name}/metrics` - Metrics summary with pre-computed aggregates
+  - `/api/projects/{name}/metrics` - ProjectInfo with summary + workflow detail breakdowns
+  - `/api/all-projects` - Aggregate metrics across all discovered projects
 - Response caching and async cache persistence for optimal performance
 - Archive-aware metrics: includes archived workflows + live data
 
 **Web UI** (Sycamore + WASM in `src/client/`)
-- Reactive WASM-based dashboard
-- Real-time project list display
+- Multi-view reactive dashboard with type-safe routing (View enum)
+- All-projects aggregate view with cross-project metrics
+- Per-project workflow detail with collapsible workflows/phases
 - Built with Trunk bundler (outputs to `static/`)
 
 **Dependencies**
@@ -191,11 +193,10 @@ hegel-pm/
 ## Future Work
 
 1. **Enhanced UI Features**:
-   - Workflow state visualizations and phase breakdowns
    - Token usage graphs and trends over time
    - Project health indicators and alerts
-   - Search, filtering, and sorting
-   - Per-project detail views with full metrics display
+   - Search, filtering, and sorting across workflows
+   - Phase-level detail expansion (show individual events/commands)
 2. **CLI Commands** - `hegel-pm scan`, `hegel-pm serve`, `hegel-pm status`
 3. **Live Updates** - File watching for real-time state synchronization (optional)
 4. **Team Features** - Multi-user support for commercial version (data model ready)

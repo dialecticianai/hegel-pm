@@ -28,7 +28,8 @@ Tech stack and architectural decisions for multi-project Hegel dashboard
 
 **Still To Explore**:
 - Sycamore routing for multi-view dashboard
-- Live state updates (deferred to future feature)
+- Live state updates
+- WASM bundle optimization (code splitting, lazy loading)
 
 ---
 
