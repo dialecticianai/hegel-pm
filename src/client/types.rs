@@ -35,6 +35,8 @@ pub struct ProjectStatistics {
     pub phase_count: usize,
 }
 
+// TODO: Wire up state transition timeline view
+#[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StateTransitionEvent {
     pub timestamp: String,
@@ -45,6 +47,8 @@ pub struct StateTransitionEvent {
     pub mode: String,
 }
 
+// TODO: Wire up detailed phase metrics view with event drill-down
+#[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PhaseMetrics {
     pub phase_name: String,
@@ -57,6 +61,8 @@ pub struct PhaseMetrics {
     pub git_commits: Vec<GitCommit>,
 }
 
+// TODO: Use in PhaseMetrics for detailed token tracking
+#[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TokenMetrics {
     pub total_input_tokens: u64,
@@ -66,6 +72,8 @@ pub struct TokenMetrics {
     pub assistant_turns: u64,
 }
 
+// TODO: Use in PhaseMetrics for bash command history
+#[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BashCommand {
     pub command: String,
@@ -74,6 +82,8 @@ pub struct BashCommand {
     pub stderr: String,
 }
 
+// TODO: Use in PhaseMetrics for file change tracking
+#[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FileModification {
     pub file_path: String,
@@ -81,6 +91,8 @@ pub struct FileModification {
     pub timestamp: Option<String>,
 }
 
+// TODO: Use in PhaseMetrics for git commit history
+#[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GitCommit {
     pub hash: String,

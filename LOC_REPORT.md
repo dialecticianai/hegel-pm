@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 00:16
+**Last Updated**: 2025-11-05 14:23
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 3,728 | 7,918 | 11,646 |
-| **Comments** | 263 | - | 263 |
-| **Blank Lines** | 627 | - | 627 |
-| **Total Lines** | 4,618 | 7,918 | 12,536 |
-| **Files** | 30 | 29 | 59 |
+| **Lines** | 4,373 | 8,725 | 13,098 |
+| **Comments** | 330 | - | 330 |
+| **Blank Lines** | 753 | - | 753 |
+| **Total Lines** | 5,456 | 8,725 | 14,181 |
+| **Files** | 34 | 31 | 65 |
 
-**Documentation Ratio**: 2.12 lines of docs per line of code
+**Documentation Ratio**: 2.00 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            30            627            263           3728
+Rust                            34            753            330           4373
 Markdown                         6             28              0            131
 -------------------------------------------------------------------------------
-SUM:                            36            655            263           3859
+SUM:                            40            781            330           4504
 -------------------------------------------------------------------------------
 ```
 
@@ -50,7 +50,11 @@ SUM:                            36            655            263           3859
 | `client/components/sidebar.rs` | 105 | 105 | 0 | 0.0% | ✅ |
 | `client/components/workflow_detail_view.rs` | 321 | 321 | 0 | 0.0% | ⚠️ Large |
 | `client/mod.rs` | 37 | 37 | 0 | 0.0% | ✅ |
-| `client/types.rs` | 161 | 161 | 0 | 0.0% | ✅ |
+| `client/types.rs` | 173 | 173 | 0 | 0.0% | ✅ |
+| `data_layer/cache.rs` | 140 | 60 | 80 | 57.1% | ✅ |
+| `data_layer/messages.rs` | 65 | 42 | 23 | 35.4% | ✅ |
+| `data_layer/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
+| `data_layer/worker.rs` | 611 | 347 | 264 | 43.2% | ⚠️ Large |
 | `discovery_mode.rs` | 21 | 21 | 0 | 0.0% | ✅ |
 | `discovery/api_types.rs` | 46 | 46 | 0 | 0.0% | ✅ |
 | `discovery/cache_manager.rs` | 69 | 69 | 0 | 0.0% | ✅ |
@@ -63,12 +67,12 @@ SUM:                            36            655            263           3859
 | `discovery/state.rs` | 113 | 19 | 94 | 83.2% | ✅ |
 | `discovery/statistics.rs` | 30 | 3 | 27 | 90.0% | ✅ |
 | `discovery/walker.rs` | 172 | 47 | 125 | 72.7% | ✅ |
-| `lib.rs` | 12 | 6 | 6 | 50.0% | ✅ |
+| `lib.rs` | 15 | 9 | 6 | 40.0% | ✅ |
 | `main.rs` | 57 | 57 | 0 | 0.0% | ✅ |
 | `server_mode.rs` | 285 | 285 | 0 | 0.0% | ⚠️ Large |
 | `test_helpers.rs` | 61 | 35 | 26 | 42.6% | ✅ |
 
-**⚠️ Warning:** 4 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 5 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -82,6 +86,8 @@ SUM:                            36            655            263           3859
 | `.ddd/feat/metrics-integration/SPEC.md` | 102 |
 | `.ddd/feat/project-discovery/PLAN.md` | 372 |
 | `.ddd/feat/project-discovery/SPEC.md` | 333 |
+| `.ddd/feat/swappable_backend/PLAN.md` | 292 |
+| `.ddd/feat/swappable_backend/SPEC.md` | 516 |
 | `.ddd/feat/ui-v1/PLAN_REFINED_STEPS_7-10.md` | 498 |
 | `.ddd/feat/ui-v1/PLAN.md` | 482 |
 | `.ddd/feat/ui-v1/SPEC.md` | 346 |
@@ -93,7 +99,7 @@ SUM:                            36            655            263           3859
 | `learnings/LEARNING_SYCAMORE_COMPONENTS.md` | 733 |
 | `learnings/LEARNING_SYCAMORE_FOUNDATIONS.md` | 572 |
 | `learnings/LEARNING_SYCAMORE_PRACTICES.md` | 530 |
-| `LOC_REPORT.md` | 132 |
+| `LOC_REPORT.md` | 131 |
 | `README.md` | 239 |
 | `RESEARCH_PLAN.md` | 189 |
 | `src/cli/CODE_MAP.md` | 23 |
@@ -112,7 +118,7 @@ SUM:                            36            655            263           3859
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 2.12 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.00 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 

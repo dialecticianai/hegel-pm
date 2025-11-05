@@ -4,6 +4,9 @@ pub mod discovery;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod api_types;
 
+#[cfg(not(target_arch = "wasm32"))]
+pub mod data_layer;
+
 #[cfg(test)]
 mod test_helpers;
 
