@@ -1,3 +1,4 @@
+use hegel_pm::api_types::{AggregateMetrics, AllProjectsAggregate};
 use hegel_pm::discovery::{CacheManager, DiscoveryEngine, ProjectListItem, ProjectMetricsSummary};
 use std::collections::HashMap;
 use std::error::Error;
@@ -184,11 +185,68 @@ pub async fn run(engine: &DiscoveryEngine) -> Result<(), Box<dyn Error>> {
             response
         });
 
+    // Clone for all-projects endpoint
+    let projects_for_all = projects_arc.clone();
+
+    // API endpoint for all-projects aggregate
+    let api_all_projects = warp::path!("api" / "all-projects")
+        .map(move || {
+            use std::time::Instant;
+            let start = Instant::now();
+
+            let projects = projects_for_all.lock().unwrap();
+
+            // Initialize aggregate counters
+            let mut total_input = 0u64;
+            let mut total_output = 0u64;
+            let mut total_cache_creation = 0u64;
+            let mut total_cache_read = 0u64;
+            let mut total_events = 0usize;
+            let mut total_bash_commands = 0usize;
+            let mut total_file_modifications = 0usize;
+            let mut total_git_commits = 0usize;
+            let mut total_phases = 0usize;
+
+            // Sum metrics across all projects with statistics
+            for project in projects.iter() {
+                if let Some(ref stats) = project.statistics {
+                    total_input += stats.token_metrics.total_input_tokens;
+                    total_output += stats.token_metrics.total_output_tokens;
+                    total_cache_creation += stats.token_metrics.total_cache_creation_tokens;
+                    total_cache_read += stats.token_metrics.total_cache_read_tokens;
+                    total_events += stats.hook_metrics.total_events;
+                    total_bash_commands += stats.hook_metrics.bash_commands.len();
+                    total_file_modifications += stats.hook_metrics.file_modifications.len();
+                    total_git_commits += stats.git_commits.len();
+                    total_phases += stats.phase_metrics.len();
+                }
+            }
+
+            let aggregate = AllProjectsAggregate {
+                total_projects: projects.len(),
+                aggregate_metrics: AggregateMetrics {
+                    total_input_tokens: total_input,
+                    total_output_tokens: total_output,
+                    total_cache_creation_tokens: total_cache_creation,
+                    total_cache_read_tokens: total_cache_read,
+                    total_all_tokens: total_input + total_output + total_cache_creation + total_cache_read,
+                    total_events,
+                    bash_command_count: total_bash_commands,
+                    file_modification_count: total_file_modifications,
+                    git_commit_count: total_git_commits,
+                    phase_count: total_phases,
+                },
+            };
+
+            debug!("📊 All-projects aggregate request completed in {:?} ({} projects)", start.elapsed(), projects.len());
+            warp::reply::json(&aggregate)
+        });
+
     // Serve static files (HTML, WASM, JS)
     let static_files = warp::fs::dir("./static");
 
     // Combine routes
-    let routes = api_projects.or(api_metrics).or(static_files);
+    let routes = api_projects.or(api_all_projects).or(api_metrics).or(static_files);
 
     let url = "http://localhost:3030";
     info!("🌐 Server running at {}", url);
