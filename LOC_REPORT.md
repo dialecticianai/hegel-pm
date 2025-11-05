@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-04 20:13
+**Last Updated**: 2025-11-04 20:15
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 3,076 | 7,372 | 10,448 |
-| **Comments** | 222 | - | 222 |
-| **Blank Lines** | 537 | - | 537 |
-| **Total Lines** | 3,835 | 7,372 | 11,207 |
+| **Lines** | 3,341 | 7,375 | 10,716 |
+| **Comments** | 242 | - | 242 |
+| **Blank Lines** | 575 | - | 575 |
+| **Total Lines** | 4,158 | 7,375 | 11,533 |
 | **Files** | 29 | 27 | 56 |
 
-**Documentation Ratio**: 2.40 lines of docs per line of code
+**Documentation Ratio**: 2.21 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            29            537            222           3076
+Rust                            29            575            242           3341
 Markdown                         6             28              0            128
 -------------------------------------------------------------------------------
-SUM:                            35            565            222           3204
+SUM:                            35            603            242           3469
 -------------------------------------------------------------------------------
 ```
 
@@ -37,7 +37,7 @@ SUM:                            35            565            222           3204
 
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
-| `api_types.rs` | 186 | 86 | 100 | 53.8% | ✅ |
+| `api_types.rs` | 509 | 230 | 279 | 54.8% | ⚠️ Large |
 | `cli.rs` | 211 | 69 | 142 | 67.3% | ✅ |
 | `cli/discover/all.rs` | 401 | 274 | 127 | 31.7% | ⚠️ Large |
 | `cli/discover/format.rs` | 128 | 52 | 76 | 59.4% | ✅ |
@@ -67,7 +67,7 @@ SUM:                            35            565            222           3204
 | `server_mode.rs` | 209 | 209 | 0 | 0.0% | ⚠️ Large |
 | `test_helpers.rs` | 61 | 35 | 26 | 42.6% | ✅ |
 
-**⚠️ Warning:** 2 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 3 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -91,7 +91,7 @@ SUM:                            35            565            222           3204
 | `learnings/LEARNING_SYCAMORE_COMPONENTS.md` | 733 |
 | `learnings/LEARNING_SYCAMORE_FOUNDATIONS.md` | 572 |
 | `learnings/LEARNING_SYCAMORE_PRACTICES.md` | 530 |
-| `LOC_REPORT.md` | 125 |
+| `LOC_REPORT.md` | 128 |
 | `README.md` | 238 |
 | `RESEARCH_PLAN.md` | 189 |
 | `src/cli/CODE_MAP.md` | 23 |
@@ -109,7 +109,7 @@ SUM:                            35            565            222           3204
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 2.40 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.21 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 
