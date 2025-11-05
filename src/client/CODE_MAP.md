@@ -13,8 +13,7 @@ client/
     ├── mod.rs                  Re-exports all view components
     ├── sidebar.rs              Left panel: project list with "All Projects" link, navigation control
     ├── all_projects_view.rs    Dashboard showing aggregate metrics across all projects
-    ├── workflow_detail_view.rs Per-project view with collapsible workflows and phase breakdowns
-    └── metrics_view.rs         Legacy metrics view (deprecated, use workflow_detail_view.rs)
+    └── workflow_detail_view.rs Per-project view with summary metrics + collapsible workflow/phase breakdowns
 ```
 
 ## Key Patterns

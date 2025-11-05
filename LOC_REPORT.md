@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-04 23:14
+**Last Updated**: 2025-11-05 00:16
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 3,887 | 7,919 | 11,806 |
-| **Comments** | 267 | - | 267 |
-| **Blank Lines** | 640 | - | 640 |
-| **Total Lines** | 4,794 | 7,919 | 12,713 |
-| **Files** | 31 | 29 | 60 |
+| **Lines** | 3,728 | 7,918 | 11,646 |
+| **Comments** | 263 | - | 263 |
+| **Blank Lines** | 627 | - | 627 |
+| **Total Lines** | 4,618 | 7,918 | 12,536 |
+| **Files** | 30 | 29 | 59 |
 
-**Documentation Ratio**: 2.04 lines of docs per line of code
+**Documentation Ratio**: 2.12 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            31            640            267           3887
-Markdown                         6             28              0            132
+Rust                            30            627            263           3728
+Markdown                         6             28              0            131
 -------------------------------------------------------------------------------
-SUM:                            37            668            267           4019
+SUM:                            36            655            263           3859
 -------------------------------------------------------------------------------
 ```
 
@@ -46,8 +46,7 @@ SUM:                            37            668            267           4019
 | `cli/discover/show.rs` | 262 | 169 | 93 | 35.5% | ✅ |
 | `cli/hegel.rs` | 157 | 96 | 61 | 38.9% | ✅ |
 | `client/components/all_projects_view.rs` | 130 | 130 | 0 | 0.0% | ✅ |
-| `client/components/metrics_view.rs` | 174 | 174 | 0 | 0.0% | ✅ |
-| `client/components/mod.rs` | 9 | 9 | 0 | 0.0% | ✅ |
+| `client/components/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
 | `client/components/sidebar.rs` | 105 | 105 | 0 | 0.0% | ✅ |
 | `client/components/workflow_detail_view.rs` | 321 | 321 | 0 | 0.0% | ⚠️ Large |
 | `client/mod.rs` | 37 | 37 | 0 | 0.0% | ✅ |
@@ -99,7 +98,7 @@ SUM:                            37            668            267           4019
 | `RESEARCH_PLAN.md` | 189 |
 | `src/cli/CODE_MAP.md` | 23 |
 | `src/cli/discover/README.md` | 29 |
-| `src/client/CODE_MAP.md` | 26 |
+| `src/client/CODE_MAP.md` | 25 |
 | `src/CODE_MAP.md` | 25 |
 | `src/discovery/CODE_MAP.md` | 26 |
 | `src/discovery/README.md` | 31 |
@@ -113,7 +112,7 @@ SUM:                            37            668            267           4019
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 2.04 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.12 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 
