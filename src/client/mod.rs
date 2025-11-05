@@ -18,16 +18,13 @@ pub fn App() -> View {
             Sidebar(current_view=current_view, selected_project=selected_project)
 
             div(class="main-content") {
-                (move || {
-                    match current_view.get() {
-                        ViewEnum::AllProjects => view! {
-                            AllProjectsView()
-                        },
-                        ViewEnum::ProjectDetail => view! {
-                            WorkflowDetailView(selected_project=*selected_project)
-                        },
-                    }
-                })
+                // Keep both views mounted, just toggle visibility with class
+                div(class=move || if current_view.get() == ViewEnum::AllProjects { "view-visible" } else { "view-hidden" }) {
+                    AllProjectsView()
+                }
+                div(class=move || if current_view.get() == ViewEnum::ProjectDetail { "view-visible" } else { "view-hidden" }) {
+                    WorkflowDetailView(selected_project=*selected_project, is_visible=create_memo(move || current_view.get() == ViewEnum::ProjectDetail))
+                }
             }
         }
     }
