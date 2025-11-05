@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-04 23:03
+**Last Updated**: 2025-11-04 23:14
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 3,887 | 7,920 | 11,807 |
+| **Lines** | 3,887 | 7,919 | 11,806 |
 | **Comments** | 267 | - | 267 |
 | **Blank Lines** | 640 | - | 640 |
-| **Total Lines** | 4,794 | 7,920 | 12,714 |
+| **Total Lines** | 4,794 | 7,919 | 12,713 |
 | **Files** | 31 | 29 | 60 |
 
 **Documentation Ratio**: 2.04 lines of docs per line of code
@@ -94,7 +94,7 @@ SUM:                            37            668            267           4019
 | `learnings/LEARNING_SYCAMORE_COMPONENTS.md` | 733 |
 | `learnings/LEARNING_SYCAMORE_FOUNDATIONS.md` | 572 |
 | `learnings/LEARNING_SYCAMORE_PRACTICES.md` | 530 |
-| `LOC_REPORT.md` | 133 |
+| `LOC_REPORT.md` | 132 |
 | `README.md` | 239 |
 | `RESEARCH_PLAN.md` | 189 |
 | `src/cli/CODE_MAP.md` | 23 |
