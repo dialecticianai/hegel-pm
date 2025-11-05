@@ -1,22 +1,26 @@
 # src/client
 
-Sycamore WASM web UI for hegel-pm dashboard. Renders project list and metrics in browser.
+Sycamore WASM web UI for hegel-pm dashboard. Multi-view interface with all-projects aggregate and per-project workflow detail.
 
 ## Structure
 
 ```
 client/
-├── mod.rs                      App entry point, WASM initialization, mounts App to DOM
-├── types.rs                    Data models matching server API (DiscoveredProject, WorkflowState, ProjectStatistics)
+├── mod.rs                      App entry point with view routing, WASM initialization
+├── types.rs                    Data models and View enum for navigation (AllProjects | ProjectDetail)
+│
 └── components/                 UI components
-    ├── mod.rs                  Re-exports Sidebar and MetricsView
-    ├── sidebar.rs              Left panel: project list with workflow states, fetches /api/projects
-    └── metrics_view.rs         Main panel: live metrics from /api/projects/{name}/metrics
+    ├── mod.rs                  Re-exports all view components
+    ├── sidebar.rs              Left panel: project list with "All Projects" link, navigation control
+    ├── all_projects_view.rs    Dashboard showing aggregate metrics across all projects
+    ├── workflow_detail_view.rs Per-project view with collapsible workflows and phase breakdowns
+    └── metrics_view.rs         Legacy metrics view (deprecated, use workflow_detail_view.rs)
 ```
 
 ## Key Patterns
 
-**Reactive state**: `create_signal()` for mutable reactive values
-**Async data**: `spawn_local()` for fetch operations
-**Type safety**: Types match server API via serde
-**Lightweight API**: Metrics endpoint returns summary counts (~243 bytes) not full data arrays
+**View routing**: Pattern matching on `Signal<View>` enum for type-safe navigation
+**Reactive state**: `create_signal()` for mutable reactive values, `Signal<Vec<bool>>` for index-based collapse state
+**Async data**: `spawn_local()` for fetch operations, `batch()` for multi-signal updates
+**Type safety**: Types match server API via serde (ProjectInfo, WorkflowSummary, PhaseSummary)
+**Idiomatic Sycamore**: Signals are Copy, data cloned before view! macros, tuples for indices through Indexed
