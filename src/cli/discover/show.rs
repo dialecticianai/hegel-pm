@@ -2,7 +2,6 @@ use super::format::{format_size, format_timestamp, format_timestamp_iso};
 use hegel_pm::discovery::{DiscoveredProject, DiscoveryEngine};
 use serde::Serialize;
 use std::error::Error;
-use tracing::info;
 
 /// Run the show command
 pub fn run(
@@ -111,47 +110,47 @@ fn output_json(project: &DiscoveredProject) -> Result<(), Box<dyn Error>> {
         error: project.error.clone(),
     };
 
-    info!("{}", serde_json::to_string_pretty(&output)?);
+    println!("{}", serde_json::to_string_pretty(&output)?);
     Ok(())
 }
 
 fn output_human(project: &DiscoveredProject) -> Result<(), Box<dyn Error>> {
     let size = calculate_dir_size(&project.hegel_dir).unwrap_or(0);
 
-    info!("Project: {}", project.name);
-    info!("Path: {}", project.project_path.display());
-    info!(".hegel size: {}", format_size(size));
-    info!(
+    println!("Project: {}", project.name);
+    println!("Path: {}", project.project_path.display());
+    println!(".hegel size: {}", format_size(size));
+    println!(
         "Last activity: {}\n",
         format_timestamp(project.last_activity)
     );
 
     // Workflow state
     if let Some(error) = &project.error {
-        info!("Workflow State: Error loading state");
-        info!("  Error: {}\n", error);
+        println!("Workflow State: Error loading state");
+        println!("  Error: {}\n", error);
     } else if let Some(state) = &project.workflow_state {
-        info!("Workflow State:");
-        info!("  Mode: {}", state.mode);
-        info!("  Current node: {}", state.current_node);
-        info!("  History: {}\n", state.history.join(" → "));
+        println!("Workflow State:");
+        println!("  Mode: {}", state.mode);
+        println!("  Current node: {}", state.current_node);
+        println!("  History: {}\n", state.history.join(" → "));
     } else {
-        info!("Workflow State: None\n");
+        println!("Workflow State: None\n");
     }
 
     // Metrics
     if let Some(stats) = &project.statistics {
-        info!("Metrics:");
-        info!(
+        println!("Metrics:");
+        println!(
             "  Total tokens: {} (input: {}, output: {})",
             stats.token_metrics.total_input_tokens + stats.token_metrics.total_output_tokens,
             stats.token_metrics.total_input_tokens,
             stats.token_metrics.total_output_tokens
         );
-        info!("  Total events: {}", stats.hook_metrics.total_events);
-        info!("  Phase count: {}", stats.phase_metrics.len());
+        println!("  Total events: {}", stats.hook_metrics.total_events);
+        println!("  Phase count: {}", stats.phase_metrics.len());
     } else {
-        info!("Metrics: No metrics available");
+        println!("Metrics: No metrics available");
     }
 
     // Status
@@ -162,7 +161,7 @@ fn output_human(project: &DiscoveredProject) -> Result<(), Box<dyn Error>> {
     } else {
         "Inactive"
     };
-    info!("\nStatus: {}", status);
+    println!("\nStatus: {}", status);
 
     Ok(())
 }

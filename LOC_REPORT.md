@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 22:31
+**Last Updated**: 2025-11-05 22:43
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 4,979 | 9,599 | 14,578 |
+| **Lines** | 4,975 | 9,599 | 14,574 |
 | **Comments** | 362 | - | 362 |
 | **Blank Lines** | 833 | - | 833 |
-| **Total Lines** | 6,174 | 9,599 | 15,773 |
+| **Total Lines** | 6,170 | 9,599 | 15,769 |
 | **Files** | 37 | 34 | 71 |
 
 **Documentation Ratio**: 1.93 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            37            833            362           4979
+Rust                            37            833            362           4975
 Markdown                         7             37              0            165
 -------------------------------------------------------------------------------
-SUM:                            44            870            362           5144
+SUM:                            44            870            362           5140
 -------------------------------------------------------------------------------
 ```
 
@@ -40,12 +40,12 @@ SUM:                            44            870            362           5144
 | `api_types.rs` | 511 | 230 | 281 | 55.0% | ⚠️ Large |
 | `benchmark_mode.rs` | 387 | 238 | 149 | 38.5% | ⚠️ Large |
 | `cli.rs` | 264 | 80 | 184 | 69.7% | ✅ |
-| `cli/discover/all.rs` | 401 | 274 | 127 | 31.7% | ⚠️ Large |
+| `cli/discover/all.rs` | 400 | 273 | 127 | 31.8% | ⚠️ Large |
 | `cli/discover/format.rs` | 128 | 52 | 76 | 59.4% | ✅ |
-| `cli/discover/list.rs` | 210 | 119 | 91 | 43.3% | ✅ |
+| `cli/discover/list.rs` | 209 | 118 | 91 | 43.5% | ✅ |
 | `cli/discover/mod.rs` | 97 | 68 | 29 | 29.9% | ✅ |
-| `cli/discover/show.rs` | 262 | 169 | 93 | 35.5% | ✅ |
-| `cli/hegel.rs` | 157 | 96 | 61 | 38.9% | ✅ |
+| `cli/discover/show.rs` | 261 | 168 | 93 | 35.6% | ✅ |
+| `cli/hegel.rs` | 156 | 95 | 61 | 39.1% | ✅ |
 | `client/components/all_projects_view.rs` | 132 | 132 | 0 | 0.0% | ✅ |
 | `client/components/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
 | `client/components/sidebar.rs` | 113 | 113 | 0 | 0.0% | ✅ |

@@ -4,7 +4,6 @@ use hegel_pm::discovery::DiscoveryEngine;
 use serde::Serialize;
 use std::error::Error;
 use std::time::Instant;
-use tracing::info;
 
 #[derive(Clone)]
 struct ProjectRow {
@@ -166,7 +165,7 @@ fn output_json(
         cache_used,
     };
 
-    info!("{}", serde_json::to_string_pretty(&output)?);
+    println!("{}", serde_json::to_string_pretty(&output)?);
     Ok(())
 }
 
@@ -177,7 +176,7 @@ fn output_human(
     _cache_used: bool,
 ) -> Result<(), Box<dyn Error>> {
     if rows.is_empty() {
-        info!("No Hegel projects found");
+        println!("No Hegel projects found");
         return Ok(());
     }
 
@@ -192,7 +191,7 @@ fn output_human(
 
     // Print header
     if total_load_time.is_some() {
-        info!(
+        println!(
             "{:<name_width$}  {:<path_width$}  {:>8}  {:>19}  {:>8}  {:>8}  {:>7}  {:>9}",
             "NAME",
             "PATH",
@@ -206,7 +205,7 @@ fn output_human(
             path_width = path_width
         );
     } else {
-        info!(
+        println!(
             "{:<name_width$}  {:<path_width$}  {:>8}  {:>19}  {:>8}  {:>8}  {:>7}",
             "NAME",
             "PATH",
@@ -226,7 +225,7 @@ fn output_human(
         let timestamp = format_timestamp(row.last_activity);
 
         if let Some(load_ms) = row.load_time_ms {
-            info!(
+            println!(
                 "{:<name_width$}  {:<path_width$}  {:>8}  {:>19}  {:>8}  {:>8}  {:>7}  {:>9}",
                 row.name,
                 path_abbrev,
@@ -240,7 +239,7 @@ fn output_human(
                 path_width = path_width
             );
         } else {
-            info!(
+            println!(
                 "{:<name_width$}  {:<path_width$}  {:>8}  {:>19}  {:>8}  {:>8}  {:>7}",
                 row.name,
                 path_abbrev,
@@ -257,13 +256,13 @@ fn output_human(
 
     // Footer
     if sort_by == "last-activity" {
-        info!("\n{} projects found", rows.len());
+        println!("\n{} projects found", rows.len());
     } else {
-        info!("\n{} projects found (sorted by {})", rows.len(), sort_by);
+        println!("\n{} projects found (sorted by {})", rows.len(), sort_by);
     }
 
     if let Some(total_ms) = total_load_time {
-        info!(
+        println!(
             "Total load time: {}",
             format_duration_ms(std::time::Duration::from_millis(total_ms))
         );
