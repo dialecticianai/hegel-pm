@@ -46,6 +46,13 @@ Project manager for Hegel projects with web UI. Auto-discovers projects, visuali
 - Per-project workflow detail with collapsible workflows/phases
 - Built with Trunk bundler (outputs to `static/`)
 
+**Alternative Frontends** (`frontends/`)
+- Swappable frontend architecture supporting multiple implementations
+- Alpine.js proof-of-concept (pure JavaScript, no build step)
+- Backend-agnostic (all frontends consume same API)
+- Select via FRONTEND env var (e.g., `FRONTEND=alpine ./scripts/test.sh`)
+- See `frontends/README.md` and `frontends/ADDING_FRONTENDS.md` for details
+
 **Benchmark Module** (`src/benchmark_mode.rs`)
 - HTTP endpoint performance measurement tool
 - Measures full round-trip latency via loopback requests
