@@ -6,12 +6,13 @@ Core application modules for Hegel project discovery and visualization.
 
 ```
 src/
-├── lib.rs              Library root exposing discovery, data_layer, http modules
-├── main.rs             Binary entry point (mode dispatch, cfg-guarded for native only)
-├── cli.rs              CLI subcommand definitions (discover, deprecated flags)
+├── lib.rs              Library root exposing discovery, data_layer, http, benchmark_mode modules
+├── main.rs             Binary entry point (mode dispatch, benchmark integration, cfg-guarded for native only)
+├── cli.rs              CLI subcommand definitions (discover, hegel, benchmark flags)
 ├── api_types.rs        Shared API response types (ProjectInfo, AggregateMetrics, workflow summaries)
 ├── discovery_mode.rs   Legacy discovery output (deprecated, kept for compatibility)
 ├── server_mode.rs      Server orchestration (worker pool + backend selection)
+├── benchmark_mode.rs   HTTP endpoint benchmarking with per-project metrics
 │
 ├── cli/                CLI command implementations
 │   └── See cli/README.md
