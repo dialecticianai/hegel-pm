@@ -170,6 +170,7 @@ Tech stack and architectural decisions for multi-project Hegel dashboard
 **Choice**: Abstract HTTP layer with trait-based backend selection (warp or axum)
 
 **Rationale**:
+- **Framework exploration is a primary project goal**: Backend diversity equally important to functionality
 - **Flexibility**: Different backends for different deployment scenarios
 - **Compile-time selection**: Zero runtime overhead, single backend per build
 - **Future-proofing**: Easy to add new backends (hyper, actix-web) without changing data layer
@@ -191,12 +192,56 @@ Tech stack and architectural decisions for multi-project Hegel dashboard
 **Tradeoffs**:
 - Additional abstraction layer vs direct warp usage
 - Slightly more complex build configuration (feature flags)
-- **Acceptable**: Flexibility and testability outweigh minimal complexity
+- **Non-issue**: Framework exploration is a primary project goal - abstraction enables comparison
 
 **Alternatives considered**:
 - **Warp only**: Simpler but locked into single framework
 - **Runtime selection**: Higher complexity, runtime overhead
 - **Separate binaries**: Build complexity, code duplication
+
+### Decision 8: Swappable Frontend Architecture
+
+**Choice**: Support multiple frontend implementations (Sycamore, Alpine.js, React, Vue, etc.) selected at build time via environment variable
+
+**Rationale**:
+- **Framework exploration is a primary project goal**: Equally important to building the dashboard itself
+- **Learning and experimentation**: Test different approaches (Rust/WASM, pure JS, React, Vue) in same context
+- **No TypeScript requirement**: Pure JavaScript frontends are first-class citizens (explicit project policy)
+- **Backend agnostic**: HTTP layer already serves static files - frontend choice is completely orthogonal
+- **Technology diversity**: Explore different reactive models, build tools, and development experiences
+
+**Implementation**:
+- Flagship Sycamore frontend stays in `src/client/` (built with Trunk)
+- Alternative frontends in `frontends/` directory (Alpine.js, React, Vue, etc.)
+- Build scripts (`test.sh`, `restart-server.sh`) dispatch based on `FRONTEND` env var
+- All frontends output to `static/` directory and consume same API endpoints
+- Backend unchanged - serves any frontend from `static/` directory
+
+**Build Dispatch**:
+```bash
+FRONTEND=sycamore  # trunk build --release (default)
+FRONTEND=alpine    # cp frontends/alpine/* static/
+FRONTEND=react     # cd frontends/react && npm run build
+```
+
+**API Contract**:
+- `GET /api/projects` - List all projects with summary + detail
+- `GET /api/projects/{name}/metrics` - Per-project metrics
+- All frontends consume same JSON responses (no frontend-specific endpoints)
+
+**Tradeoffs**:
+- More frontends = more maintenance surface (each needs updates for API changes)
+- Build script complexity (case statements for each frontend)
+- **Non-issue**: Framework exploration is a primary project goal - these costs are the point, not obstacles
+
+**Alternatives considered**:
+- **Sycamore only**: Simpler but misses opportunity to demonstrate pure JS alternatives
+- **Separate repositories**: More isolation but duplicates backend, harder to keep APIs in sync
+- **Runtime selection**: Over-engineered for static file serving use case
+
+**Current Implementations**:
+- **Sycamore** (`src/client/`) - Flagship Rust/WASM frontend, full feature set
+- **Alpine.js** (`frontends/alpine/`) - Proof-of-concept, pure JavaScript, single file, no build step
 
 ---
 

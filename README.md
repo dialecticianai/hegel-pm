@@ -169,20 +169,30 @@ let config = DiscoveryConfig::new(
 
 **Build & Test (Preferred):**
 ```bash
-./scripts/test.sh                      # Build + test everything (default)
-./scripts/test.sh --exclude frontend   # Backend only (skip WASM)
+# Default (Sycamore frontend)
+./scripts/test.sh                      # Build + test everything
+./scripts/test.sh --exclude frontend   # Backend only (skip frontend build)
 ./scripts/test.sh --exclude backend    # Frontend only (skip cargo)
+
+# Alternative frontends
+FRONTEND=alpine ./scripts/test.sh      # Build with Alpine.js frontend
+FRONTEND=sycamore ./scripts/test.sh    # Explicit default (Sycamore)
 ```
 
 Use this for:
 - Quick iteration during development
 - Verifying changes without starting the server
+- Testing alternative frontends
 - CI/CD pipelines
 
 **Server Management:**
 ```bash
-./scripts/restart-server.sh              # Backend only (fast)
-./scripts/restart-server.sh --frontend   # Backend + frontend (full rebuild)
+# Backend only (fast, no frontend rebuild)
+./scripts/restart-server.sh
+
+# Backend + frontend (full rebuild)
+./scripts/restart-server.sh --frontend              # Default: Sycamore
+FRONTEND=alpine ./scripts/restart-server.sh --frontend  # Alpine.js frontend
 ```
 
 This script:
@@ -192,8 +202,9 @@ This script:
 
 Use this when:
 - You need to see server logs with timing information
-- Server is behaving unexpectedly or UI has stale WASM
+- Server is behaving unexpectedly or UI has stale content
 - After changes that require viewing in browser
+- Switching between frontends for testing
 
 **Manual Commands:**
 ```bash
@@ -217,19 +228,21 @@ hegel-pm/
 │   │   ├── warp_backend.rs   # Warp implementation
 │   │   ├── axum_backend.rs   # Axum implementation
 │   │   └── README.md         # Backend documentation
-│   ├── client/        # Sycamore WASM UI
+│   ├── client/        # Sycamore WASM UI (flagship frontend)
 │   ├── cli/           # CLI commands
 │   ├── lib.rs
 │   ├── main.rs
 │   └── README.md      # Source structure overview
+├── frontends/         # Alternative frontend implementations
+│   ├── alpine/        # Alpine.js (pure JS, no build)
+│   ├── ADDING_FRONTENDS.md  # Guide for adding frontends
+│   └── README.md      # Frontends directory structure
+├── scripts/           # Build and development scripts
+│   ├── test.sh        # Build & test (supports FRONTEND env var)
+│   ├── restart-server.sh  # Restart server (supports FRONTEND env var)
+│   └── README.md      # Scripts documentation
 ├── index.html         # Trunk build template (WASM entry point)
-├── static/            # Built WASM output (served by web server)
-├── .ddd/
-│   └── feat/
-│       └── swappable_backend/
-│           ├── SPEC.md    # Feature specification
-│           ├── PLAN.md    # Implementation plan
-│           └── HANDOFF.md # Implementation handoff
+├── static/            # Built frontend output (served by web server)
 └── README.md
 ```
 
