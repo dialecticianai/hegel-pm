@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 21:56
+**Last Updated**: 2025-11-05 21:57
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 4,846 | 9,595 | 14,441 |
-| **Comments** | 348 | - | 348 |
-| **Blank Lines** | 813 | - | 813 |
-| **Total Lines** | 6,007 | 9,595 | 15,602 |
+| **Lines** | 4,879 | 9,595 | 14,474 |
+| **Comments** | 352 | - | 352 |
+| **Blank Lines** | 821 | - | 821 |
+| **Total Lines** | 6,052 | 9,595 | 15,647 |
 | **Files** | 37 | 34 | 71 |
 
-**Documentation Ratio**: 1.98 lines of docs per line of code
+**Documentation Ratio**: 1.97 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            37            813            348           4846
+Rust                            37            821            352           4879
 Markdown                         7             37              0            164
 -------------------------------------------------------------------------------
-SUM:                            44            850            348           5010
+SUM:                            44            858            352           5043
 -------------------------------------------------------------------------------
 ```
 
@@ -38,7 +38,7 @@ SUM:                            44            850            348           5010
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
 | `api_types.rs` | 511 | 230 | 281 | 55.0% | ⚠️ Large |
-| `benchmark_mode.rs` | 236 | 128 | 108 | 45.8% | ✅ |
+| `benchmark_mode.rs` | 281 | 165 | 116 | 41.3% | ✅ |
 | `cli.rs` | 264 | 81 | 183 | 69.3% | ✅ |
 | `cli/discover/all.rs` | 401 | 274 | 127 | 31.7% | ⚠️ Large |
 | `cli/discover/format.rs` | 128 | 52 | 76 | 59.4% | ✅ |
@@ -124,7 +124,7 @@ SUM:                            44            850            348           5010
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.98 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.97 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 

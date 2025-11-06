@@ -1,3 +1,4 @@
+use crate::discovery::DiscoveryEngine;
 use anyhow::{Context, Result};
 use serde::Serialize;
 use std::time::Duration;
@@ -99,8 +100,34 @@ async fn wait_for_server_ready(url: &str, timeout_secs: u64) -> Result<()> {
     }
 }
 
+/// Benchmark project-specific metrics endpoints
+async fn benchmark_project_metrics(
+    base_url: &str,
+    project_names: &[String],
+    iterations: usize,
+) -> Result<Vec<ProjectBenchmark>> {
+    let mut results = Vec::new();
+
+    for project_name in project_names {
+        info!("📊 Benchmarking /api/projects/{}/metrics...", project_name);
+        let url = format!("{}/api/projects/{}/metrics", base_url, project_name);
+
+        let endpoint_result = benchmark_endpoint(&url, iterations)
+            .await
+            .with_context(|| format!("Failed to benchmark project {}", project_name))?;
+
+        results.push(ProjectBenchmark {
+            project_name: project_name.clone(),
+            avg_ms: endpoint_result.avg_ms,
+            iterations: endpoint_result.iterations,
+        });
+    }
+
+    Ok(results)
+}
+
 /// Run benchmarks for HTTP endpoints
-pub async fn run(iterations: usize, _output_json: bool) -> Result<()> {
+pub async fn run(engine: &DiscoveryEngine, iterations: usize, _output_json: bool) -> Result<()> {
     let base_url = "http://127.0.0.1:3030";
 
     // Wait for server to be ready
@@ -108,6 +135,11 @@ pub async fn run(iterations: usize, _output_json: bool) -> Result<()> {
     wait_for_server_ready(&format!("{}/api/projects", base_url), 10)
         .await
         .context("Failed to wait for server readiness")?;
+
+    // Get discovered projects
+    let projects = engine.get_projects(false)?;
+    let project_names: Vec<String> = projects.iter().map(|p| p.name.clone()).collect();
+    info!("📋 Found {} projects to benchmark", project_names.len());
 
     // Benchmark /api/projects endpoint
     info!("📊 Benchmarking /api/projects...");
@@ -120,6 +152,11 @@ pub async fn run(iterations: usize, _output_json: bool) -> Result<()> {
     let _all_projects = benchmark_endpoint(&format!("{}/api/all-projects", base_url), iterations)
         .await
         .context("Failed to benchmark /api/all-projects")?;
+
+    // Benchmark per-project metrics
+    let _project_metrics = benchmark_project_metrics(base_url, &project_names, iterations)
+        .await
+        .context("Failed to benchmark project metrics")?;
 
     info!("✅ Benchmarks complete");
 
@@ -231,6 +268,14 @@ mod tests {
     async fn test_benchmark_endpoint_error_on_bad_url() {
         // Should fail when server not running
         let result = benchmark_endpoint("http://127.0.0.1:9999/api/projects", 5).await;
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_benchmark_project_metrics_error() {
+        // Should fail when server not running
+        let project_names = vec!["test-project".to_string()];
+        let result = benchmark_project_metrics("http://127.0.0.1:9999", &project_names, 5).await;
         assert!(result.is_err());
     }
 }
