@@ -39,6 +39,37 @@ pub struct BenchmarkResults {
     pub project_metrics: Vec<ProjectBenchmark>,
 }
 
+/// Benchmark a single endpoint with multiple iterations
+async fn benchmark_endpoint(url: &str, iterations: usize) -> Result<EndpointBenchmark> {
+    let client = reqwest::Client::new();
+
+    // Warmup request
+    debug!("🔥 Warmup request to {}", url);
+    client.get(url).send().await?.error_for_status()?;
+
+    // Timed iterations
+    let mut total_ms = 0.0;
+    for i in 0..iterations {
+        let start = std::time::Instant::now();
+        client.get(url).send().await?.error_for_status()?;
+        let elapsed = start.elapsed().as_secs_f64() * 1000.0; // Convert to milliseconds
+        total_ms += elapsed;
+
+        if (i + 1) % 10 == 0 {
+            debug!("  Completed {} iterations", i + 1);
+        }
+    }
+
+    let avg_ms = total_ms / iterations as f64;
+    debug!("✅ Average: {:.2}ms over {} iterations", avg_ms, iterations);
+
+    Ok(EndpointBenchmark {
+        path: url.to_string(),
+        avg_ms,
+        iterations,
+    })
+}
+
 /// Wait for server to become ready by polling endpoint
 async fn wait_for_server_ready(url: &str, timeout_secs: u64) -> Result<()> {
     let start = std::time::Instant::now();
@@ -69,11 +100,28 @@ async fn wait_for_server_ready(url: &str, timeout_secs: u64) -> Result<()> {
 }
 
 /// Run benchmarks for HTTP endpoints
-pub async fn run(_iterations: usize, _output_json: bool) -> Result<()> {
+pub async fn run(iterations: usize, _output_json: bool) -> Result<()> {
+    let base_url = "http://127.0.0.1:3030";
+
     // Wait for server to be ready
-    wait_for_server_ready("http://127.0.0.1:3030/api/projects", 10)
+    info!("🚀 Starting HTTP endpoint benchmarks");
+    wait_for_server_ready(&format!("{}/api/projects", base_url), 10)
         .await
         .context("Failed to wait for server readiness")?;
+
+    // Benchmark /api/projects endpoint
+    info!("📊 Benchmarking /api/projects...");
+    let _projects_list = benchmark_endpoint(&format!("{}/api/projects", base_url), iterations)
+        .await
+        .context("Failed to benchmark /api/projects")?;
+
+    // Benchmark /api/all-projects endpoint
+    info!("📊 Benchmarking /api/all-projects...");
+    let _all_projects = benchmark_endpoint(&format!("{}/api/all-projects", base_url), iterations)
+        .await
+        .context("Failed to benchmark /api/all-projects")?;
+
+    info!("✅ Benchmarks complete");
 
     Ok(())
 }
@@ -177,5 +225,12 @@ mod tests {
             .unwrap_err()
             .to_string()
             .contains("did not become ready"));
+    }
+
+    #[tokio::test]
+    async fn test_benchmark_endpoint_error_on_bad_url() {
+        // Should fail when server not running
+        let result = benchmark_endpoint("http://127.0.0.1:9999/api/projects", 5).await;
+        assert!(result.is_err());
     }
 }
