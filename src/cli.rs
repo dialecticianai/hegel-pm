@@ -18,6 +18,18 @@ pub struct Args {
     /// [DEPRECATED] Force refresh cache during discovery (use --no-cache instead)
     #[arg(long, requires = "discover")]
     pub refresh: bool,
+
+    /// Run HTTP endpoint benchmarks and exit
+    #[arg(long)]
+    pub run_benchmarks: bool,
+
+    /// Number of iterations per endpoint (default: 100)
+    #[arg(long, requires = "run_benchmarks", default_value = "100")]
+    pub benchmark_iterations: usize,
+
+    /// Output benchmark results as JSON
+    #[arg(long, requires = "run_benchmarks")]
+    pub benchmark_json: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -207,5 +219,46 @@ mod tests {
             }
             _ => panic!("Expected Hegel command"),
         }
+    }
+
+    #[test]
+    fn test_benchmark_flag() {
+        let args = Args::parse_from(["hegel-pm", "--run-benchmarks"]);
+        assert!(args.run_benchmarks);
+        assert_eq!(args.benchmark_iterations, 100); // default
+        assert!(!args.benchmark_json);
+    }
+
+    #[test]
+    fn test_benchmark_with_custom_iterations() {
+        let args = Args::parse_from([
+            "hegel-pm",
+            "--run-benchmarks",
+            "--benchmark-iterations",
+            "50",
+        ]);
+        assert!(args.run_benchmarks);
+        assert_eq!(args.benchmark_iterations, 50);
+    }
+
+    #[test]
+    fn test_benchmark_with_json() {
+        let args = Args::parse_from(["hegel-pm", "--run-benchmarks", "--benchmark-json"]);
+        assert!(args.run_benchmarks);
+        assert!(args.benchmark_json);
+    }
+
+    #[test]
+    fn test_benchmark_all_flags() {
+        let args = Args::parse_from([
+            "hegel-pm",
+            "--run-benchmarks",
+            "--benchmark-iterations",
+            "200",
+            "--benchmark-json",
+        ]);
+        assert!(args.run_benchmarks);
+        assert_eq!(args.benchmark_iterations, 200);
+        assert!(args.benchmark_json);
     }
 }

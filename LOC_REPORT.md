@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 15:51
+**Last Updated**: 2025-11-05 21:53
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 4,618 | 8,859 | 13,477 |
-| **Comments** | 321 | - | 321 |
-| **Blank Lines** | 774 | - | 774 |
-| **Total Lines** | 5,713 | 8,859 | 14,572 |
-| **Files** | 36 | 32 | 68 |
+| **Lines** | 4,662 | 9,592 | 14,254 |
+| **Comments** | 324 | - | 324 |
+| **Blank Lines** | 782 | - | 782 |
+| **Total Lines** | 5,768 | 9,592 | 15,360 |
+| **Files** | 36 | 34 | 70 |
 
-**Documentation Ratio**: 1.92 lines of docs per line of code
+**Documentation Ratio**: 2.06 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            36            774            321           4618
-Markdown                         6             28              0            131
+Rust                            36            782            324           4662
+Markdown                         7             37              0            164
 -------------------------------------------------------------------------------
-SUM:                            42            802            321           4749
+SUM:                            43            819            324           4826
 -------------------------------------------------------------------------------
 ```
 
@@ -37,8 +37,8 @@ SUM:                            42            802            321           4749
 
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
-| `api_types.rs` | 509 | 230 | 279 | 54.8% | ⚠️ Large |
-| `cli.rs` | 211 | 69 | 142 | 67.3% | ✅ |
+| `api_types.rs` | 511 | 230 | 281 | 55.0% | ⚠️ Large |
+| `cli.rs` | 264 | 81 | 183 | 69.3% | ✅ |
 | `cli/discover/all.rs` | 401 | 274 | 127 | 31.7% | ⚠️ Large |
 | `cli/discover/format.rs` | 128 | 52 | 76 | 59.4% | ✅ |
 | `cli/discover/list.rs` | 210 | 119 | 91 | 43.3% | ✅ |
@@ -82,19 +82,20 @@ SUM:                            42            802            321           4749
 
 | File | Lines |
 |------|-------|
+| `.ddd/feat/benchmark/PLAN.md` | 324 |
+| `.ddd/feat/benchmark/SPEC.md` | 429 |
 | `.ddd/feat/cli-discovery/PLAN.md` | 391 |
 | `.ddd/feat/cli-discovery/SPEC.md` | 557 |
 | `.ddd/feat/metrics-integration/PLAN.md` | 204 |
 | `.ddd/feat/metrics-integration/SPEC.md` | 102 |
 | `.ddd/feat/project-discovery/PLAN.md` | 372 |
 | `.ddd/feat/project-discovery/SPEC.md` | 333 |
-| `.ddd/feat/swappable_backend/HANDOFF.md` | 128 |
 | `.ddd/feat/swappable_backend/PLAN.md` | 292 |
 | `.ddd/feat/swappable_backend/SPEC.md` | 516 |
 | `.ddd/feat/ui-v1/PLAN_REFINED_STEPS_7-10.md` | 498 |
 | `.ddd/feat/ui-v1/PLAN.md` | 482 |
 | `.ddd/feat/ui-v1/SPEC.md` | 346 |
-| `ARCHITECTURE.md` | 319 |
+| `ARCHITECTURE.md` | 358 |
 | `CLAUDE.md` | 414 |
 | `COVERAGE_REPORT.md` | 56 |
 | `learnings/.ddd/0_sycamore_foundations_assessment.md` | 335 |
@@ -102,15 +103,16 @@ SUM:                            42            802            321           4749
 | `learnings/LEARNING_SYCAMORE_COMPONENTS.md` | 733 |
 | `learnings/LEARNING_SYCAMORE_FOUNDATIONS.md` | 572 |
 | `learnings/LEARNING_SYCAMORE_PRACTICES.md` | 530 |
-| `LOC_REPORT.md` | 137 |
-| `README.md` | 239 |
+| `LOC_REPORT.md` | 140 |
+| `README.md` | 263 |
 | `RESEARCH_PLAN.md` | 189 |
-| `src/cli/CODE_MAP.md` | 23 |
 | `src/cli/discover/README.md` | 29 |
-| `src/client/CODE_MAP.md` | 25 |
-| `src/CODE_MAP.md` | 25 |
-| `src/discovery/CODE_MAP.md` | 26 |
-| `src/discovery/README.md` | 31 |
+| `src/cli/README.md` | 23 |
+| `src/client/README.md` | 25 |
+| `src/data_layer/README.md` | 20 |
+| `src/discovery/README.md` | 53 |
+| `src/http/README.md` | 19 |
+| `src/README.md` | 32 |
 | `TESTING.md` | 510 |
 | `tests/README.md` | 36 |
 | `VISION.md` | 115 |
@@ -121,7 +123,7 @@ SUM:                            42            802            321           4749
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.92 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.06 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 

@@ -232,6 +232,36 @@ pub fn build_workflow_summaries(
 mod tests {
     use super::*;
 
+    fn create_phase_metrics(
+        phase_name: &str,
+        start_time: &str,
+        end_time: Option<&str>,
+        duration_seconds: u64,
+        input_tokens: u64,
+        output_tokens: u64,
+        turns: usize,
+        workflow_id: Option<String>,
+    ) -> hegel::metrics::PhaseMetrics {
+        hegel::metrics::PhaseMetrics {
+            phase_name: phase_name.to_string(),
+            start_time: start_time.to_string(),
+            end_time: end_time.map(|s| s.to_string()),
+            duration_seconds,
+            token_metrics: hegel::metrics::TokenMetrics {
+                total_input_tokens: input_tokens,
+                total_output_tokens: output_tokens,
+                total_cache_creation_tokens: 0,
+                total_cache_read_tokens: 0,
+                assistant_turns: turns,
+            },
+            bash_commands: vec![],
+            file_modifications: vec![],
+            git_commits: vec![],
+            is_synthetic: false,
+            workflow_id,
+        }
+    }
+
     #[test]
     fn test_project_info_serialization() {
         let summary = ProjectMetricsSummary {
@@ -365,40 +395,26 @@ mod tests {
 
         // Add phases
         metrics.phase_metrics = vec![
-            PhaseMetrics {
-                phase_name: "spec".to_string(),
-                start_time: "2025-01-15T10:00:00Z".to_string(),
-                end_time: Some("2025-01-15T10:30:00Z".to_string()),
-                duration_seconds: 1800,
-                token_metrics: TokenMetrics {
-                    total_input_tokens: 1000,
-                    total_output_tokens: 500,
-                    total_cache_creation_tokens: 100,
-                    total_cache_read_tokens: 200,
-                    assistant_turns: 5,
-                },
-                bash_commands: vec![],
-                file_modifications: vec![],
-                git_commits: vec![],
-                is_synthetic: false,
-            },
-            PhaseMetrics {
-                phase_name: "plan".to_string(),
-                start_time: "2025-01-15T10:30:00Z".to_string(),
-                end_time: None, // Active phase
-                duration_seconds: 0,
-                token_metrics: TokenMetrics {
-                    total_input_tokens: 500,
-                    total_output_tokens: 250,
-                    total_cache_creation_tokens: 50,
-                    total_cache_read_tokens: 100,
-                    assistant_turns: 3,
-                },
-                bash_commands: vec![],
-                file_modifications: vec![],
-                git_commits: vec![],
-                is_synthetic: false,
-            },
+            create_phase_metrics(
+                "spec",
+                "2025-01-15T10:00:00Z",
+                Some("2025-01-15T10:30:00Z"),
+                1800,
+                1000,
+                500,
+                5,
+                Some("2025-01-15T10:00:00Z".to_string()),
+            ),
+            create_phase_metrics(
+                "plan",
+                "2025-01-15T10:30:00Z",
+                None,
+                0,
+                500,
+                250,
+                3,
+                Some("2025-01-15T10:00:00Z".to_string()),
+            ),
         ];
 
         let workflows = build_workflow_summaries(&metrics);
@@ -454,40 +470,26 @@ mod tests {
         ];
 
         metrics.phase_metrics = vec![
-            PhaseMetrics {
-                phase_name: "spec".to_string(),
-                start_time: "2025-01-15T10:00:00Z".to_string(),
-                end_time: Some("2025-01-15T10:30:00Z".to_string()),
-                duration_seconds: 1800,
-                token_metrics: TokenMetrics {
-                    total_input_tokens: 1000,
-                    total_output_tokens: 500,
-                    total_cache_creation_tokens: 0,
-                    total_cache_read_tokens: 0,
-                    assistant_turns: 5,
-                },
-                bash_commands: vec![],
-                file_modifications: vec![],
-                git_commits: vec![],
-                is_synthetic: false,
-            },
-            PhaseMetrics {
-                phase_name: "spec".to_string(),
-                start_time: "2025-01-14T10:00:00Z".to_string(),
-                end_time: Some("2025-01-14T10:30:00Z".to_string()),
-                duration_seconds: 1800,
-                token_metrics: TokenMetrics {
-                    total_input_tokens: 2000,
-                    total_output_tokens: 1000,
-                    total_cache_creation_tokens: 0,
-                    total_cache_read_tokens: 0,
-                    assistant_turns: 10,
-                },
-                bash_commands: vec![],
-                file_modifications: vec![],
-                git_commits: vec![],
-                is_synthetic: false,
-            },
+            create_phase_metrics(
+                "spec",
+                "2025-01-15T10:00:00Z",
+                Some("2025-01-15T10:30:00Z"),
+                1800,
+                1000,
+                500,
+                5,
+                Some(workflow1_id.clone()),
+            ),
+            create_phase_metrics(
+                "spec",
+                "2025-01-14T10:00:00Z",
+                Some("2025-01-14T10:30:00Z"),
+                1800,
+                2000,
+                1000,
+                10,
+                Some(workflow2_id.clone()),
+            ),
         ];
 
         let workflows = build_workflow_summaries(&metrics);
