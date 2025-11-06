@@ -197,7 +197,7 @@ hegel config set <key> <value>
 
 **Init workflows:**
 - **Greenfield** (no code): Creates CLAUDE.md, VISION.md, ARCHITECTURE.md, initializes git
-- **Retrofit** (existing code): Analyzes structure, creates CODE_MAP.md, integrates DDD patterns
+- **Retrofit** (existing code): Analyzes structure, creates README.md, integrates DDD patterns
 
 ### Meta-Modes & Workflows
 

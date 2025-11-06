@@ -15,20 +15,20 @@ Project manager for Hegel projects with web UI. Auto-discovers projects, visuali
 - Filesystem-based project discovery
 - Workflow state and metrics extraction via hegel-cli library
 - Cache persistence for fast subsequent loads
-- See `src/discovery/CODE_MAP.md` for detailed documentation
+- See `src/discovery/README.md` for detailed documentation
 
 **Data Layer** (`src/data_layer/`)
 - Message-passing worker pool for async I/O operations
 - Lock-free response caching with DashMap (pre-serialized JSON)
 - Parallel cache misses via tokio::spawn
 - Zero blocking I/O in HTTP handlers
-- See `src/data_layer/CODE_MAP.md` for architecture details
+- See `src/data_layer/README.md` for architecture details
 
 **HTTP Backends** (`src/http/`)
 - Pluggable backend architecture (warp or axum)
 - Compile-time selection via feature flags
 - Both backends delegate to data layer worker pool
-- See `src/http/CODE_MAP.md` for backend implementations
+- See `src/http/README.md` for backend implementations
 
 **Web Server** (`src/main.rs` with `server` feature)
 - HTTP server on `localhost:3030` with swappable backend
@@ -189,18 +189,18 @@ Coverage: 31.64% (target: ≥80%, enforced by pre-commit hook)
 hegel-pm/
 ├── src/
 │   ├── discovery/     # Project discovery engine
-│   │   └── CODE_MAP.md    # Module structure documentation
+│   │   └── README.md      # Module structure documentation
 │   ├── data_layer/    # Worker pool and caching
-│   │   └── CODE_MAP.md    # Data layer architecture
+│   │   └── README.md      # Data layer architecture
 │   ├── http/          # HTTP backend abstraction
 │   │   ├── warp_backend.rs   # Warp implementation
 │   │   ├── axum_backend.rs   # Axum implementation
-│   │   └── CODE_MAP.md       # Backend documentation
+│   │   └── README.md         # Backend documentation
 │   ├── client/        # Sycamore WASM UI
 │   ├── cli/           # CLI commands
 │   ├── lib.rs
 │   ├── main.rs
-│   └── CODE_MAP.md    # Source structure overview
+│   └── README.md      # Source structure overview
 ├── index.html         # Trunk build template (WASM entry point)
 ├── static/            # Built WASM output (served by web server)
 ├── .ddd/

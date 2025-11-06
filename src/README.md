@@ -14,19 +14,19 @@ src/
 ├── server_mode.rs      Server orchestration (worker pool + backend selection)
 │
 ├── cli/                CLI command implementations
-│   └── See cli/CODE_MAP.md
+│   └── See cli/README.md
 │
 ├── discovery/          Project discovery engine and data models
-│   └── See discovery/CODE_MAP.md
+│   └── See discovery/README.md
 │
 ├── data_layer/         Message-passing worker pool for async I/O and caching
-│   └── See data_layer/CODE_MAP.md
+│   └── See data_layer/README.md
 │
 ├── http/               HTTP backend abstraction and implementations (warp, axum)
-│   └── See http/CODE_MAP.md
+│   └── See http/README.md
 │
 ├── client/             Sycamore WASM web UI for dashboard
-│   └── See client/CODE_MAP.md
+│   └── See client/README.md
 │
 └── test_helpers.rs     Shared test utilities (workspaces, fixtures)
 ```
