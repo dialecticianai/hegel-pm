@@ -2,8 +2,13 @@
 # Restart hegel-pm server with fresh build
 #
 # Usage:
-#   ./restart-server.sh           # Backend only
-#   ./restart-server.sh --frontend # Backend + frontend (WASM)
+#   ./restart-server.sh                      # Backend only
+#   ./restart-server.sh --frontend           # Backend + frontend (default: Sycamore)
+#   FRONTEND=alpine ./restart-server.sh --frontend  # Backend + Alpine.js frontend
+#
+# Environment variables:
+#   FRONTEND   - Frontend to build (default: sycamore)
+#                Valid values: sycamore, alpine
 
 set -e  # Exit on error
 
@@ -12,6 +17,8 @@ BUILD_FRONTEND=false
 if [[ "$1" == "--frontend" ]]; then
     BUILD_FRONTEND=true
 fi
+
+FRONTEND=${FRONTEND:-sycamore}
 
 # Create logs directory if it doesn't exist
 mkdir -p logs
@@ -27,8 +34,26 @@ pkill -f "target/release/hegel-pm" || echo "No server running"
 sleep 0.5
 
 if [ "$BUILD_FRONTEND" = true ]; then
-    echo "🎨 Building frontend (WASM)..."
-    trunk build --release 2>&1 | tee -a "$LOG_FILE"
+    echo "🎨 Building frontend ($FRONTEND)..."
+
+    case "$FRONTEND" in
+        sycamore)
+            trunk build --release 2>&1 | tee -a "$LOG_FILE"
+            ;;
+        alpine)
+            if [ ! -d "frontends/alpine" ]; then
+                echo "Error: Frontend directory not found: frontends/alpine/"
+                echo "See frontends/ADDING_FRONTENDS.md for setup instructions"
+                exit 1
+            fi
+            cp -r frontends/alpine/* static/ 2>&1 | tee -a "$LOG_FILE"
+            ;;
+        *)
+            echo "Error: Unknown frontend '$FRONTEND'"
+            echo "Valid frontends: sycamore, alpine"
+            exit 1
+            ;;
+    esac
 fi
 
 echo "🔨 Building backend..."
