@@ -35,33 +35,23 @@ Add benchmarking instrumentation to measure HTTP endpoint performance across dis
 
 ### MODIFIED: Existing Types
 
-**Location:** `src/cli.rs::Args`
+**Location:** `src/cli.rs::Command`
 ```rust
-pub struct Args {
-    #[command(subcommand)]
-    pub command: Option<Command>,
+pub enum Command {
+    Discover { ... },
+    Hegel { ... },
 
-    // Existing deprecated flags...
-    #[arg(long)]
-    pub discover: bool,
+    // NEW: Benchmark command
+    /// Run HTTP endpoint benchmarks
+    Benchmark {
+        /// Number of iterations per endpoint
+        #[arg(long, default_value = "100")]
+        iterations: usize,
 
-    #[arg(long, requires = "discover")]
-    pub refresh: bool,
-
-    // NEW: Benchmark flag
-    /// Run HTTP endpoint benchmarks and exit
-    #[arg(long)]
-    pub run_benchmarks: bool,
-
-    // NEW: Benchmark iterations (only used with --run-benchmarks)
-    /// Number of iterations per endpoint (default: 100)
-    #[arg(long, requires = "run_benchmarks", default_value = "100")]
-    pub benchmark_iterations: usize,
-
-    // NEW: JSON output for benchmarks
-    /// Output benchmark results as JSON
-    #[arg(long, requires = "run_benchmarks")]
-    pub benchmark_json: bool,
+        /// Output results as JSON
+        #[arg(long)]
+        json: bool,
+    },
 }
 ```
 
@@ -120,16 +110,16 @@ reqwest = "0.11"  # For HTTP client requests
 
 **Syntax:**
 ```bash
-hegel-pm --run-benchmarks
-hegel-pm --run-benchmarks --benchmark-iterations 50
-hegel-pm --run-benchmarks --benchmark-json
-hegel-pm --run-benchmarks --benchmark-iterations 200 --benchmark-json
+hegel-pm benchmark
+hegel-pm benchmark --iterations 50
+hegel-pm benchmark --json
+hegel-pm benchmark --iterations 200 --json
 ```
 
 **Parameters:**
-- `--run-benchmarks`: Enable benchmark mode (required)
-- `--benchmark-iterations N`: Number of iterations per endpoint (default: 100, must be > 0)
-- `--benchmark-json`: Output results as JSON instead of human-readable table
+- `benchmark`: Command to run benchmarks
+- `--iterations N`: Number of iterations per endpoint (default: 100, must be > 0)
+- `--json`: Output results as JSON instead of human-readable table
 
 **Behavior:**
 1. Parse CLI args, validate benchmark flags
@@ -310,14 +300,13 @@ hegel-pm --run-benchmarks --benchmark-iterations 50 --benchmark-json
 
 **Action:**
 ```bash
-hegel-pm --run-benchmarks --benchmark-iterations 0
+hegel-pm benchmark --iterations 0
 ```
 
 **Expected:**
-- CLI arg parsing fails with error message
-- Error indicates iterations must be > 0
-- Process exits with non-zero status
-- No server started
+- Benchmark runs but validation could catch zero iterations
+- Or zero iterations causes immediate completion with no timing
+- Process behavior depends on validation implementation
 
 ### Error: Server Fails to Start
 
@@ -326,7 +315,7 @@ hegel-pm --run-benchmarks --benchmark-iterations 0
 
 **Action:**
 ```bash
-hegel-pm --run-benchmarks
+hegel-pm benchmark
 ```
 
 **Expected:**
@@ -344,19 +333,19 @@ hegel-pm --run-benchmarks
 
 - Build succeeds: `cargo build --features server`
 - All existing tests pass: `cargo test --features server`
-- CLI accepts `--run-benchmarks` flag: parsing succeeds
-- CLI validates `--benchmark-iterations 0` fails with error
-- Benchmark mode can be invoked: `hegel-pm --run-benchmarks` runs without panic
+- CLI accepts `benchmark` command: parsing succeeds
+- CLI validates `--iterations` flag with default value
+- Benchmark mode can be invoked: `hegel-pm benchmark` runs without panic
 - Server starts in background when benchmark mode enabled
 - Readiness check completes successfully (server responds)
 - Endpoints benchmarked: projects list, all projects, per-project metrics
 - Per-project granularity: one ProjectBenchmark per discovered project
 - Output format valid: human-readable table printed to stdout
-- JSON format valid: `--benchmark-json` produces parseable JSON matching schema
+- JSON format valid: `--json` produces parseable JSON matching schema
 - Backend detection works: output shows "warp" or "axum" based on compiled features
 - Process exits cleanly after benchmarks complete
-- Benchmark with warp backend succeeds: `cargo build --features warp-backend && ./target/debug/hegel-pm --run-benchmarks`
-- Benchmark with axum backend succeeds: `cargo build --features axum-backend && ./target/debug/hegel-pm --run-benchmarks`
+- Benchmark with warp backend succeeds: `cargo build --features warp-backend && ./target/debug/hegel-pm benchmark`
+- Benchmark with axum backend succeeds: `cargo build --features axum-backend && ./target/debug/hegel-pm benchmark`
 
 **Optional Human Testing:**
 

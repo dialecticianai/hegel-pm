@@ -18,18 +18,6 @@ pub struct Args {
     /// [DEPRECATED] Force refresh cache during discovery (use --no-cache instead)
     #[arg(long, requires = "discover")]
     pub refresh: bool,
-
-    /// Run HTTP endpoint benchmarks and exit
-    #[arg(long)]
-    pub run_benchmarks: bool,
-
-    /// Number of iterations per endpoint (default: 100)
-    #[arg(long, requires = "run_benchmarks", default_value = "100")]
-    pub benchmark_iterations: usize,
-
-    /// Output benchmark results as JSON
-    #[arg(long, requires = "run_benchmarks")]
-    pub benchmark_json: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -53,6 +41,17 @@ pub enum Command {
         /// Arguments to pass to hegel command
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
+    },
+
+    /// Run HTTP endpoint benchmarks
+    Benchmark {
+        /// Number of iterations per endpoint
+        #[arg(long, default_value = "100")]
+        iterations: usize,
+
+        /// Output results as JSON
+        #[arg(long)]
+        json: bool,
     },
 }
 
@@ -222,43 +221,50 @@ mod tests {
     }
 
     #[test]
-    fn test_benchmark_flag() {
-        let args = Args::parse_from(["hegel-pm", "--run-benchmarks"]);
-        assert!(args.run_benchmarks);
-        assert_eq!(args.benchmark_iterations, 100); // default
-        assert!(!args.benchmark_json);
+    fn test_benchmark_command() {
+        let args = Args::parse_from(["hegel-pm", "benchmark"]);
+        match args.command {
+            Some(Command::Benchmark { iterations, json }) => {
+                assert_eq!(iterations, 100); // default
+                assert!(!json);
+            }
+            _ => panic!("Expected Benchmark command"),
+        }
     }
 
     #[test]
     fn test_benchmark_with_custom_iterations() {
-        let args = Args::parse_from([
-            "hegel-pm",
-            "--run-benchmarks",
-            "--benchmark-iterations",
-            "50",
-        ]);
-        assert!(args.run_benchmarks);
-        assert_eq!(args.benchmark_iterations, 50);
+        let args = Args::parse_from(["hegel-pm", "benchmark", "--iterations", "50"]);
+        match args.command {
+            Some(Command::Benchmark { iterations, json }) => {
+                assert_eq!(iterations, 50);
+                assert!(!json);
+            }
+            _ => panic!("Expected Benchmark command"),
+        }
     }
 
     #[test]
     fn test_benchmark_with_json() {
-        let args = Args::parse_from(["hegel-pm", "--run-benchmarks", "--benchmark-json"]);
-        assert!(args.run_benchmarks);
-        assert!(args.benchmark_json);
+        let args = Args::parse_from(["hegel-pm", "benchmark", "--json"]);
+        match args.command {
+            Some(Command::Benchmark { iterations, json }) => {
+                assert_eq!(iterations, 100);
+                assert!(json);
+            }
+            _ => panic!("Expected Benchmark command"),
+        }
     }
 
     #[test]
-    fn test_benchmark_all_flags() {
-        let args = Args::parse_from([
-            "hegel-pm",
-            "--run-benchmarks",
-            "--benchmark-iterations",
-            "200",
-            "--benchmark-json",
-        ]);
-        assert!(args.run_benchmarks);
-        assert_eq!(args.benchmark_iterations, 200);
-        assert!(args.benchmark_json);
+    fn test_benchmark_all_options() {
+        let args = Args::parse_from(["hegel-pm", "benchmark", "--iterations", "200", "--json"]);
+        match args.command {
+            Some(Command::Benchmark { iterations, json }) => {
+                assert_eq!(iterations, 200);
+                assert!(json);
+            }
+            _ => panic!("Expected Benchmark command"),
+        }
     }
 }
