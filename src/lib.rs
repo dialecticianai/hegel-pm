@@ -10,6 +10,9 @@ pub mod data_layer;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod http;
 
+#[cfg(not(target_arch = "wasm32"))]
+pub mod benchmark_mode;
+
 #[cfg(test)]
 mod test_helpers;
 
