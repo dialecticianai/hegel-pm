@@ -46,6 +46,13 @@ Project manager for Hegel projects with web UI. Auto-discovers projects, visuali
 - Per-project workflow detail with collapsible workflows/phases
 - Built with Trunk bundler (outputs to `static/`)
 
+**Benchmark Module** (`src/benchmark_mode.rs`)
+- HTTP endpoint performance measurement tool
+- Measures full round-trip latency via loopback requests
+- Per-project granularity for `/api/projects/:name/metrics` endpoint
+- Backend comparison support (warp vs axum)
+- Configurable iterations with human-readable or JSON output
+
 **Dependencies**
 - `hegel-cli` (path dependency) - All .hegel data access via library API
 - `warp` (optional, default) - Async web server backend
@@ -53,6 +60,7 @@ Project manager for Hegel projects with web UI. Auto-discovers projects, visuali
 - `sycamore` - Reactive web UI framework (WASM-compiled)
 - `tokio` - Async runtime for worker pool and message passing
 - `dashmap` - Lock-free concurrent HashMap for response caching
+- `reqwest` - HTTP client for benchmark requests
 
 ## Usage
 
@@ -71,6 +79,12 @@ hegel-pm discover all               # Full table with metrics
 hegel-pm hegel status               # Run 'hegel status' on each project
 hegel-pm hegel analyze              # Run 'hegel analyze' on each project
 hegel-pm hegel analyze --fix-archives --dry-run  # Dry-run archive fix
+
+# Benchmark HTTP endpoints (compare backend performance)
+hegel-pm benchmark                  # Run with defaults (100 iterations)
+hegel-pm benchmark --iterations 50  # Custom iteration count
+hegel-pm benchmark --json           # JSON output for analysis
+hegel-pm benchmark --iterations 200 --json  # Both options
 
 # Legacy flags (deprecated, use 'discover list' instead)
 hegel-pm --discover
