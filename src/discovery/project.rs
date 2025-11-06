@@ -54,6 +54,7 @@ impl DiscoveredProject {
         self.statistics = Some(hegel::metrics::parse_unified_metrics(
             &self.hegel_dir,
             true,
+            None,
         )?);
         Ok(())
     }

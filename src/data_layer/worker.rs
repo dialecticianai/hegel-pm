@@ -227,7 +227,7 @@ impl WorkerPool {
 
         // Load statistics (blocking I/O)
         debug!("⏳ Loading statistics for project: {}", name);
-        let stats = hegel::metrics::parse_unified_metrics(&hegel_dir, true)
+        let stats = hegel::metrics::parse_unified_metrics(&hegel_dir, true, None)
             .map_err(|e| DataError::ParseError(format!("Failed to parse metrics: {}", e)))?;
 
         info!("✅ Statistics loaded in {:?}", load_start.elapsed());

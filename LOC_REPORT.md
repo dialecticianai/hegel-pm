@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 22:43
+**Last Updated**: 2025-11-06 15:42
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 4,975 | 9,599 | 14,574 |
+| **Lines** | 4,976 | 11,135 | 16,111 |
 | **Comments** | 362 | - | 362 |
 | **Blank Lines** | 833 | - | 833 |
-| **Total Lines** | 6,170 | 9,599 | 15,769 |
-| **Files** | 37 | 34 | 71 |
+| **Total Lines** | 6,171 | 11,135 | 17,306 |
+| **Files** | 37 | 39 | 76 |
 
-**Documentation Ratio**: 1.93 lines of docs per line of code
+**Documentation Ratio**: 2.24 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            37            833            362           4975
+Rust                            37            833            362           4976
 Markdown                         7             37              0            165
 -------------------------------------------------------------------------------
-SUM:                            44            870            362           5140
+SUM:                            44            870            362           5141
 -------------------------------------------------------------------------------
 ```
 
@@ -63,7 +63,7 @@ SUM:                            44            870            362           5140
 | `discovery/discover.rs` | 200 | 52 | 148 | 74.0% | ✅ |
 | `discovery/engine.rs` | 184 | 55 | 129 | 70.1% | ✅ |
 | `discovery/mod.rs` | 35 | 24 | 11 | 31.4% | ✅ |
-| `discovery/project.rs` | 239 | 116 | 123 | 51.5% | ✅ |
+| `discovery/project.rs` | 240 | 117 | 123 | 51.2% | ✅ |
 | `discovery/state.rs` | 113 | 19 | 94 | 83.2% | ✅ |
 | `discovery/statistics.rs` | 30 | 3 | 27 | 90.0% | ✅ |
 | `discovery/walker.rs` | 172 | 47 | 125 | 72.7% | ✅ |
@@ -93,12 +93,16 @@ SUM:                            44            870            362           5140
 | `.ddd/feat/project-discovery/SPEC.md` | 333 |
 | `.ddd/feat/swappable_backend/PLAN.md` | 292 |
 | `.ddd/feat/swappable_backend/SPEC.md` | 516 |
+| `.ddd/feat/swappable-frontends/PLAN.md` | 286 |
+| `.ddd/feat/swappable-frontends/SPEC.md` | 326 |
 | `.ddd/feat/ui-v1/PLAN_REFINED_STEPS_7-10.md` | 498 |
 | `.ddd/feat/ui-v1/PLAN.md` | 482 |
 | `.ddd/feat/ui-v1/SPEC.md` | 346 |
 | `ARCHITECTURE.md` | 358 |
 | `CLAUDE.md` | 414 |
 | `COVERAGE_REPORT.md` | 56 |
+| `frontends/ADDING_FRONTENDS.md` | 476 |
+| `frontends/alpine/README.md` | 224 |
 | `learnings/.ddd/0_sycamore_foundations_assessment.md` | 335 |
 | `learnings/.ddd/1_open_questions.md` | 294 |
 | `learnings/LEARNING_SYCAMORE_COMPONENTS.md` | 733 |
@@ -114,6 +118,7 @@ SUM:                            44            870            362           5140
 | `src/discovery/README.md` | 53 |
 | `src/http/README.md` | 19 |
 | `src/README.md` | 33 |
+| `static/README.md` | 224 |
 | `TESTING.md` | 510 |
 | `tests/README.md` | 36 |
 | `VISION.md` | 115 |
@@ -124,7 +129,7 @@ SUM:                            44            870            362           5140
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.93 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.24 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 
