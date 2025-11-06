@@ -100,6 +100,42 @@ async fn wait_for_server_ready(url: &str, timeout_secs: u64) -> Result<()> {
     }
 }
 
+/// Format benchmark results as human-readable table
+fn format_table(results: &BenchmarkResults) {
+    println!("\nBackend: {}", results.backend);
+    println!("Iterations: {}", results.projects_list.iterations);
+    println!("\nEndpoint Benchmarks:");
+    println!(
+        "  {:30} {:>12}",
+        results.projects_list.path,
+        format!("{:.2}ms avg", results.projects_list.avg_ms)
+    );
+    println!(
+        "  {:30} {:>12}",
+        results.all_projects.path,
+        format!("{:.2}ms avg", results.all_projects.avg_ms)
+    );
+
+    if !results.project_metrics.is_empty() {
+        println!("\nPer-Project Metrics:");
+        for pm in &results.project_metrics {
+            println!(
+                "  {:30} {:>12}",
+                pm.project_name,
+                format!("{:.2}ms avg", pm.avg_ms)
+            );
+        }
+    }
+    println!();
+}
+
+/// Format benchmark results as JSON
+fn format_json(results: &BenchmarkResults) -> Result<()> {
+    let json = serde_json::to_string_pretty(results).context("Failed to serialize results")?;
+    println!("{}", json);
+    Ok(())
+}
+
 /// Detect which HTTP backend the binary was compiled with
 fn detect_backend() -> &'static str {
     #[cfg(feature = "warp-backend")]
@@ -180,8 +216,8 @@ pub async fn run(engine: &DiscoveryEngine, iterations: usize, _output_json: bool
         .await
         .context("Failed to benchmark project metrics")?;
 
-    // Store results (will be used for output in next step)
-    let _results = BenchmarkResults {
+    // Create results
+    let results = BenchmarkResults {
         backend: backend.to_string(),
         projects_list,
         all_projects,
@@ -189,6 +225,13 @@ pub async fn run(engine: &DiscoveryEngine, iterations: usize, _output_json: bool
     };
 
     info!("✅ Benchmarks complete");
+
+    // Output results
+    if _output_json {
+        format_json(&results)?;
+    } else {
+        format_table(&results);
+    }
 
     Ok(())
 }
@@ -314,5 +357,31 @@ mod tests {
         let backend = detect_backend();
         // Should be either warp or axum depending on feature flags
         assert!(backend == "warp" || backend == "axum" || backend == "unknown");
+    }
+
+    #[test]
+    fn test_format_json() {
+        let results = BenchmarkResults {
+            backend: "warp".to_string(),
+            projects_list: EndpointBenchmark {
+                path: "/api/projects".to_string(),
+                avg_ms: 12.5,
+                iterations: 100,
+            },
+            all_projects: EndpointBenchmark {
+                path: "/api/all-projects".to_string(),
+                avg_ms: 45.3,
+                iterations: 100,
+            },
+            project_metrics: vec![ProjectBenchmark {
+                project_name: "test-project".to_string(),
+                avg_ms: 23.1,
+                iterations: 100,
+            }],
+        };
+
+        // Should not panic and should serialize successfully
+        let result = format_json(&results);
+        assert!(result.is_ok());
     }
 }

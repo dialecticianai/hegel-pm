@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 21:58
+**Last Updated**: 2025-11-05 21:59
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 4,908 | 9,595 | 14,503 |
-| **Comments** | 355 | - | 355 |
-| **Blank Lines** | 826 | - | 826 |
-| **Total Lines** | 6,089 | 9,595 | 15,684 |
+| **Lines** | 4,967 | 9,595 | 14,562 |
+| **Comments** | 359 | - | 359 |
+| **Blank Lines** | 832 | - | 832 |
+| **Total Lines** | 6,158 | 9,595 | 15,753 |
 | **Files** | 37 | 34 | 71 |
 
-**Documentation Ratio**: 1.95 lines of docs per line of code
+**Documentation Ratio**: 1.93 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            37            826            355           4908
+Rust                            37            832            359           4967
 Markdown                         7             37              0            164
 -------------------------------------------------------------------------------
-SUM:                            44            863            355           5072
+SUM:                            44            869            359           5131
 -------------------------------------------------------------------------------
 ```
 
@@ -38,7 +38,7 @@ SUM:                            44            863            355           5072
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
 | `api_types.rs` | 511 | 230 | 281 | 55.0% | ⚠️ Large |
-| `benchmark_mode.rs` | 318 | 195 | 123 | 38.7% | ✅ |
+| `benchmark_mode.rs` | 387 | 238 | 149 | 38.5% | ⚠️ Large |
 | `cli.rs` | 264 | 81 | 183 | 69.3% | ✅ |
 | `cli/discover/all.rs` | 401 | 274 | 127 | 31.7% | ⚠️ Large |
 | `cli/discover/format.rs` | 128 | 52 | 76 | 59.4% | ✅ |
@@ -75,7 +75,7 @@ SUM:                            44            863            355           5072
 | `server_mode.rs` | 49 | 49 | 0 | 0.0% | ✅ |
 | `test_helpers.rs` | 61 | 35 | 26 | 42.6% | ✅ |
 
-**⚠️ Warning:** 6 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 7 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -124,7 +124,7 @@ SUM:                            44            863            355           5072
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.95 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.93 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 
