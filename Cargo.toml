@@ -26,6 +26,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 dashmap = "6.0"
 num_cpus = "1.16"
+reqwest = "0.11"
 
 # HTTP backend dependencies (feature-gated)
 warp = { version = "0.3", optional = true }
