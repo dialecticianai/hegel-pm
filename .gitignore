@@ -4,6 +4,9 @@
 # Hegel handoff (session continuity, not committed)
 HANDOFF.md
 
+# Hegel review artifacts (local reviews, not committed)
+*.review.*
+
 # Server logs (local development, not committed)
 logs/
 
