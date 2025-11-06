@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 21:59
+**Last Updated**: 2025-11-05 22:02
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 4,967 | 9,595 | 14,562 |
-| **Comments** | 359 | - | 359 |
-| **Blank Lines** | 832 | - | 832 |
-| **Total Lines** | 6,158 | 9,595 | 15,753 |
+| **Lines** | 4,979 | 9,595 | 14,574 |
+| **Comments** | 363 | - | 363 |
+| **Blank Lines** | 835 | - | 835 |
+| **Total Lines** | 6,177 | 9,595 | 15,772 |
 | **Files** | 37 | 34 | 71 |
 
 **Documentation Ratio**: 1.93 lines of docs per line of code
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            37            832            359           4967
+Rust                            37            835            363           4979
 Markdown                         7             37              0            164
 -------------------------------------------------------------------------------
-SUM:                            44            869            359           5131
+SUM:                            44            872            363           5143
 -------------------------------------------------------------------------------
 ```
 
@@ -61,7 +61,7 @@ SUM:                            44            869            359           5131
 | `discovery/cache.rs` | 145 | 51 | 94 | 64.8% | ✅ |
 | `discovery/config.rs` | 212 | 105 | 107 | 50.5% | ✅ |
 | `discovery/discover.rs` | 200 | 52 | 148 | 74.0% | ✅ |
-| `discovery/engine.rs` | 183 | 54 | 129 | 70.5% | ✅ |
+| `discovery/engine.rs` | 184 | 55 | 129 | 70.1% | ✅ |
 | `discovery/mod.rs` | 35 | 24 | 11 | 31.4% | ✅ |
 | `discovery/project.rs` | 239 | 116 | 123 | 51.5% | ✅ |
 | `discovery/state.rs` | 113 | 19 | 94 | 83.2% | ✅ |
@@ -71,7 +71,7 @@ SUM:                            44            869            359           5131
 | `http/mod.rs` | 83 | 57 | 26 | 31.3% | ✅ |
 | `http/warp_backend.rs` | 201 | 201 | 0 | 0.0% | ⚠️ Large |
 | `lib.rs` | 21 | 15 | 6 | 28.6% | ✅ |
-| `main.rs` | 70 | 70 | 0 | 0.0% | ✅ |
+| `main.rs` | 88 | 88 | 0 | 0.0% | ✅ |
 | `server_mode.rs` | 49 | 49 | 0 | 0.0% | ✅ |
 | `test_helpers.rs` | 61 | 35 | 26 | 42.6% | ✅ |
 

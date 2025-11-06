@@ -4,6 +4,7 @@ use tracing::info;
 use super::{discover_projects, load_cache, save_cache, DiscoveredProject, DiscoveryConfig};
 
 /// Discovery engine that orchestrates project discovery with caching
+#[derive(Clone)]
 pub struct DiscoveryEngine {
     config: DiscoveryConfig,
 }

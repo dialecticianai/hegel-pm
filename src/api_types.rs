@@ -435,10 +435,10 @@ mod tests {
         assert!(matches!(workflow.phases[0].status, PhaseStatus::Completed));
         assert!(matches!(workflow.phases[1].status, PhaseStatus::InProgress));
 
-        // Check total metrics
+        // Check total metrics (helper sets cache tokens to 0)
         assert_eq!(workflow.total_metrics.total_input_tokens, 1500);
         assert_eq!(workflow.total_metrics.total_output_tokens, 750);
-        assert_eq!(workflow.total_metrics.total_all_tokens, 2700);
+        assert_eq!(workflow.total_metrics.total_all_tokens, 2250);
     }
 
     #[test]

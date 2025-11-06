@@ -35,6 +35,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = DiscoveryConfig::default();
     let engine = DiscoveryEngine::new(config)?;
 
+    // Check for benchmark mode first (before other commands)
+    if args.run_benchmarks {
+        // Benchmark mode: start server in background and run benchmarks
+        use hegel_pm::benchmark_mode;
+
+        // Start server in background
+        let engine_clone = engine.clone();
+        tokio::spawn(async move {
+            if let Err(e) = server_mode::run(&engine_clone).await {
+                eprintln!("Server error: {}", e);
+            }
+        });
+
+        // Run benchmarks
+        benchmark_mode::run(&engine, args.benchmark_iterations, args.benchmark_json).await?;
+        return Ok(());
+    }
+
     match args.command {
         Some(Command::Discover {
             subcommand,
