@@ -100,6 +100,24 @@ async fn wait_for_server_ready(url: &str, timeout_secs: u64) -> Result<()> {
     }
 }
 
+/// Detect which HTTP backend the binary was compiled with
+fn detect_backend() -> &'static str {
+    #[cfg(feature = "warp-backend")]
+    {
+        return "warp";
+    }
+
+    #[cfg(feature = "axum-backend")]
+    {
+        return "axum";
+    }
+
+    #[cfg(not(any(feature = "warp-backend", feature = "axum-backend")))]
+    {
+        return "unknown";
+    }
+}
+
 /// Benchmark project-specific metrics endpoints
 async fn benchmark_project_metrics(
     base_url: &str,
@@ -129,9 +147,13 @@ async fn benchmark_project_metrics(
 /// Run benchmarks for HTTP endpoints
 pub async fn run(engine: &DiscoveryEngine, iterations: usize, _output_json: bool) -> Result<()> {
     let base_url = "http://127.0.0.1:3030";
+    let backend = detect_backend();
 
     // Wait for server to be ready
-    info!("🚀 Starting HTTP endpoint benchmarks");
+    info!(
+        "🚀 Starting HTTP endpoint benchmarks (backend: {})",
+        backend
+    );
     wait_for_server_ready(&format!("{}/api/projects", base_url), 10)
         .await
         .context("Failed to wait for server readiness")?;
@@ -143,20 +165,28 @@ pub async fn run(engine: &DiscoveryEngine, iterations: usize, _output_json: bool
 
     // Benchmark /api/projects endpoint
     info!("📊 Benchmarking /api/projects...");
-    let _projects_list = benchmark_endpoint(&format!("{}/api/projects", base_url), iterations)
+    let projects_list = benchmark_endpoint(&format!("{}/api/projects", base_url), iterations)
         .await
         .context("Failed to benchmark /api/projects")?;
 
     // Benchmark /api/all-projects endpoint
     info!("📊 Benchmarking /api/all-projects...");
-    let _all_projects = benchmark_endpoint(&format!("{}/api/all-projects", base_url), iterations)
+    let all_projects = benchmark_endpoint(&format!("{}/api/all-projects", base_url), iterations)
         .await
         .context("Failed to benchmark /api/all-projects")?;
 
     // Benchmark per-project metrics
-    let _project_metrics = benchmark_project_metrics(base_url, &project_names, iterations)
+    let project_metrics = benchmark_project_metrics(base_url, &project_names, iterations)
         .await
         .context("Failed to benchmark project metrics")?;
+
+    // Store results (will be used for output in next step)
+    let _results = BenchmarkResults {
+        backend: backend.to_string(),
+        projects_list,
+        all_projects,
+        project_metrics,
+    };
 
     info!("✅ Benchmarks complete");
 
@@ -277,5 +307,12 @@ mod tests {
         let project_names = vec!["test-project".to_string()];
         let result = benchmark_project_metrics("http://127.0.0.1:9999", &project_names, 5).await;
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_detect_backend() {
+        let backend = detect_backend();
+        // Should be either warp or axum depending on feature flags
+        assert!(backend == "warp" || backend == "axum" || backend == "unknown");
     }
 }
