@@ -150,22 +150,22 @@
                 <template x-if="error">
                     <div style="padding: 12px; color: #e74c3c;" x-text="error"></div>
                 </template>
-                <template x-for="project in projects" :key="project.project_name">
+                <template x-for="project in projects" :key="project.name">
                     <div
                         class="project-item"
-                        :class="{ 'active': selectedProjectName === project.project_name }"
-                        @click="selectProject(project.project_name)"
+                        :class="{ 'active': selectedProjectName === project.name }"
+                        @click="selectProject(project.name)"
                     >
-                        <div class="project-name" x-text="project.project_name"></div>
+                        <div class="project-name" x-text="project.name"></div>
                         <div class="project-state">
-                            <template x-if="project.detail.current_workflow_state">
+                            <template x-if="project.workflow_state">
                                 <span>
-                                    <span class="mode" x-text="project.detail.current_workflow_state.mode"></span>
+                                    <span class="mode" x-text="project.workflow_state.mode"></span>
                                     <span> / </span>
-                                    <span class="phase" x-text="project.detail.current_workflow_state.current_node"></span>
+                                    <span class="phase" x-text="project.workflow_state.current_node"></span>
                                 </span>
                             </template>
-                            <template x-if="!project.detail.current_workflow_state">
+                            <template x-if="!project.workflow_state">
                                 <span class="inactive">No active workflow</span>
                             </template>
                         </div>
@@ -180,61 +180,69 @@
                 <template x-if="!selectedProjectName">
                     <div>
                         <h1>All Projects Overview</h1>
-                        <div class="metrics-section">
-                            <h3>Aggregate Metrics</h3>
-                            <div class="metric-grid">
-                                <div class="metric-item">
-                                    <div class="metric-label">Total Projects</div>
-                                    <div class="metric-value" x-text="projects.length"></div>
-                                </div>
-                                <div class="metric-item">
-                                    <div class="metric-label">Total Input Tokens</div>
-                                    <div class="metric-value" x-text="formatNumber(totalMetrics.total_input_tokens)"></div>
-                                </div>
-                                <div class="metric-item">
-                                    <div class="metric-label">Total Output Tokens</div>
-                                    <div class="metric-value" x-text="formatNumber(totalMetrics.total_output_tokens)"></div>
-                                </div>
-                                <div class="metric-item">
-                                    <div class="metric-label">Total Events</div>
-                                    <div class="metric-value" x-text="formatNumber(totalMetrics.total_events)"></div>
+                        <template x-if="aggregateLoading">
+                            <div class="loading">Loading aggregate metrics...</div>
+                        </template>
+                        <template x-if="aggregateData">
+                            <div class="metrics-section">
+                                <h3>Aggregate Metrics</h3>
+                                <div class="metric-grid">
+                                    <div class="metric-item">
+                                        <div class="metric-label">Total Projects</div>
+                                        <div class="metric-value" x-text="aggregateData.total_projects"></div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-label">Total Input Tokens</div>
+                                        <div class="metric-value" x-text="formatNumber(aggregateData.aggregate_metrics.total_input_tokens)"></div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-label">Total Output Tokens</div>
+                                        <div class="metric-value" x-text="formatNumber(aggregateData.aggregate_metrics.total_output_tokens)"></div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-label">Total Events</div>
+                                        <div class="metric-value" x-text="formatNumber(aggregateData.aggregate_metrics.total_events)"></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </template>
                     </div>
                 </template>
 
                 <template x-if="selectedProjectName">
                     <div>
                         <h1 x-text="selectedProjectName"></h1>
-                        <template x-if="selectedProject">
+                        <template x-if="projectLoading">
+                            <div class="loading">Loading project metrics...</div>
+                        </template>
+                        <template x-if="selectedProjectData">
                             <div>
                                 <div class="metrics-section">
                                     <h3>Project Summary</h3>
                                     <div class="metric-grid">
                                         <div class="metric-item">
                                             <div class="metric-label">Input Tokens</div>
-                                            <div class="metric-value" x-text="formatNumber(selectedProject.summary.total_input_tokens)"></div>
+                                            <div class="metric-value" x-text="formatNumber(selectedProjectData.summary.total_input_tokens)"></div>
                                         </div>
                                         <div class="metric-item">
                                             <div class="metric-label">Output Tokens</div>
-                                            <div class="metric-value" x-text="formatNumber(selectedProject.summary.total_output_tokens)"></div>
+                                            <div class="metric-value" x-text="formatNumber(selectedProjectData.summary.total_output_tokens)"></div>
                                         </div>
                                         <div class="metric-item">
                                             <div class="metric-label">Total Events</div>
-                                            <div class="metric-value" x-text="formatNumber(selectedProject.summary.total_events)"></div>
+                                            <div class="metric-value" x-text="formatNumber(selectedProjectData.summary.total_events)"></div>
                                         </div>
                                         <div class="metric-item">
                                             <div class="metric-label">Phases</div>
-                                            <div class="metric-value" x-text="selectedProject.summary.phase_count"></div>
+                                            <div class="metric-value" x-text="selectedProjectData.summary.phase_count"></div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <template x-if="selectedProject.detail.workflows.length > 0">
+                                <template x-if="selectedProjectData.detail.workflows && selectedProjectData.detail.workflows.length > 0">
                                     <div class="metrics-section">
                                         <h3>Workflows</h3>
-                                        <template x-for="workflow in selectedProject.detail.workflows" :key="workflow.workflow_id">
+                                        <template x-for="workflow in selectedProjectData.detail.workflows" :key="workflow.workflow_id">
                                             <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
                                                 <div style="margin-bottom: 10px;">
                                                     <strong>Workflow ID:</strong> <span x-text="workflow.workflow_id"></span>
@@ -262,12 +270,16 @@
             return {
                 projects: [],
                 selectedProjectName: null,
-                selectedProject: null,
+                selectedProjectData: null,
+                aggregateData: null,
                 loading: true,
                 error: null,
+                projectLoading: false,
+                aggregateLoading: false,
 
                 async init() {
                     await this.loadProjects();
+                    await this.loadAggregateData();
                 },
 
                 async loadProjects() {
@@ -287,22 +299,37 @@
                     }
                 },
 
-                async selectProject(projectName) {
-                    this.selectedProjectName = projectName;
-                    this.selectedProject = this.projects.find(p => p.project_name === projectName);
+                async loadAggregateData() {
+                    try {
+                        this.aggregateLoading = true;
+                        const response = await fetch('/api/all-projects');
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        this.aggregateData = await response.json();
+                    } catch (e) {
+                        console.error('Error loading aggregate data:', e);
+                    } finally {
+                        this.aggregateLoading = false;
+                    }
                 },
 
-                get totalMetrics() {
-                    return this.projects.reduce((acc, project) => {
-                        acc.total_input_tokens += project.summary.total_input_tokens || 0;
-                        acc.total_output_tokens += project.summary.total_output_tokens || 0;
-                        acc.total_events += project.summary.total_events || 0;
-                        return acc;
-                    }, {
-                        total_input_tokens: 0,
-                        total_output_tokens: 0,
-                        total_events: 0
-                    });
+                async selectProject(projectName) {
+                    this.selectedProjectName = projectName;
+                    this.selectedProjectData = null;
+
+                    try {
+                        this.projectLoading = true;
+                        const response = await fetch(`/api/projects/${projectName}/metrics`);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        this.selectedProjectData = await response.json();
+                    } catch (e) {
+                        console.error(`Error loading project ${projectName}:`, e);
+                    } finally {
+                        this.projectLoading = false;
+                    }
                 },
 
                 formatNumber(num) {
