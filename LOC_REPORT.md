@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-05 22:08
+**Last Updated**: 2025-11-05 22:31
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 4,985 | 9,585 | 14,570 |
+| **Lines** | 4,979 | 9,599 | 14,578 |
 | **Comments** | 362 | - | 362 |
 | **Blank Lines** | 833 | - | 833 |
-| **Total Lines** | 6,180 | 9,585 | 15,765 |
+| **Total Lines** | 6,174 | 9,599 | 15,773 |
 | **Files** | 37 | 34 | 71 |
 
-**Documentation Ratio**: 1.92 lines of docs per line of code
+**Documentation Ratio**: 1.93 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            37            833            362           4985
+Rust                            37            833            362           4979
 Markdown                         7             37              0            165
 -------------------------------------------------------------------------------
-SUM:                            44            870            362           5150
+SUM:                            44            870            362           5144
 -------------------------------------------------------------------------------
 ```
 
@@ -39,7 +39,7 @@ SUM:                            44            870            362           5150
 |------|-------------|------------|------------|--------|--------|
 | `api_types.rs` | 511 | 230 | 281 | 55.0% | ⚠️ Large |
 | `benchmark_mode.rs` | 387 | 238 | 149 | 38.5% | ⚠️ Large |
-| `cli.rs` | 270 | 80 | 190 | 70.4% | ✅ |
+| `cli.rs` | 264 | 80 | 184 | 69.7% | ✅ |
 | `cli/discover/all.rs` | 401 | 274 | 127 | 31.7% | ⚠️ Large |
 | `cli/discover/format.rs` | 128 | 52 | 76 | 59.4% | ✅ |
 | `cli/discover/list.rs` | 210 | 119 | 91 | 43.3% | ✅ |
@@ -105,7 +105,7 @@ SUM:                            44            870            362           5150
 | `learnings/LEARNING_SYCAMORE_FOUNDATIONS.md` | 572 |
 | `learnings/LEARNING_SYCAMORE_PRACTICES.md` | 530 |
 | `LOC_REPORT.md` | 143 |
-| `README.md` | 263 |
+| `README.md` | 277 |
 | `RESEARCH_PLAN.md` | 189 |
 | `src/cli/discover/README.md` | 29 |
 | `src/cli/README.md` | 23 |
@@ -124,7 +124,7 @@ SUM:                            44            870            362           5150
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 1.92 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 1.93 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 

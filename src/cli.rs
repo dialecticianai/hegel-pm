@@ -37,7 +37,7 @@ pub enum Command {
     },
 
     /// Run a hegel command across all discovered projects
-    Hegel {
+    X {
         /// Arguments to pass to hegel command
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
@@ -183,40 +183,34 @@ mod tests {
 
     #[test]
     fn test_hegel_command() {
-        let args = Args::parse_from(["hegel-pm", "hegel", "status"]);
+        let args = Args::parse_from(["hegel-pm", "x", "status"]);
         match args.command {
-            Some(Command::Hegel { args }) => {
+            Some(Command::X { args }) => {
                 assert_eq!(args, vec!["status"]);
             }
-            _ => panic!("Expected Hegel command"),
+            _ => panic!("Expected X command"),
         }
     }
 
     #[test]
     fn test_hegel_command_with_multiple_args() {
-        let args = Args::parse_from([
-            "hegel-pm",
-            "hegel",
-            "analyze",
-            "--fix-archives",
-            "--dry-run",
-        ]);
+        let args = Args::parse_from(["hegel-pm", "x", "analyze", "--fix-archives", "--dry-run"]);
         match args.command {
-            Some(Command::Hegel { args }) => {
+            Some(Command::X { args }) => {
                 assert_eq!(args, vec!["analyze", "--fix-archives", "--dry-run"]);
             }
-            _ => panic!("Expected Hegel command"),
+            _ => panic!("Expected X command"),
         }
     }
 
     #[test]
     fn test_hegel_command_with_flags() {
-        let args = Args::parse_from(["hegel-pm", "hegel", "analyze", "--fix-archives", "--json"]);
+        let args = Args::parse_from(["hegel-pm", "x", "analyze", "--fix-archives", "--json"]);
         match args.command {
-            Some(Command::Hegel { args }) => {
+            Some(Command::X { args }) => {
                 assert_eq!(args, vec!["analyze", "--fix-archives", "--json"]);
             }
-            _ => panic!("Expected Hegel command"),
+            _ => panic!("Expected X command"),
         }
     }
 
