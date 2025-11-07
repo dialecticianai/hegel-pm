@@ -1,7 +1,10 @@
 use anyhow::Result;
 use tracing::info;
 
-use super::{discover_projects, load_cache, save_cache, DiscoveredProject, DiscoveryConfig};
+use super::{
+    discover_projects, load_binary_cache, load_cache, save_binary_cache, save_cache,
+    DiscoveredProject, DiscoveryConfig,
+};
 
 /// Discovery engine that orchestrates project discovery with caching
 #[derive(Clone)]
@@ -24,16 +27,30 @@ impl DiscoveryEngine {
             return self.scan_and_cache();
         }
 
-        // Try to load from cache
-        match load_cache(&self.config.cache_location)? {
+        // Try to load from binary cache first
+        match load_binary_cache(&self.config)? {
             Some(projects) => {
-                info!("✅ Loaded {} projects from cache", projects.len());
+                info!("✅ Loaded {} projects from binary cache", projects.len());
                 Ok(projects)
             }
             None => {
-                // No cache, perform scan
-                info!("❌ No cache found, performing full scan...");
-                self.scan_and_cache()
+                // No binary cache, try JSON cache for backward compatibility
+                match load_cache(&self.config.cache_location)? {
+                    Some(projects) => {
+                        info!(
+                            "✅ Loaded {} projects from JSON cache (migrating to binary)",
+                            projects.len()
+                        );
+                        // Migrate to binary cache
+                        save_binary_cache(&projects, &self.config)?;
+                        Ok(projects)
+                    }
+                    None => {
+                        // No cache at all, perform scan
+                        info!("❌ No cache found, performing full scan...");
+                        self.scan_and_cache()
+                    }
+                }
             }
         }
     }
@@ -41,9 +58,14 @@ impl DiscoveryEngine {
     /// Scan for projects and update cache
     pub fn scan_and_cache(&self) -> Result<Vec<DiscoveredProject>> {
         let projects = discover_projects(&self.config)?;
-        info!("💾 Saving {} projects to cache", projects.len());
+        info!("💾 Saving {} projects to binary cache", projects.len());
+        save_binary_cache(&projects, &self.config)?;
+        let cache_dir = self.config.cache_dir();
+        info!("✅ Binary cache saved to {}", cache_dir.display());
+
+        // Also save JSON cache for data_layer compatibility
         save_cache(&projects, &self.config.cache_location)?;
-        info!("✅ Cache saved to {}", self.config.cache_location.display());
+
         Ok(projects)
     }
 
@@ -102,26 +124,28 @@ mod tests {
             vec![temp.path().to_path_buf()],
             10,
             vec![],
-            temp.path().join("cache.json"),
+            temp.path().join("config").join("cache.json"),
         );
 
-        let engine = DiscoveryEngine::new(config).unwrap();
+        let engine = DiscoveryEngine::new(config.clone()).unwrap();
         let projects = engine.get_projects(false).unwrap();
 
         assert_eq!(projects.len(), 1);
-        // Cache should now exist
-        assert!(temp.path().join("cache.json").exists());
+        // Binary cache should now exist
+        let cache_dir = config.cache_dir();
+        assert!(cache_dir.join("index.bin").exists());
+        // JSON cache should also exist (for data_layer)
+        assert!(temp.path().join("config").join("cache.json").exists());
     }
 
     #[test]
     fn test_get_projects_from_cache() {
         let temp = create_test_workspace();
-        let cache_file = temp.path().join("cache.json");
         let config = DiscoveryConfig::new(
             vec![temp.path().to_path_buf()],
             10,
             vec![],
-            cache_file.clone(),
+            temp.path().join("config").join("cache.json"),
         );
 
         let engine = DiscoveryEngine::new(config).unwrap();
@@ -130,7 +154,7 @@ mod tests {
         let projects1 = engine.get_projects(false).unwrap();
         assert_eq!(projects1.len(), 1);
 
-        // Second call should use cache
+        // Second call should use binary cache
         let projects2 = engine.get_projects(false).unwrap();
         assert_eq!(projects2.len(), 1);
     }
@@ -142,7 +166,7 @@ mod tests {
             vec![temp.path().to_path_buf()],
             10,
             vec![],
-            temp.path().join("cache.json"),
+            temp.path().join("config").join("cache.json"),
         );
 
         let engine = DiscoveryEngine::new(config).unwrap();
@@ -172,13 +196,16 @@ mod tests {
             vec![temp.path().to_path_buf()],
             10,
             vec![],
-            temp.path().join("cache.json"),
+            temp.path().join("config").join("cache.json"),
         );
 
-        let engine = DiscoveryEngine::new(config).unwrap();
+        let engine = DiscoveryEngine::new(config.clone()).unwrap();
         let projects = engine.scan_and_cache().unwrap();
 
         assert_eq!(projects.len(), 1);
-        assert!(temp.path().join("cache.json").exists());
+        // Both caches should exist
+        let cache_dir = config.cache_dir();
+        assert!(cache_dir.join("index.bin").exists());
+        assert!(temp.path().join("config").join("cache.json").exists());
     }
 }

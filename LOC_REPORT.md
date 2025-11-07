@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-07 11:54
+**Last Updated**: 2025-11-07 12:03
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 5,329 | 12,000 | 17,329 |
-| **Comments** | 414 | - | 414 |
-| **Blank Lines** | 926 | - | 926 |
-| **Total Lines** | 6,669 | 12,000 | 18,669 |
+| **Lines** | 5,353 | 12,004 | 17,357 |
+| **Comments** | 419 | - | 419 |
+| **Blank Lines** | 928 | - | 928 |
+| **Total Lines** | 6,700 | 12,004 | 18,704 |
 | **Files** | 37 | 43 | 80 |
 
-**Documentation Ratio**: 2.25 lines of docs per line of code
+**Documentation Ratio**: 2.24 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            37            926            414           5329
+Rust                            37            928            419           5353
 Markdown                         7             37              0            165
 -------------------------------------------------------------------------------
-SUM:                            44            963            414           5494
+SUM:                            44            965            419           5518
 -------------------------------------------------------------------------------
 ```
 
@@ -55,13 +55,13 @@ SUM:                            44            963            414           5494
 | `data_layer/cache.rs` | 140 | 60 | 80 | 57.1% | ✅ |
 | `data_layer/messages.rs` | 65 | 42 | 23 | 35.4% | ✅ |
 | `data_layer/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
-| `data_layer/worker.rs` | 611 | 347 | 264 | 43.2% | ⚠️ Large |
+| `data_layer/worker.rs` | 615 | 347 | 268 | 43.6% | ⚠️ Large |
 | `discovery_mode.rs` | 21 | 21 | 0 | 0.0% | ✅ |
 | `discovery/api_types.rs` | 46 | 46 | 0 | 0.0% | ✅ |
 | `discovery/cache.rs` | 621 | 233 | 388 | 62.5% | ⚠️ Large |
 | `discovery/config.rs` | 234 | 113 | 121 | 51.7% | ✅ |
 | `discovery/discover.rs` | 200 | 52 | 148 | 74.0% | ✅ |
-| `discovery/engine.rs` | 184 | 55 | 129 | 70.1% | ✅ |
+| `discovery/engine.rs` | 211 | 77 | 134 | 63.5% | ✅ |
 | `discovery/mod.rs` | 35 | 24 | 11 | 31.4% | ✅ |
 | `discovery/project.rs` | 240 | 117 | 123 | 51.2% | ✅ |
 | `discovery/state.rs` | 113 | 19 | 94 | 83.2% | ✅ |
@@ -111,7 +111,7 @@ SUM:                            44            963            414           5494
 | `learnings/LEARNING_SYCAMORE_COMPONENTS.md` | 733 |
 | `learnings/LEARNING_SYCAMORE_FOUNDATIONS.md` | 572 |
 | `learnings/LEARNING_SYCAMORE_PRACTICES.md` | 530 |
-| `LOC_REPORT.md` | 148 |
+| `LOC_REPORT.md` | 152 |
 | `README.md` | 297 |
 | `RESEARCH_PLAN.md` | 189 |
 | `scripts/README.md` | 101 |
@@ -133,7 +133,7 @@ SUM:                            44            963            414           5494
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 2.25 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.24 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 
