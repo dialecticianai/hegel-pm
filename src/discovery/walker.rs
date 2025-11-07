@@ -27,7 +27,7 @@ pub fn find_hegel_directories(
             Ok(e) => e,
             Err(err) => {
                 // Log error but continue scanning
-                println!("Warning: skipping entry: {}", err);
+                eprintln!("Warning: skipping entry: {}", err);
                 continue;
             }
         };

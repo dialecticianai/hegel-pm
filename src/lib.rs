@@ -1,3 +1,6 @@
+// Debug utilities (requires explicit import: use hegel_pm::debug;)
+pub mod debug;
+
 #[cfg(not(target_arch = "wasm32"))]
 pub mod discovery;
 

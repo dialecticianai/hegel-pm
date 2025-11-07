@@ -4,6 +4,7 @@ use super::{
     discover_projects, load_binary_cache, load_cache, save_binary_cache, save_cache,
     DiscoveredProject, DiscoveryConfig,
 };
+use crate::debug;
 
 /// Discovery engine that orchestrates project discovery with caching
 #[derive(Clone)]
@@ -22,21 +23,21 @@ impl DiscoveryEngine {
     pub fn get_projects(&self, force_refresh: bool) -> Result<Vec<DiscoveredProject>> {
         if force_refresh {
             // Force refresh bypasses cache
-            println!("🔄 Force refresh requested, scanning...");
+            debug!("🔄 Force refresh requested, scanning...");
             return self.scan_and_cache();
         }
 
         // Try to load from binary cache first
         match load_binary_cache(&self.config)? {
             Some(projects) => {
-                println!("✅ Loaded {} projects from binary cache", projects.len());
+                debug!("✅ Loaded {} projects from binary cache", projects.len());
                 Ok(projects)
             }
             None => {
                 // No binary cache, try JSON cache for backward compatibility
                 match load_cache(&self.config.cache_location)? {
                     Some(projects) => {
-                        println!(
+                        debug!(
                             "✅ Loaded {} projects from JSON cache (migrating to binary)",
                             projects.len()
                         );
@@ -46,7 +47,7 @@ impl DiscoveryEngine {
                     }
                     None => {
                         // No cache at all, perform scan
-                        println!("❌ No cache found, performing full scan...");
+                        debug!("❌ No cache found, performing full scan...");
                         self.scan_and_cache()
                     }
                 }
@@ -57,10 +58,10 @@ impl DiscoveryEngine {
     /// Scan for projects and update cache
     pub fn scan_and_cache(&self) -> Result<Vec<DiscoveredProject>> {
         let projects = discover_projects(&self.config)?;
-        println!("💾 Saving {} projects to binary cache", projects.len());
+        debug!("💾 Saving {} projects to binary cache", projects.len());
         save_binary_cache(&projects, &self.config)?;
         let cache_dir = self.config.cache_dir();
-        println!("✅ Binary cache saved to {}", cache_dir.display());
+        debug!("✅ Binary cache saved to {}", cache_dir.display());
 
         // Also save JSON cache for data_layer compatibility
         save_cache(&projects, &self.config.cache_location)?;
