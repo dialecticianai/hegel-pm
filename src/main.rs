@@ -1,8 +1,6 @@
 #[cfg(not(target_arch = "wasm32"))]
 mod cli;
 #[cfg(not(target_arch = "wasm32"))]
-mod discovery_mode;
-#[cfg(not(target_arch = "wasm32"))]
 mod server_mode;
 
 // The binary is only compiled for native targets, not WASM
@@ -13,7 +11,7 @@ use cli::{Args, Command};
 #[cfg(not(target_arch = "wasm32"))]
 use hegel_pm::discovery::{DiscoveryConfig, DiscoveryEngine};
 #[cfg(not(target_arch = "wasm32"))]
-use tracing::{warn, Level};
+use tracing::Level;
 #[cfg(not(target_arch = "wasm32"))]
 use tracing_subscriber::{fmt, EnvFilter};
 
@@ -64,14 +62,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             benchmark_mode::run(&engine, iterations, json).await?;
         }
         None => {
-            if args.discover {
-                // Deprecated --discover flag
-                warn!("⚠️  Warning: --discover flag is deprecated. Use 'discover list' instead.");
-                discovery_mode::run(&engine, args.refresh)?;
-            } else {
-                // Server mode: start web server
-                server_mode::run(&engine).await?;
-            }
+            // Server mode: start web server
+            server_mode::run(&engine).await?;
         }
     }
 

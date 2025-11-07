@@ -10,14 +10,6 @@ use clap::{Parser, Subcommand};
 pub struct Args {
     #[command(subcommand)]
     pub command: Option<Command>,
-
-    /// [DEPRECATED] Run discovery scan and print results (use 'discover list' instead)
-    #[arg(long)]
-    pub discover: bool,
-
-    /// [DEPRECATED] Force refresh cache during discovery (use --no-cache instead)
-    #[arg(long, requires = "discover")]
-    pub refresh: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -165,20 +157,6 @@ mod tests {
             }
             _ => panic!("Expected Discover command"),
         }
-    }
-
-    #[test]
-    fn test_deprecated_discover_flag() {
-        let args = Args::parse_from(["hegel-pm", "--discover"]);
-        assert!(args.discover);
-        assert!(args.command.is_none());
-    }
-
-    #[test]
-    fn test_deprecated_refresh_flag() {
-        let args = Args::parse_from(["hegel-pm", "--discover", "--refresh"]);
-        assert!(args.discover);
-        assert!(args.refresh);
     }
 
     #[test]

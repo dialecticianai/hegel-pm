@@ -166,6 +166,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - Workflow: 1) Write script with dry-run, 2) Test dry-run, 3) Apply, 4) Commit script + changes
 - Reference: See existing oneoff scripts for patterns (classification rules, backups, summaries)
 
+**No deprecation policy**: Delete, don't deprecate
+- This is a greenfield project with zero users
+- If a feature is deprecated, delete it entirely - no backward compatibility needed
+- No `[DEPRECATED]` markers, no deprecation warnings, no legacy code paths
+- Keep the codebase clean and minimal
+
 ---
 
 # Using Hegel for Workflow Orchestration
