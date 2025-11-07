@@ -31,6 +31,14 @@ impl DiscoveryConfig {
         }
     }
 
+    /// Get the binary cache directory path
+    pub fn cache_dir(&self) -> PathBuf {
+        self.cache_location
+            .parent()
+            .expect("Cache location must have a parent")
+            .join("cache")
+    }
+
     /// Validate the configuration
     pub fn validate(&self) -> Result<()> {
         // At least one root directory required
@@ -208,5 +216,19 @@ mod tests {
         assert_eq!(config.root_directories, deserialized.root_directories);
         assert_eq!(config.max_depth, deserialized.max_depth);
         assert_eq!(config.exclusions, deserialized.exclusions);
+    }
+
+    #[test]
+    fn test_cache_dir() {
+        let temp = TempDir::new().unwrap();
+        let config = DiscoveryConfig::new(
+            vec![temp.path().to_path_buf()],
+            10,
+            vec![],
+            temp.path().join("config").join("cache.json"),
+        );
+
+        let cache_dir = config.cache_dir();
+        assert_eq!(cache_dir, temp.path().join("config").join("cache"));
     }
 }

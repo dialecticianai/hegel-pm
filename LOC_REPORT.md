@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-06 15:42
+**Last Updated**: 2025-11-07 11:54
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 4,976 | 11,135 | 16,111 |
-| **Comments** | 362 | - | 362 |
-| **Blank Lines** | 833 | - | 833 |
-| **Total Lines** | 6,171 | 11,135 | 17,306 |
-| **Files** | 37 | 39 | 76 |
+| **Lines** | 5,329 | 12,000 | 17,329 |
+| **Comments** | 414 | - | 414 |
+| **Blank Lines** | 926 | - | 926 |
+| **Total Lines** | 6,669 | 12,000 | 18,669 |
+| **Files** | 37 | 43 | 80 |
 
-**Documentation Ratio**: 2.24 lines of docs per line of code
+**Documentation Ratio**: 2.25 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            37            833            362           4976
+Rust                            37            926            414           5329
 Markdown                         7             37              0            165
 -------------------------------------------------------------------------------
-SUM:                            44            870            362           5141
+SUM:                            44            963            414           5494
 -------------------------------------------------------------------------------
 ```
 
@@ -58,8 +58,8 @@ SUM:                            44            870            362           5141
 | `data_layer/worker.rs` | 611 | 347 | 264 | 43.2% | ⚠️ Large |
 | `discovery_mode.rs` | 21 | 21 | 0 | 0.0% | ✅ |
 | `discovery/api_types.rs` | 46 | 46 | 0 | 0.0% | ✅ |
-| `discovery/cache.rs` | 145 | 51 | 94 | 64.8% | ✅ |
-| `discovery/config.rs` | 212 | 105 | 107 | 50.5% | ✅ |
+| `discovery/cache.rs` | 621 | 233 | 388 | 62.5% | ⚠️ Large |
+| `discovery/config.rs` | 234 | 113 | 121 | 51.7% | ✅ |
 | `discovery/discover.rs` | 200 | 52 | 148 | 74.0% | ✅ |
 | `discovery/engine.rs` | 184 | 55 | 129 | 70.1% | ✅ |
 | `discovery/mod.rs` | 35 | 24 | 11 | 31.4% | ✅ |
@@ -75,7 +75,7 @@ SUM:                            44            870            362           5141
 | `server_mode.rs` | 49 | 49 | 0 | 0.0% | ✅ |
 | `test_helpers.rs` | 61 | 35 | 26 | 42.6% | ✅ |
 
-**⚠️ Warning:** 7 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 8 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -85,6 +85,8 @@ SUM:                            44            870            362           5141
 |------|-------|
 | `.ddd/feat/benchmark/PLAN.md` | 324 |
 | `.ddd/feat/benchmark/SPEC.md` | 418 |
+| `.ddd/feat/binary-cache/PLAN.md` | 320 |
+| `.ddd/feat/binary-cache/SPEC.md` | 322 |
 | `.ddd/feat/cli-discovery/PLAN.md` | 391 |
 | `.ddd/feat/cli-discovery/SPEC.md` | 557 |
 | `.ddd/feat/metrics-integration/PLAN.md` | 204 |
@@ -98,19 +100,21 @@ SUM:                            44            870            362           5141
 | `.ddd/feat/ui-v1/PLAN_REFINED_STEPS_7-10.md` | 498 |
 | `.ddd/feat/ui-v1/PLAN.md` | 482 |
 | `.ddd/feat/ui-v1/SPEC.md` | 346 |
-| `ARCHITECTURE.md` | 358 |
+| `ARCHITECTURE.md` | 403 |
 | `CLAUDE.md` | 414 |
 | `COVERAGE_REPORT.md` | 56 |
 | `frontends/ADDING_FRONTENDS.md` | 476 |
 | `frontends/alpine/README.md` | 224 |
+| `frontends/README.md` | 52 |
 | `learnings/.ddd/0_sycamore_foundations_assessment.md` | 335 |
 | `learnings/.ddd/1_open_questions.md` | 294 |
 | `learnings/LEARNING_SYCAMORE_COMPONENTS.md` | 733 |
 | `learnings/LEARNING_SYCAMORE_FOUNDATIONS.md` | 572 |
 | `learnings/LEARNING_SYCAMORE_PRACTICES.md` | 530 |
-| `LOC_REPORT.md` | 143 |
-| `README.md` | 277 |
+| `LOC_REPORT.md` | 148 |
+| `README.md` | 297 |
 | `RESEARCH_PLAN.md` | 189 |
+| `scripts/README.md` | 101 |
 | `src/cli/discover/README.md` | 29 |
 | `src/cli/README.md` | 23 |
 | `src/client/README.md` | 25 |
@@ -129,7 +133,7 @@ SUM:                            44            870            362           5141
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 2.24 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.25 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 

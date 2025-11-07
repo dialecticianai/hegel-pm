@@ -9,7 +9,7 @@ mod statistics;
 mod walker;
 
 pub use api_types::{ProjectListItem, ProjectMetricsSummary};
-pub use cache::{load_cache, save_cache};
+pub use cache::{load_binary_cache, load_cache, save_binary_cache, save_cache};
 pub use config::DiscoveryConfig;
 pub use discover::discover_projects;
 pub use engine::DiscoveryEngine;
