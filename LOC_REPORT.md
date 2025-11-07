@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-07 12:03
+**Last Updated**: 2025-11-07 12:16
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 5,353 | 12,004 | 17,357 |
-| **Comments** | 419 | - | 419 |
-| **Blank Lines** | 928 | - | 928 |
-| **Total Lines** | 6,700 | 12,004 | 18,704 |
-| **Files** | 37 | 43 | 80 |
+| **Lines** | 5,353 | 12,202 | 17,555 |
+| **Comments** | 430 | - | 430 |
+| **Blank Lines** | 929 | - | 929 |
+| **Total Lines** | 6,712 | 12,202 | 18,914 |
+| **Files** | 37 | 44 | 81 |
 
-**Documentation Ratio**: 2.24 lines of docs per line of code
+**Documentation Ratio**: 2.28 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            37            928            419           5353
+Rust                            37            929            430           5353
 Markdown                         7             37              0            165
 -------------------------------------------------------------------------------
-SUM:                            44            965            419           5518
+SUM:                            44            966            430           5518
 -------------------------------------------------------------------------------
 ```
 
@@ -58,7 +58,7 @@ SUM:                            44            965            419           5518
 | `data_layer/worker.rs` | 615 | 347 | 268 | 43.6% | ⚠️ Large |
 | `discovery_mode.rs` | 21 | 21 | 0 | 0.0% | ✅ |
 | `discovery/api_types.rs` | 46 | 46 | 0 | 0.0% | ✅ |
-| `discovery/cache.rs` | 621 | 233 | 388 | 62.5% | ⚠️ Large |
+| `discovery/cache.rs` | 633 | 245 | 388 | 61.3% | ⚠️ Large |
 | `discovery/config.rs` | 234 | 113 | 121 | 51.7% | ✅ |
 | `discovery/discover.rs` | 200 | 52 | 148 | 74.0% | ✅ |
 | `discovery/engine.rs` | 211 | 77 | 134 | 63.5% | ✅ |
@@ -85,6 +85,7 @@ SUM:                            44            965            419           5518
 |------|-------|
 | `.ddd/feat/benchmark/PLAN.md` | 324 |
 | `.ddd/feat/benchmark/SPEC.md` | 418 |
+| `.ddd/feat/binary-cache/HANDOFF.md` | 198 |
 | `.ddd/feat/binary-cache/PLAN.md` | 320 |
 | `.ddd/feat/binary-cache/SPEC.md` | 322 |
 | `.ddd/feat/cli-discovery/PLAN.md` | 391 |
@@ -133,7 +134,7 @@ SUM:                            44            965            419           5518
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 2.24 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 2.28 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 

@@ -1,3 +1,12 @@
+//! Project discovery cache implementation
+//!
+//! Dual-cache strategy:
+//! - **Binary cache** (CLI): Multi-file structure at `~/.config/hegel-pm/cache/` with `index.bin` + per-project `.bin` files
+//! - **JSON cache** (Server): Single file at `~/.config/hegel-pm/cache.json` for data_layer compatibility
+//!
+//! Note: "Binary" cache uses JSON serialization (not bincode) due to `InvalidBoolEncoding` errors with `DiscoveredProject`.
+//! Multi-file structure enables future incremental updates.
+
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -6,7 +15,7 @@ use std::time::SystemTime;
 
 use super::DiscoveredProject;
 
-/// Lightweight index entry for fast project listing
+/// Lightweight index entry for fast project listing without loading full project data
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ProjectIndexEntry {
     pub name: String,
@@ -165,7 +174,9 @@ fn read_project(name: &str, cache_dir: &PathBuf) -> Result<Option<DiscoveredProj
     Ok(Some(project))
 }
 
-/// Save discovered projects to binary cache
+/// Save discovered projects to binary cache (multi-file: index.bin + per-project files)
+///
+/// Index written last to ensure consistency. Project write failures logged as warnings but don't abort.
 pub fn save_binary_cache(
     projects: &[DiscoveredProject],
     config: &super::DiscoveryConfig,
@@ -196,25 +207,26 @@ pub fn save_binary_cache(
         })
         .collect();
 
-    // Write index file (atomic)
+    // Write index last to ensure consistency (atomic write)
     write_index(&index, &cache_dir)?;
 
     Ok(())
 }
 
 /// Load discovered projects from binary cache
+///
+/// Returns `Ok(None)` if cache missing, `Err` if index corrupted. Missing/corrupted project files skipped with warnings.
 pub fn load_binary_cache(
     config: &super::DiscoveryConfig,
 ) -> Result<Option<Vec<DiscoveredProject>>> {
     let cache_dir = config.cache_dir();
 
-    // Read index
     let index = match read_index(&cache_dir)? {
         Some(idx) => idx,
-        None => return Ok(None),
+        None => return Ok(None), // Cache miss
     };
 
-    // Load each project from index
+    // Skip missing/corrupted project files, continue with valid ones
     let mut projects = Vec::new();
     for entry in index {
         match read_project(&entry.name, &cache_dir) {
