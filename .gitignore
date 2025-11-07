@@ -43,3 +43,4 @@ node_modules/
 static/*.js
 static/*.wasm
 static/index.html
+static/
