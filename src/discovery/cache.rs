@@ -192,7 +192,7 @@ pub fn save_binary_cache(
     // Write each project file (skip failures, log warnings)
     for project in projects {
         if let Err(e) = write_project(project, &cache_dir) {
-            tracing::warn!("Failed to write project '{}': {}", project.name, e);
+            eprintln!("Failed to write project '{}': {}", project.name, e);
         }
     }
 
@@ -232,10 +232,10 @@ pub fn load_binary_cache(
         match read_project(&entry.name, &cache_dir) {
             Ok(Some(project)) => projects.push(project),
             Ok(None) => {
-                tracing::warn!("Project file missing for: {}", entry.name);
+                eprintln!("Project file missing for: {}", entry.name);
             }
             Err(e) => {
-                tracing::warn!("Failed to load project '{}': {}", entry.name, e);
+                eprintln!("Failed to load project '{}': {}", entry.name, e);
             }
         }
     }

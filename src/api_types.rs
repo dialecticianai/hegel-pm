@@ -367,7 +367,7 @@ mod tests {
 
     #[test]
     fn test_build_workflow_summaries_single_workflow() {
-        use hegel::metrics::{PhaseMetrics, StateTransitionEvent, TokenMetrics, UnifiedMetrics};
+        use hegel::metrics::{StateTransitionEvent, UnifiedMetrics};
 
         let workflow_id = "2025-01-15T10:00:00Z".to_string();
 
@@ -443,7 +443,7 @@ mod tests {
 
     #[test]
     fn test_build_workflow_summaries_multiple_workflows() {
-        use hegel::metrics::{PhaseMetrics, StateTransitionEvent, TokenMetrics, UnifiedMetrics};
+        use hegel::metrics::{StateTransitionEvent, UnifiedMetrics};
 
         let workflow1_id = "2025-01-15T10:00:00Z".to_string();
         let workflow2_id = "2025-01-14T10:00:00Z".to_string();

@@ -46,6 +46,7 @@ impl Default for WorkerPoolConfig {
 pub struct WorkerPool {
     request_rx: mpsc::Receiver<DataRequest>,
     cache: ResponseCache,
+    #[allow(dead_code)]
     discovery_engine: Arc<DiscoveryEngine>,
     projects: Arc<RwLock<Vec<DiscoveredProject>>>,
 }
