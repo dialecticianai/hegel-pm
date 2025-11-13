@@ -146,8 +146,8 @@ hegel-pm discover list              # List all projects
 hegel-pm discover show <name>       # Show single project
 hegel-pm discover all               # Full table with metrics
 
-hegel-pm hegel status               # Run 'hegel status' on each project
-hegel-pm hegel analyze              # Run 'hegel analyze' on each project
+hegel-pm x status                   # Run 'hegel status' on each project
+hegel-pm x analyze                  # Run 'hegel analyze' on each project
 ```
 
 **Tradeoffs**:

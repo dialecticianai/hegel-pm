@@ -278,6 +278,114 @@ pub fn remove_from_cache(project_name: &str, config: &super::DiscoveryConfig) ->
     Ok(true)
 }
 
+/// Refresh all projects in the cache (rediscover and update each one)
+///
+/// Returns count of successfully refreshed projects.
+pub fn refresh_all_projects(config: &super::DiscoveryConfig) -> Result<usize> {
+    let cache_dir = config.cache_dir();
+
+    // Load current index
+    let index = match read_index(&cache_dir)? {
+        Some(idx) => idx,
+        None => {
+            anyhow::bail!("No cache found. Run 'hegel-pm discover list' first to populate cache.")
+        }
+    };
+
+    if index.is_empty() {
+        return Ok(0);
+    }
+
+    let mut refreshed_count = 0;
+    let mut errors = Vec::new();
+
+    for entry in &index {
+        match refresh_project(&entry.name, config) {
+            Ok(_) => refreshed_count += 1,
+            Err(e) => errors.push(format!("  - {}: {}", entry.name, e)),
+        }
+    }
+
+    if !errors.is_empty() {
+        eprintln!("\nWarnings during refresh:");
+        for error in &errors {
+            eprintln!("{}", error);
+        }
+    }
+
+    Ok(refreshed_count)
+}
+
+/// Refresh a single project in the cache (rediscover and update)
+///
+/// Returns `Ok(true)` if project was found and refreshed, error if not in cache or path invalid.
+pub fn refresh_project(project_name: &str, config: &super::DiscoveryConfig) -> Result<bool> {
+    let cache_dir = config.cache_dir();
+
+    // Load current index
+    let mut index = match read_index(&cache_dir)? {
+        Some(idx) => idx,
+        None => {
+            anyhow::bail!("No cache found. Run 'hegel-pm discover list' first to populate cache.")
+        }
+    };
+
+    // Find project in index
+    let project_entry = index
+        .iter()
+        .find(|e| e.name == project_name)
+        .ok_or_else(|| anyhow::anyhow!("Project '{}' not found in cache", project_name))?;
+
+    let project_path = project_entry.project_path.clone();
+    let hegel_dir = project_path.join(".hegel");
+
+    // Verify .hegel directory exists
+    if !hegel_dir.exists() {
+        anyhow::bail!(
+            "Project '{}' not found at cached path: {}\nUse 'hegel-pm remove {}' if you want to stop tracking it.",
+            project_name,
+            project_path.display(),
+            project_name
+        );
+    }
+
+    // Rediscover the project (same logic as discover_projects but for one project)
+    let (workflow_state, error) = match super::load_state(&hegel_dir) {
+        Ok(state) => (state, None),
+        Err(e) => (None, Some(format!("Failed to load state: {}", e))),
+    };
+
+    let last_activity = super::DiscoveredProject::calculate_last_activity(&hegel_dir)
+        .unwrap_or(SystemTime::UNIX_EPOCH);
+
+    let refreshed_project = super::DiscoveredProject::new(
+        project_name.to_string(),
+        project_path.clone(),
+        hegel_dir.clone(),
+        workflow_state,
+        last_activity,
+        error,
+    );
+
+    // Update index entry with new last_activity
+    for entry in index.iter_mut() {
+        if entry.name == project_name {
+            entry.last_activity = last_activity;
+            entry.project_path = project_path.clone();
+            entry.hegel_dir = hegel_dir.clone();
+            break;
+        }
+    }
+
+    // Write updated index
+    write_index(&index, &cache_dir)?;
+
+    // Write refreshed project file
+    write_project(&refreshed_project, &cache_dir)?;
+
+    Ok(true)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -780,5 +888,119 @@ mod tests {
         // Verify it's gone
         let loaded = load_binary_cache(&config).unwrap().unwrap();
         assert_eq!(loaded.len(), 0);
+    }
+
+    #[test]
+    fn test_refresh_project_existing() {
+        let temp = TempDir::new().unwrap();
+        let config = super::super::DiscoveryConfig::new(
+            vec![dirs::home_dir().unwrap().join("Code")],
+            10,
+            vec![],
+            temp.path().join("cache.json"),
+        );
+
+        // Discover and cache projects
+        let engine = super::super::DiscoveryEngine::new(config.clone()).unwrap();
+        let projects = engine.get_projects(true).unwrap();
+
+        if projects.is_empty() {
+            return;
+        }
+
+        // Save to cache
+        save_binary_cache(&projects, &config).unwrap();
+
+        let project_to_refresh = &projects[0].name;
+
+        // Refresh the project
+        let refreshed = refresh_project(project_to_refresh, &config).unwrap();
+        assert!(refreshed);
+
+        // Load cache and verify project still exists with updated data
+        let loaded = load_binary_cache(&config).unwrap().unwrap();
+        assert_eq!(loaded.len(), projects.len());
+        assert!(loaded.iter().any(|p| p.name == *project_to_refresh));
+    }
+
+    #[test]
+    fn test_refresh_project_not_in_cache() {
+        let temp = TempDir::new().unwrap();
+        let config = super::super::DiscoveryConfig::new(
+            vec![dirs::home_dir().unwrap().join("Code")],
+            10,
+            vec![],
+            temp.path().join("cache.json"),
+        );
+
+        // Discover and cache projects
+        let engine = super::super::DiscoveryEngine::new(config.clone()).unwrap();
+        let projects = engine.get_projects(true).unwrap();
+
+        if projects.is_empty() {
+            return;
+        }
+
+        // Save to cache
+        save_binary_cache(&projects, &config).unwrap();
+
+        // Try to refresh project that doesn't exist in cache
+        let result = refresh_project("nonexistent-project", &config);
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("not found in cache"));
+    }
+
+    #[test]
+    fn test_refresh_project_no_cache() {
+        let temp = TempDir::new().unwrap();
+        let config = super::super::DiscoveryConfig::new(
+            vec![temp.path().to_path_buf()],
+            10,
+            vec![],
+            temp.path().join("config").join("cache.json"),
+        );
+
+        // Try to refresh from non-existent cache
+        let result = refresh_project("some-project", &config);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("No cache found"));
+    }
+
+    #[test]
+    fn test_refresh_project_missing_hegel_dir() {
+        let temp = TempDir::new().unwrap();
+        let config = super::super::DiscoveryConfig::new(
+            vec![dirs::home_dir().unwrap().join("Code")],
+            10,
+            vec![],
+            temp.path().join("cache.json"),
+        );
+
+        // Discover and cache projects
+        let engine = super::super::DiscoveryEngine::new(config.clone()).unwrap();
+        let projects = engine.get_projects(true).unwrap();
+
+        if projects.is_empty() {
+            return;
+        }
+
+        // Create a fake project with non-existent path
+        let mut fake_project = projects[0].clone();
+        fake_project.name = "fake-project".to_string();
+        fake_project.project_path = temp.path().join("nonexistent");
+        fake_project.hegel_dir = temp.path().join("nonexistent/.hegel");
+
+        let projects_with_fake = vec![fake_project];
+        save_binary_cache(&projects_with_fake, &config).unwrap();
+
+        // Try to refresh project with missing .hegel directory
+        let result = refresh_project("fake-project", &config);
+        assert!(result.is_err());
+        let err_msg = result.unwrap_err().to_string();
+        assert!(err_msg.contains("not found at cached path"));
+        assert!(err_msg.contains("Use 'hegel-pm remove"));
     }
 }

@@ -42,8 +42,10 @@ hegel-pm discover list              # List all projects (name + workflow state)
 hegel-pm discover show <name>       # Show single project details
 hegel-pm discover all               # Full table with metrics
 
-# Remove project from tracking
+# Cache management
 hegel-pm remove <name>              # Remove project from cache (stop tracking)
+hegel-pm refresh                    # Refresh all cached projects
+hegel-pm refresh <name> [names...]  # Refresh specific project(s)
 
 # Run hegel commands across all projects (xargs-style)
 hegel-pm x status                   # Run 'hegel status' on each project
@@ -158,7 +160,7 @@ All errors include context with file paths for debugging:
 
 - **Initial scan**: <2 seconds for typical workspace (10-20 projects)
 - **Cached discovery**: <100ms (binary deserialization + validation)
-- **Per-project invalidation**: Only re-scans projects with stale cache entries (checks `.hegel/state.json` mtime)
+- **Manual refresh**: Use `--no-cache` flag or `refresh` command to update cache
 - **Graceful failure**: One corrupted project doesn't block discovery of others
 - **Memory**: Bounded (lazy loading via hegel-cli library)
 

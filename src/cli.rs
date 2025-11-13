@@ -34,6 +34,12 @@ pub enum Command {
         project_name: String,
     },
 
+    /// Refresh cached data for project(s)
+    Refresh {
+        /// Names of projects to refresh (omit to refresh all cached projects)
+        project_names: Vec<String>,
+    },
+
     /// Run a hegel command across all discovered projects
     X {
         /// Arguments to pass to hegel command
@@ -195,6 +201,39 @@ mod tests {
                 assert_eq!(project_name, "my-project");
             }
             _ => panic!("Expected Remove command"),
+        }
+    }
+
+    #[test]
+    fn test_refresh_command_single() {
+        let args = Args::parse_from(["hegel-pm", "refresh", "my-project"]);
+        match args.command {
+            Some(Command::Refresh { project_names }) => {
+                assert_eq!(project_names, vec!["my-project"]);
+            }
+            _ => panic!("Expected Refresh command"),
+        }
+    }
+
+    #[test]
+    fn test_refresh_command_multiple() {
+        let args = Args::parse_from(["hegel-pm", "refresh", "project1", "project2", "project3"]);
+        match args.command {
+            Some(Command::Refresh { project_names }) => {
+                assert_eq!(project_names, vec!["project1", "project2", "project3"]);
+            }
+            _ => panic!("Expected Refresh command"),
+        }
+    }
+
+    #[test]
+    fn test_refresh_command_no_args() {
+        let args = Args::parse_from(["hegel-pm", "refresh"]);
+        match args.command {
+            Some(Command::Refresh { project_names }) => {
+                assert!(project_names.is_empty());
+            }
+            _ => panic!("Expected Refresh command"),
         }
     }
 }

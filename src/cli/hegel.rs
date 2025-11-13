@@ -12,7 +12,7 @@ const DISALLOWED_COMMANDS: &[&str] = &[
 pub fn run(engine: &DiscoveryEngine, args: &[String]) -> Result<(), Box<dyn Error>> {
     // Validate we have at least a subcommand
     if args.is_empty() {
-        return Err("No hegel command specified. Usage: hegel-pm hegel <command> [args...]".into());
+        return Err("No hegel command specified. Usage: hegel-pm x <command> [args...]".into());
     }
 
     // Check if the command is disallowed

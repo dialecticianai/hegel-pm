@@ -15,7 +15,8 @@ cli/
 └── hegel.rs         Run hegel commands across all projects (xargs-style passthrough)
 
 Top-level commands (handled in main.rs):
-- remove <name>      Remove project from cache (stop tracking)
+- remove <name>          Remove project from cache (stop tracking)
+- refresh [names...]     Refresh cached data (all projects or specific ones)
 ```
 
 ## Key Patterns
