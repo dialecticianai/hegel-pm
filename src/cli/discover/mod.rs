@@ -4,7 +4,7 @@ mod list;
 mod show;
 
 use crate::cli::DiscoverCommand;
-use hegel_pm::discovery::DiscoveryEngine;
+use crate::discovery::DiscoveryEngine;
 use std::error::Error;
 
 /// Run a discover subcommand

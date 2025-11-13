@@ -1,4 +1,4 @@
-use hegel_pm::discovery::DiscoveryEngine;
+use crate::discovery::DiscoveryEngine;
 use std::error::Error;
 use std::process::Command;
 
@@ -99,7 +99,7 @@ mod tests {
 
     #[test]
     fn test_disallowed_command_top() {
-        let config = hegel_pm::discovery::DiscoveryConfig::default();
+        let config = crate::discovery::DiscoveryConfig::default();
         let engine = DiscoveryEngine::new(config).unwrap();
 
         let result = run(&engine, &["top".to_string()]);
@@ -109,7 +109,7 @@ mod tests {
 
     #[test]
     fn test_disallowed_command_reflect() {
-        let config = hegel_pm::discovery::DiscoveryConfig::default();
+        let config = crate::discovery::DiscoveryConfig::default();
         let engine = DiscoveryEngine::new(config).unwrap();
 
         let result = run(&engine, &["reflect".to_string(), "SPEC.md".to_string()]);
@@ -119,7 +119,7 @@ mod tests {
 
     #[test]
     fn test_empty_args() {
-        let config = hegel_pm::discovery::DiscoveryConfig::default();
+        let config = crate::discovery::DiscoveryConfig::default();
         let engine = DiscoveryEngine::new(config).unwrap();
 
         let result = run(&engine, &[]);

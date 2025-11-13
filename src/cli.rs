@@ -3,10 +3,10 @@ pub mod hegel;
 
 use clap::{Parser, Subcommand};
 
-/// Hegel Project Manager - Multi-project workflow orchestration
+/// Hegel Project Manager - CLI for discovering and managing Hegel projects
 #[derive(Parser, Debug)]
 #[command(name = "hegel-pm")]
-#[command(about = "Project manager for Hegel projects with web UI", long_about = None)]
+#[command(about = "CLI and library for discovering and managing Hegel projects", long_about = None)]
 pub struct Args {
     #[command(subcommand)]
     pub command: Option<Command>,
@@ -33,17 +33,6 @@ pub enum Command {
         /// Arguments to pass to hegel command
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
-    },
-
-    /// Run HTTP endpoint benchmarks
-    Benchmark {
-        /// Number of iterations per endpoint
-        #[arg(long, default_value = "100")]
-        iterations: usize,
-
-        /// Output results as JSON
-        #[arg(long)]
-        json: bool,
     },
 }
 
@@ -189,54 +178,6 @@ mod tests {
                 assert_eq!(args, vec!["analyze", "--fix-archives", "--json"]);
             }
             _ => panic!("Expected X command"),
-        }
-    }
-
-    #[test]
-    fn test_benchmark_command() {
-        let args = Args::parse_from(["hegel-pm", "benchmark"]);
-        match args.command {
-            Some(Command::Benchmark { iterations, json }) => {
-                assert_eq!(iterations, 100); // default
-                assert!(!json);
-            }
-            _ => panic!("Expected Benchmark command"),
-        }
-    }
-
-    #[test]
-    fn test_benchmark_with_custom_iterations() {
-        let args = Args::parse_from(["hegel-pm", "benchmark", "--iterations", "50"]);
-        match args.command {
-            Some(Command::Benchmark { iterations, json }) => {
-                assert_eq!(iterations, 50);
-                assert!(!json);
-            }
-            _ => panic!("Expected Benchmark command"),
-        }
-    }
-
-    #[test]
-    fn test_benchmark_with_json() {
-        let args = Args::parse_from(["hegel-pm", "benchmark", "--json"]);
-        match args.command {
-            Some(Command::Benchmark { iterations, json }) => {
-                assert_eq!(iterations, 100);
-                assert!(json);
-            }
-            _ => panic!("Expected Benchmark command"),
-        }
-    }
-
-    #[test]
-    fn test_benchmark_all_options() {
-        let args = Args::parse_from(["hegel-pm", "benchmark", "--iterations", "200", "--json"]);
-        match args.command {
-            Some(Command::Benchmark { iterations, json }) => {
-                assert_eq!(iterations, 200);
-                assert!(json);
-            }
-            _ => panic!("Expected Benchmark command"),
         }
     }
 }

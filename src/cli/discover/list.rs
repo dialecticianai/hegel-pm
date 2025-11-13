@@ -1,5 +1,5 @@
 use super::format::{abbreviate_path, format_size, format_timestamp, format_timestamp_iso};
-use hegel_pm::discovery::{DiscoveredProject, DiscoveryEngine};
+use crate::discovery::{DiscoveredProject, DiscoveryEngine};
 use serde::Serialize;
 use std::error::Error;
 
@@ -119,7 +119,7 @@ fn output_human(projects: &[DiscoveredProject], _cache_used: bool) -> Result<(),
 #[cfg(test)]
 mod tests {
     use super::*;
-    use hegel_pm::discovery::DiscoveryConfig;
+    use crate::discovery::DiscoveryConfig;
     use std::fs;
     use tempfile::TempDir;
 

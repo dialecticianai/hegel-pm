@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-07 13:22
+**Last Updated**: 2025-11-13 00:51
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 5,345 | 11,985 | 17,330 |
-| **Comments** | 438 | - | 438 |
-| **Blank Lines** | 927 | - | 927 |
-| **Total Lines** | 6,710 | 11,985 | 18,695 |
-| **Files** | 37 | 43 | 80 |
+| **Lines** | 2,717 | 11,627 | 14,344 |
+| **Comments** | 246 | - | 246 |
+| **Blank Lines** | 530 | - | 530 |
+| **Total Lines** | 3,493 | 11,627 | 15,120 |
+| **Files** | 21 | 39 | 60 |
 
-**Documentation Ratio**: 2.24 lines of docs per line of code
+**Documentation Ratio**: 4.28 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            37            927            438           5345
-Markdown                         7             37              0            165
+Rust                            21            530            246           2717
+Markdown                         4             22              0            116
 -------------------------------------------------------------------------------
-SUM:                            44            964            438           5510
+SUM:                            25            552            246           2833
 -------------------------------------------------------------------------------
 ```
 
@@ -37,25 +37,13 @@ SUM:                            44            964            438           5510
 
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
-| `api_types.rs` | 511 | 230 | 281 | 55.0% | ⚠️ Large |
-| `benchmark_mode.rs` | 387 | 238 | 149 | 38.5% | ⚠️ Large |
-| `cli.rs` | 242 | 72 | 170 | 70.2% | ✅ |
+| `cli.rs` | 183 | 61 | 122 | 66.7% | ✅ |
 | `cli/discover/all.rs` | 400 | 273 | 127 | 31.8% | ⚠️ Large |
 | `cli/discover/format.rs` | 128 | 52 | 76 | 59.4% | ✅ |
 | `cli/discover/list.rs` | 209 | 118 | 91 | 43.5% | ✅ |
 | `cli/discover/mod.rs` | 97 | 68 | 29 | 29.9% | ✅ |
 | `cli/discover/show.rs` | 261 | 168 | 93 | 35.6% | ✅ |
 | `cli/hegel.rs` | 156 | 95 | 61 | 39.1% | ✅ |
-| `client/components/all_projects_view.rs` | 132 | 132 | 0 | 0.0% | ✅ |
-| `client/components/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
-| `client/components/sidebar.rs` | 113 | 113 | 0 | 0.0% | ✅ |
-| `client/components/workflow_detail_view.rs` | 327 | 327 | 0 | 0.0% | ⚠️ Large |
-| `client/mod.rs` | 37 | 37 | 0 | 0.0% | ✅ |
-| `client/types.rs` | 173 | 173 | 0 | 0.0% | ✅ |
-| `data_layer/cache.rs` | 140 | 60 | 80 | 57.1% | ✅ |
-| `data_layer/messages.rs` | 65 | 42 | 23 | 35.4% | ✅ |
-| `data_layer/mod.rs` | 7 | 7 | 0 | 0.0% | ✅ |
-| `data_layer/worker.rs` | 616 | 348 | 268 | 43.5% | ⚠️ Large |
 | `debug.rs` | 46 | 18 | 28 | 60.9% | ✅ |
 | `discovery/api_types.rs` | 46 | 46 | 0 | 0.0% | ✅ |
 | `discovery/cache.rs` | 633 | 245 | 388 | 61.3% | ⚠️ Large |
@@ -64,18 +52,14 @@ SUM:                            44            964            438           5510
 | `discovery/engine.rs` | 211 | 77 | 134 | 63.5% | ✅ |
 | `discovery/mod.rs` | 35 | 24 | 11 | 31.4% | ✅ |
 | `discovery/project.rs` | 240 | 117 | 123 | 51.2% | ✅ |
-| `discovery/state.rs` | 113 | 19 | 94 | 83.2% | ✅ |
+| `discovery/state.rs` | 109 | 19 | 90 | 82.6% | ✅ |
 | `discovery/statistics.rs` | 30 | 3 | 27 | 90.0% | ✅ |
 | `discovery/walker.rs` | 171 | 46 | 125 | 73.1% | ✅ |
-| `http/axum_backend.rs` | 248 | 248 | 0 | 0.0% | ⚠️ Large |
-| `http/mod.rs` | 83 | 57 | 26 | 31.3% | ✅ |
-| `http/warp_backend.rs` | 201 | 201 | 0 | 0.0% | ⚠️ Large |
-| `lib.rs` | 24 | 18 | 6 | 25.0% | ✅ |
-| `main.rs` | 77 | 77 | 0 | 0.0% | ✅ |
-| `server_mode.rs` | 49 | 49 | 0 | 0.0% | ✅ |
+| `lib.rs` | 11 | 9 | 2 | 18.2% | ✅ |
+| `main.rs` | 32 | 32 | 0 | 0.0% | ✅ |
 | `test_helpers.rs` | 61 | 35 | 26 | 42.6% | ✅ |
 
-**⚠️ Warning:** 8 file(s) over 200 impl lines - consider splitting for maintainability
+**⚠️ Warning:** 2 file(s) over 200 impl lines - consider splitting for maintainability
 
 ---
 
@@ -90,6 +74,8 @@ SUM:                            44            964            438           5510
 | `.ddd/feat/binary-cache/SPEC.md` | 322 |
 | `.ddd/feat/cli-discovery/PLAN.md` | 391 |
 | `.ddd/feat/cli-discovery/SPEC.md` | 557 |
+| `.ddd/feat/extract-web-ui/PLAN.md` | 360 |
+| `.ddd/feat/extract-web-ui/SPEC.md` | 82 |
 | `.ddd/feat/metrics-integration/PLAN.md` | 204 |
 | `.ddd/feat/metrics-integration/SPEC.md` | 102 |
 | `.ddd/feat/project-discovery/PLAN.md` | 372 |
@@ -104,27 +90,21 @@ SUM:                            44            964            438           5510
 | `ARCHITECTURE.md` | 403 |
 | `CLAUDE.md` | 420 |
 | `COVERAGE_REPORT.md` | 56 |
-| `frontends/ADDING_FRONTENDS.md` | 476 |
-| `frontends/alpine/README.md` | 224 |
-| `frontends/README.md` | 52 |
 | `learnings/.ddd/0_sycamore_foundations_assessment.md` | 335 |
 | `learnings/.ddd/1_open_questions.md` | 294 |
 | `learnings/LEARNING_SYCAMORE_COMPONENTS.md` | 733 |
 | `learnings/LEARNING_SYCAMORE_FOUNDATIONS.md` | 572 |
 | `learnings/LEARNING_SYCAMORE_PRACTICES.md` | 530 |
-| `LOC_REPORT.md` | 153 |
+| `LOC_REPORT.md` | 152 |
+| `MANUAL_EDITS.md` | 53 |
 | `README.md` | 297 |
 | `RESEARCH_PLAN.md` | 189 |
 | `scripts/README.md` | 101 |
 | `src/cli/discover/README.md` | 29 |
 | `src/cli/README.md` | 23 |
-| `src/client/README.md` | 25 |
-| `src/data_layer/README.md` | 20 |
 | `src/discovery/README.md` | 53 |
-| `src/http/README.md` | 19 |
 | `src/README.md` | 33 |
 | `TESTING.md` | 510 |
-| `tests/README.md` | 36 |
 | `VISION.md` | 115 |
 
 ---
@@ -133,7 +113,7 @@ SUM:                            44            964            438           5510
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 2.24 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 4.28 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 

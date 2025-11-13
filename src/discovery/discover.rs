@@ -66,7 +66,7 @@ mod tests {
             fs::write(
                 hegel_dir.join("state.json"),
                 r#"{
-                    "workflow_state": {
+                    "workflow": {
                         "current_node": "code",
                         "mode": "discovery",
                         "history": ["spec", "code"]

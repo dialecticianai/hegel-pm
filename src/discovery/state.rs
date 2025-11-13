@@ -14,7 +14,7 @@ pub fn load_state(hegel_dir: &PathBuf) -> Result<Option<WorkflowState>> {
 
     let state = storage.load().context("Failed to load state")?;
 
-    Ok(state.workflow_state)
+    Ok(state.workflow)
 }
 
 #[cfg(test)]
@@ -35,7 +35,7 @@ mod tests {
     fn test_load_valid_state() {
         let temp = create_hegel_dir_with_state(
             r#"{
-                "workflow_state": {
+                "workflow": {
                     "current_node": "spec",
                     "mode": "discovery",
                     "history": ["init", "spec"]
@@ -90,10 +90,6 @@ mod tests {
         let temp = create_hegel_dir_with_state(
             r#"{
                 "workflow": {
-                    "name": "discovery",
-                    "nodes": {}
-                },
-                "workflow_state": {
                     "current_node": "code",
                     "mode": "discovery",
                     "history": ["spec", "plan", "code"],
