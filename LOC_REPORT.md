@@ -1,6 +1,6 @@
 # Lines of Code Report
 
-**Last Updated**: 2025-11-13 00:51
+**Last Updated**: 2025-11-13 14:45
 **Tool**: [cloc](https://github.com/AlDanial/cloc) + wc
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Rust Code | Documentation (.md) | Total |
 |--------|-----------|---------------------|-------|
-| **Lines** | 2,717 | 11,627 | 14,344 |
-| **Comments** | 246 | - | 246 |
-| **Blank Lines** | 530 | - | 530 |
-| **Total Lines** | 3,493 | 11,627 | 15,120 |
-| **Files** | 21 | 39 | 60 |
+| **Lines** | 2,841 | 8,640 | 11,481 |
+| **Comments** | 270 | - | 270 |
+| **Blank Lines** | 561 | - | 561 |
+| **Total Lines** | 3,672 | 8,640 | 12,312 |
+| **Files** | 21 | 32 | 53 |
 
-**Documentation Ratio**: 4.28 lines of docs per line of code
+**Documentation Ratio**: 3.04 lines of docs per line of code
 
 ---
 
@@ -24,10 +24,10 @@
 ```
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Rust                            21            530            246           2717
-Markdown                         4             22              0            116
+Rust                            21            561            270           2841
+Markdown                         4             23              0            106
 -------------------------------------------------------------------------------
-SUM:                            25            552            246           2833
+SUM:                            25            584            270           2947
 -------------------------------------------------------------------------------
 ```
 
@@ -37,7 +37,7 @@ SUM:                            25            552            246           2833
 
 | File | Total Lines | Impl Lines | Test Lines | Test % | Status |
 |------|-------------|------------|------------|--------|--------|
-| `cli.rs` | 183 | 61 | 122 | 66.7% | ✅ |
+| `cli.rs` | 200 | 67 | 133 | 66.5% | ✅ |
 | `cli/discover/all.rs` | 400 | 273 | 127 | 31.8% | ⚠️ Large |
 | `cli/discover/format.rs` | 128 | 52 | 76 | 59.4% | ✅ |
 | `cli/discover/list.rs` | 209 | 118 | 91 | 43.5% | ✅ |
@@ -46,7 +46,7 @@ SUM:                            25            552            246           2833
 | `cli/hegel.rs` | 156 | 95 | 61 | 39.1% | ✅ |
 | `debug.rs` | 46 | 18 | 28 | 60.9% | ✅ |
 | `discovery/api_types.rs` | 46 | 46 | 0 | 0.0% | ✅ |
-| `discovery/cache.rs` | 633 | 245 | 388 | 61.3% | ⚠️ Large |
+| `discovery/cache.rs` | 784 | 280 | 504 | 64.3% | ⚠️ Large |
 | `discovery/config.rs` | 234 | 113 | 121 | 51.7% | ✅ |
 | `discovery/discover.rs` | 200 | 52 | 148 | 74.0% | ✅ |
 | `discovery/engine.rs` | 211 | 77 | 134 | 63.5% | ✅ |
@@ -56,7 +56,7 @@ SUM:                            25            552            246           2833
 | `discovery/statistics.rs` | 30 | 3 | 27 | 90.0% | ✅ |
 | `discovery/walker.rs` | 171 | 46 | 125 | 73.1% | ✅ |
 | `lib.rs` | 11 | 9 | 2 | 18.2% | ✅ |
-| `main.rs` | 32 | 32 | 0 | 0.0% | ✅ |
+| `main.rs` | 43 | 43 | 0 | 0.0% | ✅ |
 | `test_helpers.rs` | 61 | 35 | 26 | 42.6% | ✅ |
 
 **⚠️ Warning:** 2 file(s) over 200 impl lines - consider splitting for maintainability
@@ -87,25 +87,18 @@ SUM:                            25            552            246           2833
 | `.ddd/feat/ui-v1/PLAN_REFINED_STEPS_7-10.md` | 498 |
 | `.ddd/feat/ui-v1/PLAN.md` | 482 |
 | `.ddd/feat/ui-v1/SPEC.md` | 346 |
-| `ARCHITECTURE.md` | 403 |
-| `CLAUDE.md` | 420 |
+| `ARCHITECTURE.md` | 257 |
+| `CLAUDE.md` | 393 |
 | `COVERAGE_REPORT.md` | 56 |
-| `learnings/.ddd/0_sycamore_foundations_assessment.md` | 335 |
-| `learnings/.ddd/1_open_questions.md` | 294 |
-| `learnings/LEARNING_SYCAMORE_COMPONENTS.md` | 733 |
-| `learnings/LEARNING_SYCAMORE_FOUNDATIONS.md` | 572 |
-| `learnings/LEARNING_SYCAMORE_PRACTICES.md` | 530 |
-| `LOC_REPORT.md` | 152 |
-| `MANUAL_EDITS.md` | 53 |
-| `README.md` | 297 |
-| `RESEARCH_PLAN.md` | 189 |
-| `scripts/README.md` | 101 |
+| `LOC_REPORT.md` | 132 |
+| `README.md` | 190 |
+| `scripts/README.md` | 72 |
 | `src/cli/discover/README.md` | 29 |
-| `src/cli/README.md` | 23 |
+| `src/cli/README.md` | 26 |
 | `src/discovery/README.md` | 53 |
-| `src/README.md` | 33 |
-| `TESTING.md` | 510 |
-| `VISION.md` | 115 |
+| `src/README.md` | 21 |
+| `TESTING.md` | 573 |
+| `VISION.md` | 109 |
 
 ---
 
@@ -113,7 +106,7 @@ SUM:                            25            552            246           2833
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Docs/Code Ratio | ≥0.3 | 4.28 | ✅ Excellent |
+| Docs/Code Ratio | ≥0.3 | 3.04 | ✅ Excellent |
 | README exists | Yes | ✅ | Met |
 | Architecture docs | Yes | ✅ | Met |
 

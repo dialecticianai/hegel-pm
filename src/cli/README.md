@@ -13,6 +13,9 @@ cli/
 │   ├── all.rs       Aggregate table with sorting and optional benchmarking
 │   └── format.rs    Output formatting utilities (sizes, timestamps, paths, durations)
 └── hegel.rs         Run hegel commands across all projects (xargs-style passthrough)
+
+Top-level commands (handled in main.rs):
+- remove <name>      Remove project from cache (stop tracking)
 ```
 
 ## Key Patterns

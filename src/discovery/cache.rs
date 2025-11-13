@@ -243,6 +243,41 @@ pub fn load_binary_cache(
     Ok(Some(projects))
 }
 
+/// Remove a project from the binary cache (both index and project file)
+///
+/// Returns `Ok(true)` if project was found and removed, `Ok(false)` if project not in cache.
+pub fn remove_from_cache(project_name: &str, config: &super::DiscoveryConfig) -> Result<bool> {
+    let cache_dir = config.cache_dir();
+
+    // Load current index
+    let mut index = match read_index(&cache_dir)? {
+        Some(idx) => idx,
+        None => return Ok(false), // No cache, nothing to remove
+    };
+
+    // Check if project exists in index
+    let original_len = index.len();
+    index.retain(|entry| entry.name != project_name);
+
+    if index.len() == original_len {
+        // Project not found in index
+        return Ok(false);
+    }
+
+    // Write updated index (atomic)
+    write_index(&index, &cache_dir)?;
+
+    // Delete individual project file (best effort, don't fail if already gone)
+    let safe_name =
+        project_name.replace(|c: char| !c.is_alphanumeric() && c != '-' && c != '_', "_");
+    let project_path = cache_dir.join(format!("{}.bin", safe_name));
+    if project_path.exists() {
+        fs::remove_file(&project_path).ok(); // Ignore errors
+    }
+
+    Ok(true)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -627,6 +662,122 @@ mod tests {
         save_binary_cache(&projects, &config).unwrap();
 
         // Load should return empty vec
+        let loaded = load_binary_cache(&config).unwrap().unwrap();
+        assert_eq!(loaded.len(), 0);
+    }
+
+    #[test]
+    fn test_remove_from_cache_existing_project() {
+        let temp = TempDir::new().unwrap();
+        let config = super::super::DiscoveryConfig::new(
+            vec![dirs::home_dir().unwrap().join("Code")],
+            10,
+            vec![],
+            temp.path().join("cache.json"),
+        );
+
+        // Discover and cache projects
+        let engine = super::super::DiscoveryEngine::new(config.clone()).unwrap();
+        let projects = engine.get_projects(true).unwrap();
+
+        if projects.is_empty() {
+            return;
+        }
+
+        // Save to cache
+        save_binary_cache(&projects, &config).unwrap();
+
+        // Remove first project
+        let project_to_remove = &projects[0].name;
+        let removed = remove_from_cache(project_to_remove, &config).unwrap();
+        assert!(removed);
+
+        // Load cache and verify project is gone
+        let loaded = load_binary_cache(&config).unwrap().unwrap();
+        assert_eq!(loaded.len(), projects.len() - 1);
+        assert!(!loaded.iter().any(|p| p.name == *project_to_remove));
+
+        // Verify project file is deleted
+        let cache_dir = config.cache_dir();
+        let safe_name =
+            project_to_remove.replace(|c: char| !c.is_alphanumeric() && c != '-' && c != '_', "_");
+        assert!(!cache_dir.join(format!("{}.bin", safe_name)).exists());
+    }
+
+    #[test]
+    fn test_remove_from_cache_nonexistent_project() {
+        let temp = TempDir::new().unwrap();
+        let config = super::super::DiscoveryConfig::new(
+            vec![dirs::home_dir().unwrap().join("Code")],
+            10,
+            vec![],
+            temp.path().join("cache.json"),
+        );
+
+        // Discover and cache projects
+        let engine = super::super::DiscoveryEngine::new(config.clone()).unwrap();
+        let projects = engine.get_projects(true).unwrap();
+
+        if projects.is_empty() {
+            return;
+        }
+
+        // Save to cache
+        save_binary_cache(&projects, &config).unwrap();
+
+        // Try to remove project that doesn't exist
+        let removed = remove_from_cache("nonexistent-project", &config).unwrap();
+        assert!(!removed);
+
+        // Load cache and verify nothing changed
+        let loaded = load_binary_cache(&config).unwrap().unwrap();
+        assert_eq!(loaded.len(), projects.len());
+    }
+
+    #[test]
+    fn test_remove_from_cache_no_cache() {
+        let temp = TempDir::new().unwrap();
+        let config = super::super::DiscoveryConfig::new(
+            vec![temp.path().to_path_buf()],
+            10,
+            vec![],
+            temp.path().join("config").join("cache.json"),
+        );
+
+        // Try to remove from non-existent cache
+        let removed = remove_from_cache("some-project", &config).unwrap();
+        assert!(!removed);
+    }
+
+    #[test]
+    fn test_remove_from_cache_with_special_chars() {
+        let temp = TempDir::new().unwrap();
+        let config = super::super::DiscoveryConfig::new(
+            vec![dirs::home_dir().unwrap().join("Code")],
+            10,
+            vec![],
+            temp.path().join("cache.json"),
+        );
+
+        // Discover real project and rename it with special chars for testing
+        let engine = super::super::DiscoveryEngine::new(config.clone()).unwrap();
+        let projects = engine.get_projects(true).unwrap();
+
+        if projects.is_empty() {
+            return;
+        }
+
+        let mut project = projects[0].clone();
+        project.name = "project/with:special*chars".to_string();
+
+        let projects_with_special = vec![project.clone()];
+        save_binary_cache(&projects_with_special, &config).unwrap();
+
+        // Remove project with special characters
+        let removed = remove_from_cache(&project.name, &config).unwrap();
+        assert!(removed);
+
+        // Verify it's gone
         let loaded = load_binary_cache(&config).unwrap().unwrap();
         assert_eq!(loaded.len(), 0);
     }

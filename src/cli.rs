@@ -28,6 +28,12 @@ pub enum Command {
         no_cache: bool,
     },
 
+    /// Remove a project from tracking (clears from cache)
+    Remove {
+        /// Name of the project to remove
+        project_name: String,
+    },
+
     /// Run a hegel command across all discovered projects
     X {
         /// Arguments to pass to hegel command
@@ -178,6 +184,17 @@ mod tests {
                 assert_eq!(args, vec!["analyze", "--fix-archives", "--json"]);
             }
             _ => panic!("Expected X command"),
+        }
+    }
+
+    #[test]
+    fn test_remove_command() {
+        let args = Args::parse_from(["hegel-pm", "remove", "my-project"]);
+        match args.command {
+            Some(Command::Remove { project_name }) => {
+                assert_eq!(project_name, "my-project");
+            }
+            _ => panic!("Expected Remove command"),
         }
     }
 }

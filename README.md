@@ -42,14 +42,13 @@ hegel-pm discover list              # List all projects (name + workflow state)
 hegel-pm discover show <name>       # Show single project details
 hegel-pm discover all               # Full table with metrics
 
+# Remove project from tracking
+hegel-pm remove <name>              # Remove project from cache (stop tracking)
+
 # Run hegel commands across all projects (xargs-style)
 hegel-pm hegel status               # Run 'hegel status' on each project
 hegel-pm hegel analyze              # Run 'hegel analyze' on each project
 hegel-pm hegel analyze --fix-archives --dry-run  # Dry-run archive fix
-
-# Legacy flags (deprecated, use 'discover list' instead)
-hegel-pm --discover
-hegel-pm --discover --refresh
 ```
 
 **Build from source:**
