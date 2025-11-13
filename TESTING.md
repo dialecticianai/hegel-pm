@@ -1,52 +1,89 @@
 # Testing Guide - hegel-pm
 
-**Purpose**: Testing strategy and patterns for hegel-pm, covering native Rust code and WASM UI components.
+**Purpose**: Testing strategy and patterns for hegel-pm discovery library and CLI.
 
-**Status**: Testing infrastructure established during Sycamore 0.9 migration (2025-11-03)
+**Status**: TDD discipline with ≥80% line coverage enforced by pre-commit hook
 
 ---
 
 ## Overview
 
-hegel-pm has two distinct testing surfaces:
+hegel-pm is a pure Rust library and CLI tool for discovering Hegel projects across the filesystem. Testing focuses on:
 
-1. **Native code** (discovery engine, CLI) - Standard Rust `#[test]`
-2. **WASM UI** (Sycamore components) - `wasm-bindgen-test` in browser
+1. **Discovery engine** - Filesystem walking, project detection, caching
+2. **CLI commands** - Argument parsing, output formatting, error handling
+3. **Integration** - End-to-end discovery workflows
 
 ---
 
 ## Running Tests
 
-### All Tests
+### Quick Start
 
 ```bash
-# Native tests only (fast)
+# Recommended: Build + test script
+./scripts/test.sh
+
+# Or run tests directly
 cargo test
 
-# WASM tests (requires browser)
-wasm-pack test --headless --firefox
-
-# Specific test file
+# Run specific module tests
 cargo test discovery
-wasm-pack test --headless --firefox --test client_tests
+cargo test cli
+
+# Run with output
+cargo test -- --nocapture
+
+# Run single test
+cargo test test_discovery_engine_finds_projects
 ```
 
 ### Coverage
 
 ```bash
-# Generate coverage report (native code)
-cargo tarpaulin --out Html
+# Generate coverage report (enforced by pre-commit hook)
+./scripts/generate-coverage-report.sh
+
+# Or use cargo-llvm-cov directly
+cargo llvm-cov test --html
+open target/llvm-cov/html/index.html
 ```
 
-**Current coverage**: ~34% (will improve with UI testing)
+**Current coverage**: See `COVERAGE_REPORT.md` (auto-generated)
+**Target**: ≥80% line coverage (enforced by pre-commit hook)
 
 ---
 
-## Native Code Testing
+## Testing Philosophy
 
-### Standard Unit Tests
+**TDD discipline**: Code exists because tests drove its implementation.
 
-**Location**: Co-located `#[cfg(test)]` modules in implementation files
+**Coverage target**: ≥80% lines (enforced by pre-commit hook)
+
+**What to test**:
+- ✅ State parsing and serialization (JSONL format correctness)
+- ✅ Multi-project discovery and tracking logic
+- ✅ Workflow state interpretation
+- ✅ Filesystem walking and `.hegel` detection
+- ✅ Metrics extraction and aggregation
+- ✅ Cache persistence and invalidation
+- ✅ CLI argument parsing and output formatting
+- ✅ Error handling paths
+
+**What NOT to test**:
+- ❌ Third-party library behavior (serde, hegel-cli internals)
+- ❌ File system primitives (trust std::fs)
+- ❌ External dependencies (walkdir, clap)
+
+**Test organization**: Co-located `#[cfg(test)]` modules in implementation files
+
+---
+
+## Test Structure
+
+### Unit Tests
+
+**Location**: Co-located with implementation code in `#[cfg(test)]` modules
 
 **Pattern**:
 ```rust
@@ -55,378 +92,359 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_discovery_engine_caching() {
-        // Arrange
+    fn test_discovery_config_default() {
         let config = DiscoveryConfig::default();
-        let engine = DiscoveryEngine::new(config).unwrap();
+        assert!(config.roots.len() > 0);
+        assert_eq!(config.max_depth, 10);
+    }
 
-        // Act
-        let projects = engine.get_projects(false).unwrap();
+    #[test]
+    fn test_cache_persistence() {
+        let cache = Cache::new(temp_path());
+        cache.save(&projects).unwrap();
 
-        // Assert
-        assert!(!projects.is_empty());
+        let loaded = Cache::load(&temp_path()).unwrap();
+        assert_eq!(loaded.len(), projects.len());
     }
 }
 ```
 
-**What to test**:
-- ✅ Discovery engine logic
-- ✅ Configuration validation
-- ✅ Cache persistence
-- ✅ State extraction
-- ✅ Error handling paths
+### Integration Tests
 
-**What NOT to test**:
-- ❌ hegel-cli library internals (trust dependency)
-- ❌ Filesystem primitives (trust std::fs)
+**Location**: `tests/` directory (if needed for end-to-end scenarios)
 
----
-
-## WASM UI Testing
-
-### Setup
-
-**Dependencies** (in `Cargo.toml`):
-```toml
-[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
-wasm-bindgen-test = "0.3"
-web-sys = { version = "0.3", features = ["Element", "Window", "Document", "HtmlElement"] }
-```
-
-**Test file structure**:
-```
-tests/
-└── client_tests.rs    # WASM browser tests
-```
-
-### Basic Test Pattern
-
+**Pattern**:
 ```rust
-#![cfg(target_arch = "wasm32")]
+// tests/integration_test.rs
+use hegel_pm::discovery::{DiscoveryConfig, DiscoveryEngine};
 
-use wasm_bindgen_test::*;
-use wasm_bindgen::JsCast;
-use sycamore::prelude::*;
+#[test]
+fn test_discover_and_cache_workflow() {
+    let config = DiscoveryConfig::default();
+    let engine = DiscoveryEngine::new(config).unwrap();
 
-wasm_bindgen_test_configure!(run_in_browser);
+    // First discovery (fresh scan)
+    let projects1 = engine.get_projects(false).unwrap();
 
-#[wasm_bindgen_test]
-fn test_signal_reactivity() {
-    let _ = create_root(|| {
-        let count = create_signal(0);
+    // Second discovery (cached)
+    let projects2 = engine.get_projects(false).unwrap();
 
-        let node = view! {
-            div {
-                p(id="counter") { (count.get()) }
-            }
-        };
-
-        sycamore::render_in_scope(|| node, &test_container());
-
-        let counter = query("#counter");
-        assert_text_content!(counter, "0");
-
-        // Update signal
-        count.set(42);
-
-        // Verify reactivity
-        assert_text_content!(counter, "42");
-    });
+    assert_eq!(projects1.len(), projects2.len());
 }
 ```
 
 ### Test Helpers
 
-**Test container**:
+**Location**: `src/test_helpers.rs`
+
+Common utilities for creating test fixtures:
 ```rust
-fn test_container() -> web_sys::Element {
-    let document = web_sys::window().unwrap().document().unwrap();
-    document.query_selector("body").unwrap().unwrap()
-}
-```
+pub fn create_temp_hegel_project(name: &str) -> TempDir {
+    let dir = TempDir::new().unwrap();
+    let hegel_dir = dir.path().join(".hegel");
+    fs::create_dir(&hegel_dir).unwrap();
 
-**Query helper**:
-```rust
-fn query(selector: &str) -> web_sys::Element {
-    let document = web_sys::window().unwrap().document().unwrap();
-    document
-        .query_selector(selector)
-        .unwrap()
-        .expect(&format!("Element not found: {}", selector))
-}
-```
-
-**Assertion macro**:
-```rust
-macro_rules! assert_text_content {
-    ($element:expr, $expected:expr) => {
-        assert_eq!(
-            $element.text_content().unwrap_or_default().trim(),
-            $expected
-        );
-    };
-}
-```
-
-### What to Test in WASM
-
-Based on `LEARNING_SYCAMORE_PRACTICES.md`:
-
-**✅ DO test**:
-- Signal update logic (reactive primitives)
-- User interactions → state changes
-- Conditional rendering (different code paths)
-- List operations (add/remove/reorder with Keyed)
-- Memo/effect behavior
-
-**❌ DON'T test**:
-- Sycamore framework internals
-- Exact DOM structure (brittle)
-- CSS/styling (use visual regression tools)
-
-### Example: Testing Memo Updates
-
-```rust
-#[wasm_bindgen_test]
-fn test_memo_updates() {
-    let _ = create_root(|| {
-        let count = create_signal(5);
-        let doubled = create_memo(move || count.get() * 2);
-
-        let node = view! {
-            div {
-                p(id="original") { (count.get()) }
-                p(id="doubled") { (doubled.get()) }
-            }
-        };
-
-        sycamore::render_in_scope(|| node, &test_container());
-
-        let original = query("#original");
-        let doubled_elem = query("#doubled");
-
-        assert_text_content!(original, "5");
-        assert_text_content!(doubled_elem, "10");
-
-        // Update source signal
-        count.set(10);
-
-        // Memo should update automatically
-        assert_text_content!(original, "10");
-        assert_text_content!(doubled_elem, "20");
+    // Create minimal state.json
+    let state = json!({
+        "workflow": "discovery",
+        "node": "spec"
     });
+    fs::write(hegel_dir.join("state.json"), state.to_string()).unwrap();
+
+    dir
 }
 ```
 
 ---
 
-## Browser Test Runners
+## Testing Discovery Engine
 
-### Firefox (Recommended)
+### Core Functionality
 
-```bash
-wasm-pack test --headless --firefox
-```
-
-**Pros**:
-- More stable than Chrome in CI
-- Better WebDriver support
-- Fewer version conflicts
-
-### Chrome
-
-```bash
-wasm-pack test --headless --chrome
-```
-
-**Pros**:
-- Faster execution
-- Better debugging tools
-
-**Cons**:
-- ChromeDriver version compatibility issues
-- Can fail with network timeouts
-
-### Manual Browser Testing
-
-```bash
-# Open interactive browser for debugging
-wasm-pack test --firefox
-# or
-wasm-pack test --chrome
-```
-
-Useful for debugging test failures with browser DevTools.
-
----
-
-## Testing Patterns from Sycamore Research
-
-### 1. Testing Reactive Primitives
-
-**Signals**:
+**Project detection**:
 ```rust
 #[test]
-fn test_signal_updates() {
-    create_root(|| {
-        let count = create_signal(0);
-        assert_eq!(count.get(), 0);
+fn test_finds_hegel_projects() {
+    let temp = create_temp_workspace();
+    create_hegel_project(&temp, "project1");
+    create_hegel_project(&temp, "project2");
 
-        count.set(5);
-        assert_eq!(count.get(), 5);
-    });
+    let config = DiscoveryConfig::new(vec![temp.path()], 10, vec![], cache_path());
+    let engine = DiscoveryEngine::new(config).unwrap();
+
+    let projects = engine.get_projects(true).unwrap();
+    assert_eq!(projects.len(), 2);
 }
 ```
 
-**Memos**:
+**Exclusion handling**:
 ```rust
 #[test]
-fn test_memo_caching() {
-    create_root(|| {
-        let count = create_signal(1);
-        let doubled = create_memo(move || count.get() * 2);
+fn test_respects_exclusions() {
+    let temp = create_temp_workspace();
+    create_hegel_project(&temp, "project1");
+    create_hegel_project(&temp.path().join("node_modules"), "ignored");
 
-        assert_eq!(doubled.get(), 2);
-        assert_eq!(doubled.get(), 2); // Cached, not recomputed
+    let config = DiscoveryConfig::new(
+        vec![temp.path()],
+        10,
+        vec!["node_modules".to_string()],
+        cache_path()
+    );
+    let engine = DiscoveryEngine::new(config).unwrap();
 
-        count.set(5);
-        assert_eq!(doubled.get(), 10); // Updated
-    });
+    let projects = engine.get_projects(true).unwrap();
+    assert_eq!(projects.len(), 1);
+    assert_eq!(projects[0].name, "project1");
 }
 ```
 
-**Effects**:
+**Max depth enforcement**:
 ```rust
 #[test]
-fn test_effect_runs_on_change() {
-    create_root(|| {
-        let count = create_signal(0);
-        let effect_runs = create_signal(0);
+fn test_respects_max_depth() {
+    let temp = create_temp_workspace();
+    let deep = temp.path().join("a/b/c/d/e/f");
+    fs::create_dir_all(&deep).unwrap();
+    create_hegel_project(&deep, "too-deep");
 
-        create_effect(move || {
-            count.track();
-            effect_runs.update(|n| *n += 1);
-        });
+    let config = DiscoveryConfig::new(vec![temp.path()], 3, vec![], cache_path());
+    let engine = DiscoveryEngine::new(config).unwrap();
 
-        assert_eq!(effect_runs.get(), 1); // Runs immediately
-
-        count.set(1);
-        assert_eq!(effect_runs.get(), 2); // Runs on update
-    });
+    let projects = engine.get_projects(true).unwrap();
+    assert_eq!(projects.len(), 0);
 }
 ```
 
-### 2. Testing Components (Future)
+### Caching Behavior
 
-When testing actual hegel-pm components, use mocking for API calls:
-
+**Cache persistence**:
 ```rust
-#[wasm_bindgen_test]
-fn test_sidebar_loading_state() {
-    // Mock fetch would go here
-    let _ = create_root(|| {
-        let node = view! { Sidebar {} };
-        sycamore::render_in_scope(|| node, &test_container());
+#[test]
+fn test_cache_persists_discoveries() {
+    let config = DiscoveryConfig::default();
+    let engine = DiscoveryEngine::new(config).unwrap();
 
-        // Check loading state initially
-        let loading = query(".project-list p");
-        assert_text_content!(loading, "Loading projects...");
-    });
+    // Fresh discovery
+    let projects1 = engine.get_projects(true).unwrap();
+
+    // Create new engine, should load from cache
+    let engine2 = DiscoveryEngine::new(config).unwrap();
+    let projects2 = engine2.get_projects(false).unwrap();
+
+    assert_eq!(projects1.len(), projects2.len());
 }
 ```
 
-### 3. Testing Keyed Lists
-
+**Cache invalidation**:
 ```rust
-#[wasm_bindgen_test]
-fn test_keyed_list_updates() {
-    #[derive(Clone, PartialEq)]
-    struct Item { id: u32, name: String }
+#[test]
+fn test_cache_invalidation_on_state_change() {
+    let temp = create_temp_hegel_project("test");
+    let config = DiscoveryConfig::new(vec![temp.path()], 10, vec![], cache_path());
+    let engine = DiscoveryEngine::new(config).unwrap();
 
-    let _ = create_root(|| {
-        let items = create_signal(vec![
-            Item { id: 1, name: "First".into() },
-            Item { id: 2, name: "Second".into() },
-        ]);
+    // Initial discovery
+    let projects1 = engine.get_projects(true).unwrap();
 
-        let node = view! {
-            ul {
-                Keyed(
-                    list=items,
-                    key=|item| item.id,
-                    view=|item| {
-                        let name = item.name.clone();
-                        view! { li(id=format!("item-{}", item.id)) { (name) } }
-                    }
-                )
-            }
-        };
+    // Modify state.json (change mtime)
+    std::thread::sleep(Duration::from_millis(10));
+    modify_state_file(&temp);
 
-        sycamore::render_in_scope(|| node, &test_container());
-
-        // Verify initial render
-        let item1 = query("#item-1");
-        assert_text_content!(item1, "First");
-
-        // Add item
-        items.update(|list| list.push(Item { id: 3, name: "Third".into() }));
-
-        // Verify new item rendered
-        let item3 = query("#item-3");
-        assert_text_content!(item3, "Third");
-    });
+    // Should detect change and refresh
+    let projects2 = engine.get_projects(false).unwrap();
+    assert_ne!(projects1[0].last_modified, projects2[0].last_modified);
 }
 ```
 
 ---
 
-## Common Testing Gotchas
+## Testing CLI Commands
 
-### 1. Signal Ownership in Tests
-
-```rust
-// ❌ Wrong: Signal moved into closure
-let count = create_signal(0);
-create_effect(move || {
-    count.set(count.get() + 1); // count moved here
-});
-count.get(); // ERROR: count moved
-
-// ✅ Correct: Signal is Copy
-let count = create_signal(0);
-create_effect(move || {
-    count.set(count.get() + 1); // copies count
-});
-assert_eq!(count.get(), 1); // OK: still have count
-```
-
-### 2. Test Isolation with `create_root`
-
-Always wrap tests in `create_root()` for proper cleanup:
+### Argument Parsing
 
 ```rust
 #[test]
-fn test_something() {
-    // ✅ Good: Wrapped in root
-    create_root(|| {
-        let signal = create_signal(0);
-        // test logic
-    }); // Cleans up signal
+fn test_cli_discover_list_args() {
+    let args = Cli::parse_from(["hegel-pm", "discover", "list"]);
+    assert!(matches!(args.command, Command::Discover(DiscoverCmd::List)));
 }
 
-// ❌ Bad: No root - memory leak
 #[test]
-fn test_something() {
-    let signal = create_signal(0); // Never cleaned up!
+fn test_cli_json_flag() {
+    let args = Cli::parse_from(["hegel-pm", "--json", "discover", "list"]);
+    assert!(args.json);
 }
 ```
 
-### 3. Browser Test Timeouts
+### Output Formatting
 
-If tests timeout in browser:
-- Check for infinite loops in effects
-- Ensure async operations complete
-- Verify DOM queries succeed (element exists)
+```rust
+#[test]
+fn test_format_project_list() {
+    let projects = vec![
+        Project { name: "proj1".into(), workflow: Some("discovery".into()), ... },
+        Project { name: "proj2".into(), workflow: None, ... },
+    ];
+
+    let output = format_project_list(&projects);
+    assert!(output.contains("proj1"));
+    assert!(output.contains("discovery"));
+    assert!(output.contains("proj2"));
+}
+
+#[test]
+fn test_json_output() {
+    let projects = vec![Project { ... }];
+    let json = serde_json::to_string(&projects).unwrap();
+
+    // Verify valid JSON
+    let parsed: Vec<Project> = serde_json::from_str(&json).unwrap();
+    assert_eq!(parsed.len(), projects.len());
+}
+```
+
+---
+
+## Testing Error Handling
+
+### Graceful Degradation
+
+```rust
+#[test]
+fn test_corrupted_hegel_dir_doesnt_crash() {
+    let temp = create_temp_workspace();
+    let hegel_dir = temp.path().join("broken-project/.hegel");
+    fs::create_dir_all(&hegel_dir).unwrap();
+
+    // Create invalid state.json
+    fs::write(hegel_dir.join("state.json"), "invalid json").unwrap();
+
+    let config = DiscoveryConfig::new(vec![temp.path()], 10, vec![], cache_path());
+    let engine = DiscoveryEngine::new(config).unwrap();
+
+    // Should continue discovering other projects
+    let result = engine.get_projects(true);
+    assert!(result.is_ok());
+}
+```
+
+### Error Context
+
+```rust
+#[test]
+fn test_error_includes_file_path() {
+    let result = DiscoveryEngine::load_state("/nonexistent/.hegel/state.json");
+
+    assert!(result.is_err());
+    let err = result.unwrap_err();
+    assert!(err.to_string().contains("/nonexistent/.hegel/state.json"));
+}
+```
+
+---
+
+## Common Testing Patterns
+
+### 1. Temporary Directories
+
+Use `tempfile` crate for isolated test environments:
+
+```rust
+use tempfile::TempDir;
+
+#[test]
+fn test_with_temp_dir() {
+    let temp = TempDir::new().unwrap();
+
+    // Create test files in temp.path()
+
+    // temp is automatically cleaned up when dropped
+}
+```
+
+### 2. Fixture Data
+
+Create reusable test fixtures:
+
+```rust
+fn create_test_project(dir: &Path, name: &str, workflow: &str) -> PathBuf {
+    let project_dir = dir.join(name);
+    let hegel_dir = project_dir.join(".hegel");
+    fs::create_dir_all(&hegel_dir).unwrap();
+
+    let state = json!({
+        "workflow": workflow,
+        "node": "spec",
+        "history": []
+    });
+    fs::write(hegel_dir.join("state.json"), state.to_string()).unwrap();
+
+    project_dir
+}
+```
+
+### 3. Mock hegel-cli Data
+
+Test metrics extraction without full hegel-cli setup:
+
+```rust
+fn create_mock_metrics(hegel_dir: &Path) -> std::io::Result<()> {
+    let hooks = vec![
+        json!({"event": "tool_use", "timestamp": "2025-01-01T00:00:00Z"}),
+        json!({"event": "file_write", "timestamp": "2025-01-01T00:01:00Z"}),
+    ];
+
+    let mut file = fs::File::create(hegel_dir.join("hooks.jsonl"))?;
+    for hook in hooks {
+        writeln!(file, "{}", hook.to_string())?;
+    }
+    Ok(())
+}
+```
+
+---
+
+## Performance Testing
+
+### Benchmark-style Tests
+
+```rust
+#[test]
+fn test_discovery_performance() {
+    let temp = create_large_workspace(100); // 100 projects
+
+    let config = DiscoveryConfig::new(vec![temp.path()], 10, vec![], cache_path());
+    let engine = DiscoveryEngine::new(config).unwrap();
+
+    let start = Instant::now();
+    let projects = engine.get_projects(true).unwrap();
+    let duration = start.elapsed();
+
+    assert_eq!(projects.len(), 100);
+    assert!(duration < Duration::from_secs(5), "Discovery took {:?}", duration);
+}
+```
+
+### Cache Performance
+
+```rust
+#[test]
+fn test_cached_discovery_is_fast() {
+    let config = DiscoveryConfig::default();
+    let engine = DiscoveryEngine::new(config).unwrap();
+
+    // Prime cache
+    engine.get_projects(true).unwrap();
+
+    // Measure cached access
+    let start = Instant::now();
+    let projects = engine.get_projects(false).unwrap();
+    let duration = start.elapsed();
+
+    assert!(duration < Duration::from_millis(100), "Cached discovery took {:?}", duration);
+}
+```
 
 ---
 
@@ -440,71 +458,116 @@ name: Tests
 on: [push, pull_request]
 
 jobs:
-  test-native:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
-      - run: cargo test
-
-  test-wasm:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
-          target: wasm32-unknown-unknown
-      - run: cargo install wasm-pack
-      - run: wasm-pack test --headless --firefox
+          toolchain: stable
+      - run: ./scripts/test.sh
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+      - run: cargo install cargo-llvm-cov
+      - run: cargo llvm-cov test --lcov --output-path lcov.info
+      - uses: codecov/codecov-action@v3
+        with:
+          files: lcov.info
 ```
 
 ---
 
-## Testing Strategy
+## Pre-commit Hook
 
-### Phase 1: Core Reactive Logic ✅
-- Unit test signals, memos, effects
-- Validate reactive patterns work correctly
-- No browser required, fast feedback
+Coverage is enforced automatically:
 
-### Phase 2: Component Behavior (Future)
-- Test user interactions
-- Verify conditional rendering
-- Validate list operations
+```bash
+# Installed by .git/hooks/pre-commit
+# Runs on every commit:
+1. rustfmt on staged .rs files
+2. Coverage report generation
+3. Fails commit if coverage < 80%
+```
 
-### Phase 3: Integration (Future)
-- Mock API endpoints
-- Test async data loading
-- Verify error handling
+**Manual coverage check**:
+```bash
+./scripts/generate-coverage-report.sh
+cat COVERAGE_REPORT.md  # View results
+```
+
+---
+
+## Debugging Tests
+
+### Print Output
+
+```rust
+#[test]
+fn test_with_debug_output() {
+    let projects = engine.get_projects(true).unwrap();
+
+    // Print during test
+    println!("Found {} projects", projects.len());
+    for p in &projects {
+        println!("  - {}: {:?}", p.name, p.workflow);
+    }
+
+    assert!(!projects.is_empty());
+}
+
+// Run with: cargo test -- --nocapture
+```
+
+### Conditional Logging
+
+```rust
+#[test]
+fn test_with_logging() {
+    if std::env::var("RUST_LOG").is_ok() {
+        env_logger::init();
+    }
+
+    // Use log macros
+    log::debug!("Starting discovery...");
+
+    let projects = engine.get_projects(true).unwrap();
+    log::info!("Found {} projects", projects.len());
+}
+
+// Run with: RUST_LOG=debug cargo test
+```
+
+---
+
+## Test Organization Checklist
+
+- [ ] Each module has `#[cfg(test)]` mod tests
+- [ ] Test names clearly describe what they test
+- [ ] Tests are independent (no shared state)
+- [ ] Temporary files cleaned up (use TempDir)
+- [ ] Error cases tested, not just happy path
+- [ ] Edge cases covered (empty lists, max depth, etc.)
+- [ ] Coverage ≥80% (enforced by pre-commit)
 
 ---
 
 ## Resources
 
 **Internal**:
-- `learnings/LEARNING_SYCAMORE_PRACTICES.md` - Testing patterns and examples
-- `learnings/LEARNING_SYCAMORE_FOUNDATIONS.md` - Reactive primitives to test
-- `tests/client_tests.rs` - Example WASM tests
+- `src/test_helpers.rs` - Shared test utilities
+- `COVERAGE_REPORT.md` - Auto-generated coverage report
+- `scripts/test.sh` - Build + test script
+- `scripts/generate-coverage-report.sh` - Coverage generation
 
 **External**:
-- [wasm-bindgen-test docs](https://rustwasm.github.io/wasm-bindgen/wasm-bindgen-test/)
-- [Sycamore testing examples](https://github.com/sycamore-rs/sycamore/tree/main/packages/sycamore/tests)
+- [Rust testing book](https://doc.rust-lang.org/book/ch11-00-testing.html)
+- [cargo-llvm-cov](https://github.com/taiki-e/cargo-llvm-cov)
 
 ---
 
-## Status
-
-**Native tests**: ✅ Working, 34% coverage
-**WASM test infrastructure**: ✅ Set up, example tests pass
-**Component tests**: ⏳ Deferred (browser driver issues, patterns validated)
-
-**Next steps** (optional):
-1. Add more reactive primitive tests
-2. Mock API for component testing
-3. Improve browser driver reliability
-4. Add visual regression testing for UI
-
----
-
-**Last updated**: 2025-11-03
-**Test framework versions**: wasm-bindgen-test 0.3, wasm-pack 0.13.1
+**Last updated**: 2025-11-13
+**Test coverage**: See `COVERAGE_REPORT.md` (≥80% target)

@@ -181,8 +181,8 @@ hegel-pm depends on hegel-cli as a library for all .hegel data access:
 
 **hegel-pm-web**: Web dashboard that visualizes projects discovered by hegel-pm
 - Uses `DiscoveryEngine` API for project discovery
-- Serves HTTP API endpoints with project data
-- See hegel-pm-web repository for web UI details
+- Provides web UI with HTTP API for project data
+- See hegel-pm-web repository for details
 
 **Future tools**: Any tool needing Hegel project discovery can depend on hegel-pm library
 

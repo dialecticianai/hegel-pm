@@ -2,7 +2,7 @@
 Automatic discovery of Hegel projects by scanning filesystem for `.hegel/` state directories.
 
 ## Purpose
-Provides zero-configuration project discovery for hegel-pm dashboard. Recursively scans configured root directories, parses workflow state using hegel-cli's storage module, and caches results for fast subsequent loads. Designed as read-only observer with graceful degradation for corrupted state.
+Provides zero-configuration project discovery for consumers (e.g., hegel-pm-web, CLI commands, other tools). Recursively scans configured root directories, parses workflow state using hegel-cli's storage module, and caches results for fast subsequent loads. Designed as read-only observer with graceful degradation for corrupted state.
 
 ## Key API
 ```rust
