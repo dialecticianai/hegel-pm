@@ -1,84 +1,44 @@
 # hegel-pm
 
-Project manager for Hegel projects with web UI. Auto-discovers projects, visualizes workflow states, provides unified dashboard.
+Project discovery library and CLI for finding and tracking Hegel projects. Auto-discovers projects by walking the filesystem, extracts workflow state via hegel-cli, provides library API and CLI commands.
 
 ## Status
 
-**Current**: Multi-view UI with all-projects dashboard and per-project workflow detail (collapsible workflows/phases)
-**Next**: Enhanced UI features (graphs/trends, search/filtering)
+**Current**: Filesystem discovery with persistent caching, CLI commands for listing/querying projects
+**Next**: Parallel discovery optimization, incremental update mechanisms
 
 ## Architecture
 
 ### Core Components
 
 **Discovery Engine** (`src/discovery/`)
-- Filesystem-based project discovery
+- Filesystem-based project discovery (walks configured roots to find `.hegel/` directories)
 - Workflow state and metrics extraction via hegel-cli library
-- Cache persistence for fast subsequent loads
+- Persistent binary cache for fast subsequent loads (<100ms vs ~2s first run)
+- Configurable roots, max depth, and exclusions
 - See `src/discovery/README.md` for detailed documentation
 
-**Data Layer** (`src/data_layer/`)
-- Message-passing worker pool for async I/O operations
-- Lock-free response caching with DashMap (pre-serialized JSON)
-- Parallel cache misses via tokio::spawn
-- Zero blocking I/O in HTTP handlers
-- See `src/data_layer/README.md` for architecture details
-
-**HTTP Backends** (`src/http/`)
-- Pluggable backend architecture (warp or axum)
-- Compile-time selection via feature flags
-- Both backends delegate to data layer worker pool
-- See `src/http/README.md` for backend implementations
-
-**Web Server** (`src/main.rs` with `server` feature)
-- HTTP server on `localhost:3030` with swappable backend
-- Default: warp-backend (can switch to axum-backend via features)
-- Serves Sycamore WASM UI bundle (built by trunk to `static/`)
-- JSON API endpoints:
-  - `/api/projects` - Lightweight project list (name + workflow_state only)
-  - `/api/projects/{name}/metrics` - ProjectInfo with summary + workflow detail breakdowns
-  - `/api/all-projects` - Aggregate metrics across all discovered projects
-- Archive-aware metrics: includes archived workflows + live data
-
-**Web UI** (Sycamore + WASM in `src/client/`)
-- Multi-view reactive dashboard with type-safe routing (View enum)
-- All-projects aggregate view with cross-project metrics
-- Per-project workflow detail with collapsible workflows/phases
-- Built with Trunk bundler (outputs to `static/`)
-
-**Alternative Frontends** (`frontends/`)
-- Swappable frontend architecture supporting multiple implementations
-- Alpine.js proof-of-concept (pure JavaScript, no build step)
-- Backend-agnostic (all frontends consume same API)
-- Select via FRONTEND env var (e.g., `FRONTEND=alpine ./scripts/test.sh`)
-- See `frontends/README.md` and `frontends/ADDING_FRONTENDS.md` for details
-
-**Benchmark Module** (`src/benchmark_mode.rs`)
-- HTTP endpoint performance measurement tool
-- Measures full round-trip latency via loopback requests
-- Per-project granularity for `/api/projects/:name/metrics` endpoint
-- Backend comparison support (warp vs axum)
-- Configurable iterations with human-readable or JSON output
+**CLI Commands** (`src/cli/`)
+- Subcommand structure: `discover` (list, show, all), `hegel` (xargs-style)
+- Thin wrappers around library API
+- Human-readable and JSON output formats
+- See `src/cli/README.md` for command documentation
 
 **Dependencies**
-- `hegel-cli` (path dependency) - All .hegel data access via library API
-- `warp` (optional, default) - Async web server backend
-- `axum` (optional) - Alternative async web server backend
-- `sycamore` - Reactive web UI framework (WASM-compiled)
-- `tokio` - Async runtime for worker pool and message passing
-- `dashmap` - Lock-free concurrent HashMap for response caching
-- `reqwest` - HTTP client for benchmark requests
+- `hegel` (hegel-cli library) - All .hegel data access (state parsing, metrics extraction, JSONL handling)
+- `walkdir` - Cross-platform recursive directory traversal
+- `serde` + `serde_json` - Cache serialization
+- `clap` - CLI argument parsing
+- `anyhow` - Error handling
+- `chrono` - Timestamp parsing
 
 ## Usage
 
 ### CLI
 
 ```bash
-# Start web server and open browser (default)
-hegel-pm
-
-# Discovery commands (new subcommand structure)
-hegel-pm discover list              # List all projects
+# Discovery commands
+hegel-pm discover list              # List all projects (name + workflow state)
 hegel-pm discover show <name>       # Show single project details
 hegel-pm discover all               # Full table with metrics
 
@@ -87,12 +47,6 @@ hegel-pm hegel status               # Run 'hegel status' on each project
 hegel-pm hegel analyze              # Run 'hegel analyze' on each project
 hegel-pm hegel analyze --fix-archives --dry-run  # Dry-run archive fix
 
-# Benchmark HTTP endpoints (compare backend performance)
-hegel-pm benchmark                  # Run with defaults (100 iterations)
-hegel-pm benchmark --iterations 50  # Custom iteration count
-hegel-pm benchmark --json           # JSON output for analysis
-hegel-pm benchmark --iterations 200 --json  # Both options
-
 # Legacy flags (deprecated, use 'discover list' instead)
 hegel-pm --discover
 hegel-pm --discover --refresh
@@ -100,34 +54,11 @@ hegel-pm --discover --refresh
 
 **Build from source:**
 ```bash
-# Default build (warp backend)
-cargo build --release --bin hegel-pm --features server
+cargo build --release --bin hegel-pm
 ./target/release/hegel-pm
-
-# With axum backend
-cargo build --release --bin hegel-pm --no-default-features --features server,axum-backend
 ```
 
-**WASM UI development:**
-```bash
-trunk serve  # Hot reload at localhost:8080
-trunk build --release  # Production build to static/
-```
-
-**Build artifacts:**
-```bash
-# Source template with CSS styles
-./index.html  # Tracked in git
-
-# Generated build artifacts (ignored by git)
-static/index.html   # Generated by trunk build
-static/*.js         # WASM bindings
-static/*.wasm       # WASM blobs
-```
-
-Developers must run `trunk build` after pulling to generate `static/` artifacts.
-
-### Discovery API (Library Usage)
+### Library API
 
 ```rust
 use hegel_pm::discovery::{DiscoveryConfig, DiscoveryEngine};
@@ -151,7 +82,7 @@ Default configuration:
 - **Root directories**: `~/Code`
 - **Max depth**: 10 levels
 - **Exclusions**: `node_modules`, `target`, `.git`, `vendor`
-- **Cache location**: `~/.config/hegel-pm/cache.json`
+- **Cache location**: `~/.config/hegel-pm/cache.bin` (binary format)
 
 Custom configuration:
 ```rust
@@ -159,7 +90,7 @@ let config = DiscoveryConfig::new(
     vec![PathBuf::from("/custom/path")],
     5,  // max depth
     vec!["build".to_string()],  // additional exclusions
-    PathBuf::from("/tmp/cache.json"),
+    PathBuf::from("/tmp/cache.bin"),
 );
 ```
 
@@ -167,50 +98,21 @@ let config = DiscoveryConfig::new(
 
 ### Scripts
 
-**Build & Test (Preferred):**
+**Build & Test:**
 ```bash
-# Default (Sycamore frontend)
-./scripts/test.sh                      # Build + test everything
-./scripts/test.sh --exclude frontend   # Backend only (skip frontend build)
-./scripts/test.sh --exclude backend    # Frontend only (skip cargo)
-
-# Alternative frontends
-FRONTEND=alpine ./scripts/test.sh      # Build with Alpine.js frontend
-FRONTEND=sycamore ./scripts/test.sh    # Explicit default (Sycamore)
+./scripts/test.sh    # Build + test
 ```
 
 Use this for:
 - Quick iteration during development
-- Verifying changes without starting the server
-- Testing alternative frontends
+- Verifying changes work correctly
 - CI/CD pipelines
-
-**Server Management:**
-```bash
-# Backend only (fast, no frontend rebuild)
-./scripts/restart-server.sh
-
-# Backend + frontend (full rebuild)
-./scripts/restart-server.sh --frontend              # Default: Sycamore
-FRONTEND=alpine ./scripts/restart-server.sh --frontend  # Alpine.js frontend
-```
-
-This script:
-1. Stops any running hegel-pm server
-2. Rebuilds backend/frontend (optional)
-3. Starts fresh server with full logging (cache status, request timing)
-
-Use this when:
-- You need to see server logs with timing information
-- Server is behaving unexpectedly or UI has stale content
-- After changes that require viewing in browser
-- Switching between frontends for testing
 
 **Manual Commands:**
 ```bash
 cargo test                  # Run all tests
 cargo test discovery        # Run discovery module tests only
-cargo test --features server  # Run with server feature enabled
+cargo build --release       # Build CLI binary
 ```
 
 Coverage: 31.64% (target: ≥80%, enforced by pre-commit hook)
@@ -224,10 +126,10 @@ hegel-pm/
 │   │   └── README.md      # Module structure documentation
 │   ├── cli/           # CLI commands
 │   │   └── README.md      # CLI commands documentation
-│   ├── lib.rs
-│   ├── main.rs
-│   ├── cli.rs
-│   ├── debug.rs
+│   ├── lib.rs         # Library root (exports discovery module)
+│   ├── main.rs        # CLI entry point
+│   ├── cli.rs         # CLI argument definitions
+│   ├── debug.rs       # Debug utilities
 │   ├── test_helpers.rs
 │   └── README.md      # Source structure overview
 ├── scripts/           # Build and development scripts
@@ -237,14 +139,13 @@ hegel-pm/
 
 ## Future Work
 
-1. **Enhanced UI Features**:
-   - Token usage graphs and trends over time
-   - Project health indicators and alerts
-   - Search, filtering, and sorting across workflows
-   - Phase-level detail expansion (show individual events/commands)
-2. **CLI Commands** - `hegel-pm scan`, `hegel-pm serve`, `hegel-pm status`
-3. **Live Updates** - File watching for real-time state synchronization (optional)
-4. **Team Features** - Multi-user support for commercial version (data model ready)
+1. **Performance Optimization**:
+   - Parallel filesystem walking for large workspaces
+   - Incremental cache updates (only re-scan changed projects)
+2. **Discovery Features**:
+   - File watching integration for real-time discovery
+   - Filtered discovery (by workflow state, last activity, etc.)
+   - Project dependency graphing
 
 ## Error Handling
 
@@ -253,21 +154,16 @@ All errors include context with file paths for debugging:
 - **Permission denied**: Logged, scan continues with accessible directories
 - **Invalid state data**: Project included with error flag, marked for user attention
 - **Missing cache**: Triggers fresh scan automatically
+- **Corrupted cache**: Falls back to fresh scan
 - **Invalid configuration**: Caught at engine creation with specific validation errors
 
 ## Performance
 
 - **Initial scan**: <2 seconds for typical workspace (10-20 projects)
-- **Worker pool**: Parallel I/O with configurable worker count (default: num_cpus * 2)
-- **Response caching**: Lock-free reads via DashMap, pre-serialized JSON
-- **Cache hits**: <1ms (zero deserialization, direct byte serving)
-- **Cache misses**: Parallel loading via tokio::spawn
-- **Metrics API response**: Fast (leverages pre-computed archive totals)
-  - Project list: Minimal payload (name + workflow_state only, ~60-80% reduction)
-  - Metrics: Pre-computed aggregates (total_all_tokens computed on backend)
-- **Archive-aware**: Includes full project history (archived + live workflows)
+- **Cached discovery**: <100ms (binary deserialization + validation)
+- **Per-project invalidation**: Only re-scans projects with stale cache entries (checks `.hegel/state.json` mtime)
+- **Graceful failure**: One corrupted project doesn't block discovery of others
 - **Memory**: Bounded (lazy loading via hegel-cli library)
-- **HTTP backends**: Both warp and axum delegate to same optimized data layer
 
 ## Integration with hegel-cli
 
@@ -280,6 +176,15 @@ hegel-pm depends on hegel-cli as a library for all .hegel data access:
   - Includes git metrics backfilled via `hegel analyze --fix-archives`
 
 **Abstraction boundary**: hegel-pm never directly reads .hegel files. All data access goes through hegel-cli's library API. The underlying storage format (JSON, JSONL, archives, SQLite, etc.) is completely opaque to hegel-pm.
+
+## Consumers
+
+**hegel-pm-web**: Web dashboard that visualizes projects discovered by hegel-pm
+- Uses `DiscoveryEngine` API for project discovery
+- Serves HTTP API endpoints with project data
+- See hegel-pm-web repository for web UI details
+
+**Future tools**: Any tool needing Hegel project discovery can depend on hegel-pm library
 
 ## License
 
