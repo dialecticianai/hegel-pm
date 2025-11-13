@@ -1,12 +1,11 @@
 # CLAUDE.md
 
-**hegel-pm**: Project manager for Hegel projects with web UI. Tracks multiple projects, visualizes workflow state, provides unified dashboard.
+**hegel-pm**: Project discovery library and CLI for finding and tracking Hegel projects. Provides project discovery, state extraction, and metrics aggregation.
 
 **Key Context**:
 - Language: Rust (edition 2021)
-- Framework: Sycamore (reactive web framework)
-- Test runner: `./scripts/test.sh` (or `cargo test --features server`)
-- Ecosystem role: Manages multiple Hegel projects (cli, mirror, etc.)
+- Test runner: `./scripts/test.sh` (or `cargo test`)
+- Ecosystem role: Discovery engine for finding and tracking Hegel projects
 
 ---
 
@@ -14,60 +13,36 @@
 
 **Available scripts in `scripts/` directory:**
 
-## Build & Test (Preferred)
+## Build & Test
 
 ```bash
-./scripts/test.sh                      # Build + test everything (default)
-./scripts/test.sh --exclude frontend   # Backend only (skip WASM)
-./scripts/test.sh --exclude backend    # Frontend only (skip cargo)
+./scripts/test.sh    # Build + test
 ```
 
 **What it does:**
-1. Builds frontend with `trunk build --release` (unless excluded)
-2. Builds backend with `cargo build --release --features server` (unless excluded)
-3. Runs `cargo test --features server` (if backend not excluded)
+1. Builds with `cargo build --release`
+2. Runs `cargo test`
 
 **When to use:**
-- **Default workflow**: Quick iteration during development
-- Verifying changes without starting the server
+- Quick iteration during development
+- Verifying changes work correctly
 - CI/CD pipelines
-- When you just need to know if tests pass
-
-## Server Management
-
-```bash
-./scripts/restart-server.sh              # Backend only (fast)
-./scripts/restart-server.sh --frontend   # Backend + frontend (full rebuild)
-```
-
-**What it does:**
-1. Stops any running hegel-pm server process
-2. Rebuilds backend with `cargo build --release --features server`
-3. Optionally rebuilds frontend with `trunk build --release` (if `--frontend` flag)
-4. Starts server with `cargo run --bin hegel-pm --features server --release`
-5. Shows server logs including cache status and request timing
-
-**When to use:**
-- **When you need to view changes**: After edits requiring browser verification
-- To see fresh server logs with timing information
-- When server is behaving unexpectedly or UI has stale WASM
-- For debugging with live log output
 
 ---
 
 # Hegel Ecosystem Integration
 
-**hegel-pm reads Hegel state directories** (`.hegel/`) from managed projects:
+**hegel-pm discovers and tracks Hegel projects** by reading `.hegel/` state directories:
 - **State format**: JSONL (newline-delimited JSON objects)
 - **Key files**: `state.json`, `hooks.jsonl`, `states.jsonl`, `command_log.jsonl`
 - **Workflow correlation**: `workflow_id` (ISO 8601 timestamp) links events across files
-- **Discovery**: Walk parent directories like git to find `.hegel/` state
+- **Discovery mechanism**: Walks filesystem to find `.hegel/` directories, extracts workflow state and metrics
 
-**Web UI provides**:
-- Multi-project dashboard (all tracked Hegel projects)
-- Workflow state visualization (current phase, history, transitions)
-- Metrics aggregation (per-project and cross-project views)
-- Real-time updates via file watching
+**Provides**:
+- Project discovery and listing
+- Workflow state extraction
+- Metrics aggregation from archives and live data
+- Library API for consumers (e.g., hegel-pm-web)
 
 ---
 
@@ -81,11 +56,11 @@
 - ✅ State parsing and serialization (JSONL format correctness)
 - ✅ Multi-project discovery and tracking logic
 - ✅ Workflow state interpretation
-- ✅ Web UI component behavior (Sycamore reactive state)
-- ✅ File watching and live updates
+- ✅ Filesystem walking and .hegel detection
+- ✅ Metrics extraction and aggregation
 
 **What NOT to test**:
-- ❌ Third-party library behavior (Sycamore internals, serde)
+- ❌ Third-party library behavior (serde, hegel-cli internals)
 - ❌ File system primitives (trust std::fs)
 
 **Test organization**: Co-located `#[cfg(test)]` modules in implementation files
@@ -112,7 +87,7 @@
 
 **Types**: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
 
-**Example scopes**: `ui`, `discovery`, `state`, `metrics`, `parser`
+**Example scopes**: `discovery`, `cli`, `state`, `metrics`, `cache`
 
 **Commit footer** (always include):
 ```
@@ -400,8 +375,6 @@ hegel meta
 # Workflows
 hegel start <discovery|execution|research|minimal>
 hegel next|restart|abort|repeat|status|reset
-
-# Commands (none for hegel-pm yet)
 
 # Code
 hegel astq [options] [path]     # See: hegel astq --help

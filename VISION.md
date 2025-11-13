@@ -1,115 +1,109 @@
 # hegel-pm Vision
 
-Unified visual dashboard for tracking multiple Hegel projects across workflows and phases.
+Discovery library and CLI for finding and tracking Hegel projects across the filesystem.
 
 ---
 
 ## Problem Statement
 
-Developers using Hegel for structured development across multiple projects face a visibility gap. Each project's `.hegel/` directory contains rich workflow state (current phase, transition history, metrics, command logs), but there's no unified view.
+Developers using Hegel methodology across multiple projects need a reliable way to discover, track, and query project state without manual configuration. Each project's `.hegel/` directory contains rich workflow state, but finding all projects and aggregating their data requires custom tooling.
 
 The current reality:
-- **Context switching overhead**: `cd` into each project, run `hegel status` or `hegel top`, mentally track which projects are active
-- **No cross-project visibility**: Can't see at a glance which projects are in SPEC phase, which are in CODE, which workflows are stalled
-- **State buried in CLI**: Rich JSONL event logs exist but require manual inspection with `cat` and `jq`
+- **Manual tracking**: Developers must remember which directories contain Hegel projects
+- **No cross-project queries**: Can't easily answer "show me all projects in CODE phase" or "which project has the most recent activity"
+- **Repetitive CLI invocations**: Running `hegel status` in multiple directories to get overall picture
+- **State aggregation complexity**: Combining metrics across projects requires custom scripts
 
-For developers juggling 5-10+ concurrent Hegel projects, this creates cognitive load and slows decision-making about where to focus next. The cost: workflow states drift from awareness, projects lose momentum invisibly.
+For tools like hegel-pm-web (web dashboard) and future ecosystem tools, there's no standardized way to discover and query Hegel project state. The cost: every tool reimplements discovery logic.
 
 ---
 
 ## Target Users
 
-**Primary**: Solo developers using Hegel methodology across multiple projects simultaneously (3-10+ active codebases). Developers who value visual clarity and want to see workflow health at a glance.
+**Primary**: Tool developers building on top of Hegel ecosystem (e.g., hegel-pm-web dashboard, CI integrations, analysis tools). These tools need reliable project discovery and state extraction.
 
-**Future (commercial)**: Development teams coordinating on shared Hegel workflows, needing team-wide visibility into project states.
+**Secondary**: CLI users who want cross-project queries ("list all active projects", "show metrics for projects in ~/Code")
 
 **Not for**:
-- Developers with only 1-2 Hegel projects (CLI tools suffice)
-- Users wanting traditional project management (task assignment, time tracking, gantt charts)
-- Teams needing real-time collaboration features in V1
+- Individual project workflow management (that's hegel-cli's job)
+- Real-time state synchronization (discovery is snapshot-based)
+- Projects without `.hegel/` directories
 
 ---
 
 ## Solution Approach
 
-**Core insight**: The state already exists (`.hegel/` directories), it just needs to be discovered, aggregated, and visualized. Don't create new state, surface existing state.
+**Core insight**: Treat project discovery like git repository discovery - walk the filesystem, recognize `.hegel/` markers, extract and cache state.
 
 **Key capabilities**:
-- **Auto-discovery**: Walk `~/Code` (configurable) to find all `.hegel/` directories without manual configuration
-- **Multi-project dashboard**: Single-page view of all active Hegel projects with workflow states, current phases, recent activity
-- **Visual workflow rendering**: See where each project is in its workflow cycle (SPEC → PLAN → CODE → etc.)
-- **History and metrics**: Per-project transition logs, event counts, file modification patterns from JSONL logs
-- **Live updates**: File watching on `.hegel/` directories for real-time state synchronization
+- **Auto-discovery**: Recursive filesystem walking to find all `.hegel/` directories in configured roots (default: `~/Code`)
+- **State extraction**: Parse `.hegel/state.json`, workflow archives, metrics files via hegel-cli library
+- **Smart caching**: Persist discovered projects with timestamps, only re-scan when needed
+- **Library API**: Clean Rust API for consumers (DiscoveryEngine, ProjectInfo, etc.)
+- **CLI interface**: Commands for listing, showing, and querying discovered projects
 
 **What we're NOT doing**:
-- ❌ Not a code editor or IDE integration
-- ❌ Not a replacement for Hegel CLI (CLI remains primary interface for workflow control)
-- ❌ Not a traditional PM tool (no task lists, sprints, burndown charts)
-- ❌ Not a SaaS/cloud service (local-first, reads local filesystem)
-
-**Architecture approach**: Build with team features in mind but don't implement them yet. Data models and UI components should gracefully extend to multi-user when commercial version arrives (no fundamental rewrites).
+- ❌ Not a visualization tool (that's hegel-pm-web)
+- ❌ Not modifying workflow state (read-only, hegel-cli manages state)
+- ❌ Not a database (cache is lightweight, filesystem is source of truth)
+- ❌ Not monitoring for real-time changes (consumers can poll or implement file watching)
 
 ---
 
 ## Success Criteria
 
 ### Qualitative
-- [ ] User can open dashboard and immediately identify which projects need attention
-- [ ] Switching between project contexts becomes visual (click) instead of mental (remember)
-- [ ] Workflow state visibility reduces "what was I working on?" friction
-- [ ] Dashboard becomes the default "morning view" for Hegel users
+- [ ] Tool developers can integrate project discovery with <10 lines of code
+- [ ] Discovery is fast enough to run on every dashboard load
+- [ ] Cache invalidation strategy is obvious and predictable
+- [ ] CLI provides useful cross-project queries
 
 ### Quantitative
-- [ ] Auto-discovers 10+ projects from `~/Code` in <2 seconds
-- [ ] Displays workflow state for all projects in single viewport
-- [ ] Updates within 500ms of `.hegel/` state file changes
-- [ ] Runs as local web server with <50MB memory footprint
-- [ ] Zero manual configuration required (auto-discovery just works)
+- [ ] Discovers 10+ projects from `~/Code` in <2 seconds (first run)
+- [ ] Cached discovery completes in <100ms
+- [ ] Handles 100+ projects without performance degradation
+- [ ] Zero manual configuration required for default use case
+- [ ] Test coverage ≥80%
 
 ---
 
 ## Guiding Principles
 
-### 1. **Visibility over convenience**
-Show all state, even if it's verbose. Transparency beats polish. If `.hegel/state.json` has unexpected structure, surface it rather than hide errors gracefully.
+### 1. **Library-first, CLI-second**
+The primary interface is the Rust library API. CLI commands are thin wrappers that demonstrate library capabilities.
 
-### 2. **Local-first, always**
-Read from filesystem, no databases. State lives in `.hegel/` directories, dashboard just renders it. User owns their data.
+### 2. **Fast defaults, configurable when needed**
+Auto-discover from `~/Code` with sensible exclusions (`node_modules`, `target`). Allow configuration for advanced users.
 
-### 3. **CLI-first, GUI-second**
-Hegel CLI remains the source of truth for workflow control. The dashboard is read-mostly with minimal write operations (future: trigger `hegel next` from UI, but CLI always works).
+### 3. **Filesystem is source of truth**
+Never cache data that belongs in `.hegel/` directories. Cache discovery results (which projects exist, where they are) but always read fresh state from hegel-cli.
 
-### 4. **Structure IS the state**
-Don't invent new state formats. Parse existing JSONL logs (`hooks.jsonl`, `states.jsonl`, `command_log.jsonl`). Filesystem structure reveals project organization.
+### 4. **Fail gracefully**
+If one project's `.hegel/` is corrupted, continue discovering others. Surface errors but don't crash the entire discovery process.
 
-### 5. **Build for teams, ship for solo**
-Data models should assume multi-user (project ownership, session attribution) but UI only renders single-user views in V1. When commercial version arrives, extend don't rewrite.
-
-### 6. **No black boxes**
-If the dashboard shows a metric, clicking it reveals the underlying JSONL events. Users can inspect raw data at any depth.
+### 5. **Depend on hegel-cli for state parsing**
+Don't reimplement JSONL parsing or state interpretation. Use hegel-cli's library API. This ensures consistency across the ecosystem.
 
 ---
 
 ## Design Philosophy (from Hegel LEXICON)
 
-**Context is king**: The dashboard's value is making workflow state visible. More context = better decisions.
+**Infrastructure compounds**: Build reusable discovery patterns that future tools can leverage.
 
-**Artifacts disposable, clarity durable**: Code can be rewritten, but the insight "I have 3 stalled projects" is what matters.
+**No black boxes**: If discovery filters a directory, log why. If state extraction fails, report the error clearly.
 
-**Infrastructure compounds**: Build reusable JSONL parsers, state models, Sycamore components that future tools can leverage.
-
-**No black boxes**: All rules visible. If auto-discovery filters a directory, log why. If state parsing fails, show the error and raw JSON.
+**Artifacts disposable, clarity durable**: The value is knowing which projects exist and their current state, not the discovery cache itself.
 
 ---
 
 ## Non-Goals (This Stage)
 
-- Real-time collaboration (future: team version)
-- Workflow control from UI (future: trigger `hegel next`, `hegel restart` from dashboard)
-- Code preview or editing (not replacing editors)
-- GitHub/GitLab integration (Hegel is local-first)
-- Mobile app or responsive design (desktop-first for developers)
+- Real-time file watching (consumers can implement if needed)
+- State modification (read-only, hegel-cli manages state)
+- Remote/cloud project discovery (local filesystem only)
+- Git integration (orthogonal concern)
+- Project dependency graphing (future feature)
 
 ---
 
-**In summary**: hegel-pm makes the invisible visible. Developers already have rich workflow state scattered across projects. We surface it in one unified, auto-discovered, visually clear dashboard. Success means never asking "which project was I working on?" again.
+**In summary**: hegel-pm makes Hegel projects discoverable. It walks the filesystem, finds `.hegel/` directories, extracts workflow state via hegel-cli, and provides clean library and CLI interfaces for consumers. Success means any tool can reliably find and query Hegel projects without reimplementing discovery logic.

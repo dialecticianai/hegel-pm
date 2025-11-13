@@ -1,6 +1,6 @@
 # hegel-pm Architecture
 
-Tech stack and architectural decisions for multi-project Hegel dashboard
+Tech stack and architectural decisions for Hegel project discovery library and CLI
 
 ---
 
@@ -9,291 +9,205 @@ Tech stack and architectural decisions for multi-project Hegel dashboard
 **Language**: Rust (stable, edition 2021)
 **Rationale**: Memory safety, zero-cost abstractions, strong type system. Consistency with hegel-cli ecosystem.
 
-**Web Framework**: Sycamore (reactive web framework)
-**Rationale**: Rust-native reactive UI, WASM compilation, fine-grained reactivity model suitable for real-time dashboard updates.
-
 **Key Dependencies**:
-- **hegel-cli** (as library dependency) - Reuse existing storage, metrics, and state parsing modules
-- **serde** + **serde_json** - JSONL parsing (already in hegel-cli)
-- **notify** (v6.0) - File watching for live updates (already in hegel-cli)
-- **walkdir** (v2.5) - Recursive directory traversal for project discovery (already in hegel-cli)
-- **chrono** - Timestamp parsing from workflow_id (already in hegel-cli)
-- **anyhow** - Error handling (already in hegel-cli)
+- **hegel** (hegel-cli library) - State parsing, metrics extraction, JSONL handling
+- **serde** + **serde_json** - Serialization for cache persistence
+- **anyhow** - Error handling
+- **clap** - CLI argument parsing
+- **walkdir** - Recursive directory traversal
+- **chrono** - Timestamp handling
 
 **Decisions Made**:
-- **HTTP backend**: Swappable architecture (warp or axum via feature flags)
-- **Data layer**: Message-passing worker pool with lock-free caching (DashMap)
-- **Build system**: Trunk (WASM bundler, generates `static/` artifacts from `index.html`)
-- **Deployment**: WASM in browser served by local HTTP server on `localhost:3030`
-- **API design**: Lightweight JSON responses (summary counts, not full data arrays)
-
-**Still To Explore**:
-- Sycamore routing for multi-view dashboard
-- Live state updates
-- WASM bundle optimization (code splitting, lazy loading)
+- **Library-first design**: Primary interface is Rust library API, CLI is thin wrapper
+- **Caching strategy**: Persistent binary cache with atomic writes
+- **Discovery mechanism**: Filesystem walking with configurable roots and exclusions
+- **State extraction**: Delegate to hegel-cli for all `.hegel/` parsing
 
 ---
 
 ## Core Architectural Decisions
 
-### Decision 1: Web UI Sidecar to hegel-cli
+### Decision 1: Library-First Design
 
-**Choice**: hegel-pm is a companion tool that depends directly on hegel-cli as a library
+**Choice**: Primary interface is Rust library API (`DiscoveryEngine`), CLI commands are thin wrappers
 
 **Rationale**:
-- **Single source of truth**: All state parsing, metrics logic lives in hegel-cli
-- **No duplication**: Reuse proven `storage`, `metrics`, `theme` modules
-- **Bundled extension model**: PM is a web UI frontend for CLI's data layer
-- **Clear ownership**: CLI owns `.hegel/` format and parsing, PM just visualizes
+- **Reusability**: Consumers like hegel-pm-web can integrate discovery with <10 lines of code
+- **Testability**: Library API easier to test than CLI commands
+- **Flexibility**: Consumers can extend or customize discovery behavior
+- **Clear separation**: Library for programmatic use, CLI for human use
+
+**Implementation**:
+```rust
+pub struct DiscoveryEngine {
+    config: DiscoveryConfig,
+    cache: Cache,
+}
+
+impl DiscoveryEngine {
+    pub fn new(config: DiscoveryConfig) -> Result<Self>;
+    pub fn get_projects(&self, refresh: bool) -> Result<Vec<Project>>;
+}
+```
+
+**Tradeoffs**:
+- More upfront API design vs simple CLI-only tool
+- **Acceptable**: Library reuse justifies design effort
+
+### Decision 2: Depend on hegel-cli for State Parsing
+
+**Choice**: Use hegel-cli as library dependency for all `.hegel/` data access
+
+**Rationale**:
+- **Single source of truth**: hegel-cli owns `.hegel/` format and parsing logic
+- **No duplication**: Reuse proven storage, metrics, state modules
+- **Consistency**: All tools parse state identically
+- **Future-proof**: Format changes in hegel-cli automatically propagate
 
 **Implementation**:
 - Dependency: `hegel = { path = "../hegel-cli" }` in Cargo.toml
-- Import directly: `use hegel::storage::State`, `use hegel::metrics::HookEvent`
-- CLI remains standalone: No reverse dependency (CLI doesn't know PM exists)
-- Workspace integration: Both live in hegel-workspace as separate repos/submodules
+- Import: `use hegel::storage::State`, `use hegel::metrics::parse_unified_metrics`
+- Never parse JSONL directly - always via hegel-cli API
 
 **Tradeoffs**:
-- Some unused dependencies: PM pulls in CLI deps (clap, ratatui) but doesn't use them
-- Version coupling: PM tied to CLI version
-- **Acceptable**: Simplicity and code reuse outweigh minor dependency bloat
+- Pulls in hegel-cli dependencies (some unused by discovery)
+- Version coupling with hegel-cli
+- **Acceptable**: Consistency and code reuse outweigh minor dependency bloat
 
 **Alternatives rejected**:
-- **hegel-core extraction**: Premature abstraction, added complexity
-- **Copy code**: DRY violation, format divergence risk
-- **Duplicate parsing**: Maintenance burden, bug inconsistencies
+- **Reimplement parsing**: DRY violation, drift risk
+- **Shared core library**: Premature abstraction
 
-### Decision 2: Read-Only Dashboard (No State Mutation)
+### Decision 3: Filesystem Walking for Discovery
 
-**Choice**: Dashboard reads `.hegel/` state files but does not write them
-
-**Rationale**:
-- **Single source of truth**: Hegel CLI remains authoritative for workflow control
-- **Simplicity**: No concurrent write coordination needed
-- **Transparency**: State changes always traceable to CLI commands
-- **Future extensibility**: Can add write operations later (trigger `hegel next` from UI)
-
-**Tradeoffs**:
-- Limited interactivity in V1
-- Users must switch to terminal for workflow control
-- Future feature: UI buttons for `hegel next`, `hegel restart` require write logic
-
-### Decision 3: Auto-Discovery via Filesystem Walking
-
-**Choice**: Recursively walk configured root directory (`~/Code` default) to find `.hegel/` folders
+**Choice**: Recursively walk configured root directories to find `.hegel/` markers
 
 **Rationale**:
-- **Zero configuration**: No manual project registration required
-- **Always in sync**: Projects automatically appear/disappear as `.hegel/` dirs are created/removed
-- **Matches git mental model**: "Find all git repos" is familiar pattern
+- **Zero configuration**: Auto-discover from `~/Code` (default)
+- **Always in sync**: Projects appear/disappear as `.hegel/` dirs are created/removed
+- **Familiar pattern**: Matches git repository discovery mental model
+- **Configurable**: Users can override roots, max depth, exclusions
+
+**Implementation**:
+- `walkdir` crate for cross-platform directory traversal
+- Default roots: `~/Code`
+- Default exclusions: `node_modules`, `target`, `.git`, `vendor`
+- Default max depth: 10 levels
+- Stop traversal below `.hegel/` directories (nested projects)
 
 **Tradeoffs**:
-- Performance cost on large codebases (mitigated by caching, incremental scans)
-- May discover abandoned/archived projects (filterable in UI)
-- No explicit project ordering (sorted by last activity or alphabetically)
+- Performance cost on large codebases (mitigated by caching)
+- May find abandoned projects (user can filter)
+- No explicit project ordering (sorted by last activity or name)
 
 **Alternatives considered**:
-- **Manual registration**: Better control but adds friction
+- **Manual registration**: Better control but friction
 - **Config file with project list**: Requires maintenance, gets stale
-- **Watch `~/Code` for new `.hegel/` dirs**: Complex, OS-specific
+- **Watch filesystem for new `.hegel/`**: Complex, OS-specific
 
-### Decision 4: Live Updates via File Watching
+### Decision 4: Persistent Binary Cache
 
-**Choice**: Use `notify` crate to watch all discovered `.hegel/` directories
-
-**Rationale**:
-- **Real-time dashboard**: Reflects state changes within 500ms target
-- **Efficient**: Event-driven, no polling overhead
-- **Reuses hegel-cli dependency**: `notify` already in dependency tree
-
-**Tradeoffs**:
-- File descriptor limits on systems with many projects (watch selectively)
-- Cross-platform inconsistencies (fsevents vs inotify)
-- Complexity vs polling (but better UX)
-
-**Alternatives considered**:
-- **Polling every N seconds**: Simpler but wasteful, laggy UX
-- **No live updates**: Refresh on demand, poor for active development
-- **WebSocket to CLI**: Over-engineered, requires CLI process
-
-### Decision 5: Sycamore Reactive Web Framework
-
-**Choice**: Sycamore for UI rendering
+**Choice**: Cache discovered projects in `~/.config/hegel-pm/cache.bin` (bincode format)
 
 **Rationale**:
-- **Rust-native**: No JavaScript, type-safe UI code
-- **Fine-grained reactivity**: Efficient updates for live data
-- **WASM compilation**: Runs in browser or as desktop app (future: Tauri)
-
-**Tradeoffs**:
-- Smaller ecosystem vs React/Vue
-- Learning curve for contributors unfamiliar with Rust UI
-- WASM bundle size (~500KB typical)
-
-**Alternatives considered**:
-- **Yew**: More mature but coarser reactivity model
-- **Leptos**: Newer, less stable ecosystem
-- **React + Rust backend**: Split-language complexity
-
-### Decision 6: Lightweight API Responses
-
-**Choice**: Server returns aggregate summary counts, not full data arrays
-
-**Rationale**:
-- **Performance**: Minimal response sizes for fast transmission
-- **Client-side speed**: Instant JSON deserialization (no UI freezing)
-- **Bandwidth**: Minimal payload for local HTTP server
-- **Caching**: Small responses easy to cache in-memory
+- **Performance**: Subsequent discoveries complete in <100ms (vs ~2s first run)
+- **Efficiency**: Skip filesystem walking when cache is fresh
+- **Binary format**: Faster serialization/deserialization than JSON
+- **Atomic writes**: Write to temp file, rename (no corruption on crash)
 
 **Implementation**:
-- `ProjectListItem` type for `/api/projects` (name + workflow_state only, ~60-80% reduction)
-- `ProjectMetricsSummary` type with pre-computed aggregates:
-  - Counts only (tokens, events, commands, files, phases)
-  - `total_all_tokens` computed on backend (eliminates frontend arithmetic)
-- `ProjectStatistics` (full UnifiedMetrics) used server-side only
-- Response caching: serialized JSON stored per project
-- Async cache persistence: background worker with deduplication
-- Archive-aware: `parse_unified_metrics(..., include_archives=true)`
-  - Merges archived workflows with live data
-  - Uses pre-computed totals from archives
-  - Fast O(1) access vs re-parsing all JSONL logs
+- Cache structure: `HashMap<String, DiscoveredProject>` with timestamps
+- Invalidation: Check mtime of `.hegel/state.json` vs cached timestamp
+- Refresh flag: Force re-scan ignoring cache
+- Per-project caching: Only re-scan projects with stale cache entries
 
 **Tradeoffs**:
-- Less detailed data in UI (can't show individual bash commands)
-- Future drill-down features require additional endpoints
-- **Acceptable**: Dashboard summary view prioritizes speed over detail
-
-**Alternative rejected**:
-- **Full data arrays**: Caused browser freezing on large payloads (megabytes)
-
-### Decision 7: Swappable HTTP Backend Architecture
-
-**Choice**: Abstract HTTP layer with trait-based backend selection (warp or axum)
-
-**Rationale**:
-- **Framework exploration is a primary project goal**: Backend diversity equally important to functionality
-- **Flexibility**: Different backends for different deployment scenarios
-- **Compile-time selection**: Zero runtime overhead, single backend per build
-- **Future-proofing**: Easy to add new backends (hyper, actix-web) without changing data layer
-- **Performance isolation**: HTTP layer separate from data layer (worker pool)
-
-**Implementation**:
-- `HttpBackend` trait with `run()` method
-- Feature flags: `warp-backend` (default), `axum-backend`
-- Compile-time mutual exclusion (build error if both enabled)
-- Both backends delegate I/O to `data_layer::WorkerPool` via message passing
-- `ServerConfig` struct for backend-agnostic configuration
-
-**Data Layer Design**:
-- Message-passing worker pool (tokio mpsc channels)
-- Pre-serialized JSON caching (DashMap for lock-free reads)
-- Parallel cache misses (tokio::spawn for concurrent loading)
-- Zero blocking I/O in HTTP handlers (all requests → DataRequest messages)
-
-**Tradeoffs**:
-- Additional abstraction layer vs direct warp usage
-- Slightly more complex build configuration (feature flags)
-- **Non-issue**: Framework exploration is a primary project goal - abstraction enables comparison
+- Cache can become stale (manual refresh needed)
+- Disk space for cache file (minimal, ~KB per project)
+- **Acceptable**: Performance gains justify maintenance overhead
 
 **Alternatives considered**:
-- **Warp only**: Simpler but locked into single framework
-- **Runtime selection**: Higher complexity, runtime overhead
-- **Separate binaries**: Build complexity, code duplication
+- **JSON cache**: Human-readable but slower
+- **No cache**: Simple but slow for repeated use
+- **In-memory only**: Fast but state lost on restart
 
-### Decision 8: Swappable Frontend Architecture
+### Decision 5: CLI Subcommand Structure
 
-**Choice**: Support multiple frontend implementations (Sycamore, Alpine.js, React, Vue, etc.) selected at build time via environment variable
+**Choice**: Organize CLI as subcommands: `discover`, `hegel` (xargs-style)
 
 **Rationale**:
-- **Framework exploration is a primary project goal**: Equally important to building the dashboard itself
-- **Learning and experimentation**: Test different approaches (Rust/WASM, pure JS, React, Vue) in same context
-- **No TypeScript requirement**: Pure JavaScript frontends are first-class citizens (explicit project policy)
-- **Backend agnostic**: HTTP layer already serves static files - frontend choice is completely orthogonal
-- **Technology diversity**: Explore different reactive models, build tools, and development experiences
+- **Clarity**: `hegel-pm discover list` is self-documenting
+- **Extensibility**: Easy to add new command groups
+- **Consistency**: Matches `hegel` CLI patterns (subcommand-based)
 
 **Implementation**:
-- Flagship Sycamore frontend stays in `src/client/` (built with Trunk)
-- Alternative frontends in `frontends/` directory (Alpine.js, React, Vue, etc.)
-- Build scripts (`test.sh`, `restart-server.sh`) dispatch based on `FRONTEND` env var
-- All frontends output to `static/` directory and consume same API endpoints
-- Backend unchanged - serves any frontend from `static/` directory
-
-**Build Dispatch**:
 ```bash
-FRONTEND=sycamore  # trunk build --release (default)
-FRONTEND=alpine    # cp frontends/alpine/* static/
-FRONTEND=react     # cd frontends/react && npm run build
+hegel-pm discover list              # List all projects
+hegel-pm discover show <name>       # Show single project
+hegel-pm discover all               # Full table with metrics
+
+hegel-pm hegel status               # Run 'hegel status' on each project
+hegel-pm hegel analyze              # Run 'hegel analyze' on each project
 ```
 
-**API Contract**:
-- `GET /api/projects` - List all projects with summary + detail
-- `GET /api/projects/{name}/metrics` - Per-project metrics
-- All frontends consume same JSON responses (no frontend-specific endpoints)
+**Tradeoffs**:
+- More verbose than flat commands
+- **Acceptable**: Clarity and organization worth extra typing
+
+### Decision 6: Read-Only Discovery
+
+**Choice**: Discovery engine never modifies `.hegel/` directories
+
+**Rationale**:
+- **Single source of truth**: hegel-cli owns workflow state
+- **Simplicity**: No concurrent write coordination
+- **Safety**: Can't corrupt project state
+- **Clear responsibility**: Discovery reads, hegel-cli writes
 
 **Tradeoffs**:
-- More frontends = more maintenance surface (each needs updates for API changes)
-- Build script complexity (case statements for each frontend)
-- **Non-issue**: Framework exploration is a primary project goal - these costs are the point, not obstacles
-
-**Alternatives considered**:
-- **Sycamore only**: Simpler but misses opportunity to demonstrate pure JS alternatives
-- **Separate repositories**: More isolation but duplicates backend, harder to keep APIs in sync
-- **Runtime selection**: Over-engineered for static file serving use case
-
-**Current Implementations**:
-- **Sycamore** (`src/client/`) - Flagship Rust/WASM frontend, full feature set
-- **Alpine.js** (`frontends/alpine/`) - Proof-of-concept, pure JavaScript, single file, no build step
+- Can't trigger workflows from discovery
+- Must use hegel-cli for state changes
 
 ---
 
 ## System Boundaries
 
 ### Internal (hegel-pm owns)
-- **Project discovery**: Recursive filesystem walking
-- **Data layer**: Worker pool with message passing, lock-free response caching
-- **HTTP backends**: Swappable warp/axum implementations (trait-based abstraction)
-- **Web server**: Local HTTP server for dashboard (pluggable backend)
-- **UI rendering**: Sycamore components (project cards, workflow graphs, metrics charts)
-- **API layer**: Lightweight response types (`ProjectMetricsSummary`) for metrics endpoint
-- **Cache management**: Pre-serialized JSON cache (DashMap), parallel cache misses
-- **File watching**: Monitor `.hegel/` directories for changes (future feature)
-- **Configuration**: User prefs (root directory, cache location)
+- **Discovery engine**: Filesystem walking, project detection
+- **Cache management**: Persistent binary cache with atomic writes
+- **CLI commands**: List, show, query operations
+- **Library API**: `DiscoveryEngine`, `Project`, `DiscoveryConfig`
 
 ### External (dependencies on hegel-cli)
-- **State parsing**: Reuse `storage::State`, `storage::WorkflowState` structs
-- **JSONL parsing**: Reuse `metrics::hooks`, `metrics::states`, `metrics::transcript` modules
-- **Workflow definitions**: Embedded workflows from hegel-cli
-- **Theme**: Reuse `theme.rs` for consistent terminal/web colors
+- **State parsing**: `storage::State`, `storage::WorkflowState`
+- **Metrics extraction**: `metrics::parse_unified_metrics`
+- **JSONL parsing**: All hooks, states, transcripts via hegel-cli
 
 ### External (integration points)
-- **Filesystem**: Read `.hegel/` directories (user owns state)
-- **Browser**: Serve dashboard via HTTP on `localhost:PORT`
-- **Hegel CLI**: Users control workflows via CLI, PM observes changes
+- **Filesystem**: Walk directories, read `.hegel/` state files
+- **Cache file**: `~/.config/hegel-pm/cache.bin`
+- **Consumers**: hegel-pm-web, future tools
 
 ---
 
 ## Known Constraints
 
 **Performance**:
-- Auto-discover 10+ projects in <2 seconds (target: ~100-200ms per project)
-- UI updates within 500ms of `.hegel/` file changes
-- Dashboard initial load <1 second for typical workspace
-
-**Memory**:
-- <50MB memory footprint for 10 active projects
-- Bounded growth: Cache state, discard stale data
+- Discovers 10+ projects from `~/Code` in <2 seconds (first run)
+- Cached discovery completes in <100ms
+- Handles 100+ projects without degradation
 
 **Platform**:
-- macOS/Linux initially (file watching differs)
-- Windows future (notify crate abstracts platform differences)
+- macOS/Linux initially
+- Windows future (walkdir abstracts platform differences)
 
 **Compatibility**:
 - Must parse hegel-cli v0.0.4+ state files
-- Graceful degradation for older/invalid state formats
-- No breaking changes to `.hegel/` format (PM is read-only)
+- Graceful degradation for older/invalid formats
 
 **Security**:
-- Local-only (no network access)
-- Read-only filesystem access to `.hegel/` dirs
+- Local filesystem only (no network)
+- Read-only access to `.hegel/` directories
 - No code execution from parsed state
 
 ---
@@ -301,103 +215,43 @@ FRONTEND=react     # cd frontends/react && npm run build
 ## Open Questions (Discovery Phase)
 
 **Resolved**:
-- [x] **Web server choice**: Swappable backend (warp default, axum available)
-- [x] **Data layer architecture**: Message-passing worker pool with lock-free caching
-- [x] **HTTP abstraction**: Trait-based backend selection with compile-time mutual exclusion
-- [x] **Project discovery caching**: Implemented persistent cache with atomic writes
-- [x] **API optimization**:
-  - Lightweight `ProjectListItem` for project list (~60-80% reduction)
-  - `ProjectMetricsSummary` with pre-computed aggregates (total_all_tokens)
-  - Archive-aware metrics (include_archives=true, uses pre-computed totals)
-  - Pre-serialized JSON cache (DashMap) for zero-copy serving
-- [x] **Concurrent access**: Lock-free reads, parallel cache misses
-- [x] **Component structure**: Refactored to `components/` directory (sidebar.rs, metrics_view.rs)
-- [x] **Multi-project commands**: `hegel-pm hegel` xargs-style passthrough for running hegel commands across all projects
+- [x] **Caching strategy**: Binary cache with per-project invalidation
+- [x] **Discovery mechanism**: Filesystem walking with walkdir
+- [x] **CLI structure**: Subcommand-based (discover, hegel)
 
 **To Investigate**:
-- [ ] **Live update mechanism**: File watching vs manual refresh (deferred to future feature)
-- [ ] **WASM bundle optimization**: Code splitting, lazy loading for faster initial load?
-
-**No Longer Relevant**:
-- ~~**JSONL parsing performance**~~: Solved via archive system (pre-computed totals, no re-parsing)
+- [ ] **Parallel discovery**: Can filesystem walking be parallelized for large workspaces?
+- [ ] **Incremental updates**: File watching integration for real-time discovery?
 
 ---
 
 ## Non-Functional Requirements
 
 **Reliability**:
-- Crashes don't affect `.hegel/` state (read-only)
-- Graceful handling of malformed JSONL (log error, continue)
-- Auto-recovery from file watcher failures (fallback to polling)
+- Corrupted cache falls back to fresh scan
+- Malformed `.hegel/` in one project doesn't block others
+- Atomic cache writes (no corruption on crash)
 
 **Performance**:
-- Sub-second for common operations (project list, workflow state view)
-- Responsive UI updates (<100ms for user interactions)
-- Efficient incremental updates (don't re-parse entire JSONL on change)
+- Sub-second for CLI commands (via caching)
+- Efficient incremental scans (only re-scan stale projects)
 
 **Maintainability**:
 - <200 lines per implementation module (Hegel standard)
 - ≥80% line coverage (TDD discipline)
-- Reusable Sycamore components (project card, workflow graph, metrics chart)
+- Clear API boundaries
 
 **Testability**:
 - Mock filesystem for discovery tests
-- Fixture `.hegel/` directories for state parsing tests
-- Component tests for Sycamore UI logic
+- Fixture `.hegel/` directories for state tests
+- Binary cache round-trip tests
 
 **Portability**:
-- Minimal platform-specific code (abstract via `notify`, `walkdir`)
-- WASM-compatible dependencies (no native-only crates)
-
----
-
-## Phased Architecture Approach
-
-### Phase 1: Single-User Local Dashboard (Current)
-- Read-only state visualization
-- Auto-discovery from `~/Code`
-- File watching for live updates
-- Local HTTP server on `localhost:PORT`
-
-### Phase 2: Interactive Controls (Future)
-- Trigger `hegel next`, `hegel restart` from UI
-- Write operations to `.hegel/state.json`
-- Concurrent access coordination with CLI
-
-### Phase 3: Multi-User Team Dashboard (Commercial)
-- User authentication and authorization
-- Project ownership and sharing
-- Centralized state server (optional)
-- Real-time collaboration indicators
-
-**Design principle**: Build data models for Phase 3 (include user_id, project ownership) but only render Phase 1 UI.
-
----
-
-## Code Reuse Strategy
-
-**From hegel-cli** (canonical implementation):
-```rust
-// hegel-cli owns these modules, hegel-pm reuses them
-use hegel::storage::{State, WorkflowState, SessionMetadata, MetaMode};
-use hegel::metrics::{HookEvent, StateTransition, TranscriptMetrics};
-use hegel::theme::{HegelTheme, ColorPalette};
-```
-
-**New in hegel-pm** (web UI layer):
-- Sycamore UI components (project cards, workflow visualizations)
-- Web server setup (local HTTP server)
-- Project discovery logic (recursive `.hegel/` scanning)
-- File watching orchestration (live updates)
-- Dashboard layout and routing (multi-view UI)
-
-**Ownership boundary**:
-- **hegel-cli owns**: `.hegel/` format, state parsing, JSONL schemas, metrics extraction
-- **hegel-pm owns**: Web UI, HTTP server, browser rendering, dashboard layout
-- **No shared core**: Direct dependency, not extracted library
+- Cross-platform (walkdir abstracts OS differences)
+- Minimal platform-specific code
 
 ---
 
 ## Summary
 
-hegel-pm is a **web UI sidecar** to hegel-cli, not a standalone tool. It depends directly on hegel-cli for all state parsing, metrics extraction, and JSONL handling - the CLI owns the data layer, PM owns the visualization layer. This architecture prioritizes **transparency** (read-only, local-first), **code reuse** (no duplication of proven logic), and **future extensibility** (team features in data models, interactive controls later). Core unknowns center on web framework choices, file watching scalability, and Sycamore best practices - all surfaced for Discovery phase investigation.
+hegel-pm is a **library-first discovery engine** for finding and tracking Hegel projects. It walks the filesystem to locate `.hegel/` directories, extracts state via hegel-cli, and caches results for fast subsequent access. The architecture prioritizes **reusability** (clean library API for consumers), **performance** (binary caching, efficient scanning), and **consistency** (all state parsing via hegel-cli). Core unknowns center on parallelization and incremental update mechanisms.

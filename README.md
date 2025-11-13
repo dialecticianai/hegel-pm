@@ -222,27 +222,16 @@ hegel-pm/
 ├── src/
 │   ├── discovery/     # Project discovery engine
 │   │   └── README.md      # Module structure documentation
-│   ├── data_layer/    # Worker pool and caching
-│   │   └── README.md      # Data layer architecture
-│   ├── http/          # HTTP backend abstraction
-│   │   ├── warp_backend.rs   # Warp implementation
-│   │   ├── axum_backend.rs   # Axum implementation
-│   │   └── README.md         # Backend documentation
-│   ├── client/        # Sycamore WASM UI (flagship frontend)
 │   ├── cli/           # CLI commands
+│   │   └── README.md      # CLI commands documentation
 │   ├── lib.rs
 │   ├── main.rs
+│   ├── cli.rs
+│   ├── debug.rs
+│   ├── test_helpers.rs
 │   └── README.md      # Source structure overview
-├── frontends/         # Alternative frontend implementations
-│   ├── alpine/        # Alpine.js (pure JS, no build)
-│   ├── ADDING_FRONTENDS.md  # Guide for adding frontends
-│   └── README.md      # Frontends directory structure
 ├── scripts/           # Build and development scripts
-│   ├── test.sh        # Build & test (supports FRONTEND env var)
-│   ├── restart-server.sh  # Restart server (supports FRONTEND env var)
 │   └── README.md      # Scripts documentation
-├── index.html         # Trunk build template (WASM entry point)
-├── static/            # Built frontend output (served by web server)
 └── README.md
 ```
 
