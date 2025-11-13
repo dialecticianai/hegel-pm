@@ -46,9 +46,7 @@ hegel-pm discover all               # Full table with metrics
 hegel-pm remove <name>              # Remove project from cache (stop tracking)
 
 # Run hegel commands across all projects (xargs-style)
-hegel-pm hegel status               # Run 'hegel status' on each project
-hegel-pm hegel analyze              # Run 'hegel analyze' on each project
-hegel-pm hegel analyze --fix-archives --dry-run  # Dry-run archive fix
+hegel-pm x status                   # Run 'hegel status' on each project
 ```
 
 **Build from source:**
